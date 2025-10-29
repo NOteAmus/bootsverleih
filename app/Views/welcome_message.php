@@ -16,6 +16,7 @@
             --text: #333333;
             --gray: #6c757d;
             --success: #28a745;
+            --error: #e74c3c;
         }
         
         * {
@@ -85,6 +86,7 @@
             display: flex;
             list-style: none;
             gap: 30px;
+            align-items: center;
         }
         
         nav a {
@@ -130,6 +132,117 @@
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
+        }
+        
+        /* Profil Icon */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 30px;
+        }
+        
+        .profile-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), #e67e22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+        
+        .profile-dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 10px 0;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .profile-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--dark);
+            text-decoration: none;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .dropdown-menu a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary);
+        }
+        
+        .dropdown-menu a i {
+            width: 20px;
+            margin-right: 10px;
+            color: var(--gray);
+        }
+        
+        .user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 5px;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .user-email {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* Login Button falls kein Benutzer */
+        .login-btn {
+            background: var(--accent);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover {
+            background: #e6c260;
+            transform: translateY(-2px);
         }
         
         /* Hero Section */
@@ -548,6 +661,10 @@
             .weather-header {
                 display: none;
             }
+            
+            .profile-section {
+                margin-left: 15px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -574,6 +691,11 @@
             .section-title h2 {
                 font-size: 2rem;
             }
+            
+            .profile-section {
+                margin-left: 0;
+                margin-top: 10px;
+            }
         }
         
         /* Animationen */
@@ -594,7 +716,7 @@
     </style>
 </head>
 <body>
-    <!-- Header mit integriertem Wetter -->
+    <!-- Header mit dynamischem Profil-Icon -->
     <header>
         <div class="container">
             <div class="header-content">
@@ -629,7 +751,11 @@
                         <li><a href="#booking">Buchen</a></li>
                         <li><a href="#services">Services</a></li>
                         <li><a href="#features">Features</a></li>
-                        <li><a href="#contact">Kontakt</a></li>
+                        
+                        <!-- Dynamisches Profil-Icon -->
+                        <li class="profile-section" id="profileSection">
+                            <!-- Wird durch JavaScript befüllt -->
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -646,11 +772,9 @@
                     <a href="#booking" class="btn">
                         <i class="fas fa-calendar-check"></i> Jetzt buchen
                     </a>
-                    <form action="<?=route_to('register') ?>" method="get">
-                        <button type="submit" class="btn btn-secondary">
-                            <i class="fas fa-user-plus"></i> Konto erstellen
-                        </button>
-                    </form>
+                    <a href="/register" class="btn btn-secondary">
+                        <i class="fas fa-user-plus"></i> Konto erstellen
+                    </a>
                 </div>
             </div>
         </div>
@@ -972,27 +1096,90 @@
     </footer>
 
     <script>
-        // Tab-Funktionalität
+        // Benutzerdaten aus der Datenbank laden
         document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            initializePage();
+        });
+
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/current-user');
+                const data = await response.json();
+                
+                const profileSection = document.getElementById('profileSection');
+                
+                if (data.success && data.user) {
+                    // Benutzer ist eingeloggt - Profil-Icon anzeigen
+                    const user = data.user;
+                    
+                    profileSection.innerHTML = `
+                        <div class="profile-dropdown">
+                            <div class="profile-icon" id="profileInitials">${user.initials}</div>
+                            <div class="dropdown-menu">
+                                <div class="user-info">
+                                    <div class="user-name">${user.firstName} ${user.lastName}</div>
+                                    <div class="user-email">${user.email}</div>
+                                </div>
+                                <a href="/profile">
+                                    <i class="fas fa-user"></i> Mein Profil
+                                </a>
+                                <a href="/bookings">
+                                    <i class="fas fa-calendar-alt"></i> Meine Buchungen
+                                </a>
+                                <a href="/settings">
+                                    <i class="fas fa-cog"></i> Einstellungen
+                                </a>
+                                <a href="/logout">
+                                    <i class="fas fa-sign-out-alt"></i> Abmelden
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Kein Benutzer eingeloggt - Login Button anzeigen
+                    profileSection.innerHTML = `
+                        <a href="/login" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Anmelden
+                        </a>
+                    `;
+                }
+            } catch (error) {
+                console.error('Fehler beim Laden der Benutzerdaten:', error);
+                
+                // Fallback: Login Button anzeigen
+                const profileSection = document.getElementById('profileSection');
+                profileSection.innerHTML = `
+                    <a href="/login" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Anmelden
+                    </a>
+                `;
+            }
+        }
+
+        function initializePage() {
+            // Tab-Funktionalität
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Aktiven Tab entfernen
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    
-                    // Neuen aktiven Tab setzen
-                    btn.classList.add('active');
-                    const tabId = btn.getAttribute('data-tab');
-                    document.getElementById(tabId).classList.add('active');
+            if (tabBtns.length > 0) {
+                tabBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        tabBtns.forEach(b => b.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        btn.classList.add('active');
+                        const tabId = btn.getAttribute('data-tab');
+                        const tabElement = document.getElementById(tabId);
+                        if (tabElement) {
+                            tabElement.classList.add('active');
+                        }
+                    });
                 });
-            });
+            }
             
-            // Einfache Fade-In Animation beim Scrollen
+            // Fade-In Animation
             const fadeElements = document.querySelectorAll('.fade-in');
-            
             const fadeInOnScroll = function() {
                 fadeElements.forEach(element => {
                     const elementTop = element.getBoundingClientRect().top;
@@ -1005,7 +1192,6 @@
                 });
             };
             
-            // Initial alle Elemente verstecken
             fadeElements.forEach(element => {
                 element.style.opacity = "0";
                 element.style.transform = "translateY(30px)";
@@ -1013,8 +1199,22 @@
             });
             
             window.addEventListener('scroll', fadeInOnScroll);
-            fadeInOnScroll(); // Einmal beim Laden ausführen
-        });
+            fadeInOnScroll();
+
+            // Smooth Scroll für Anchor Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>
