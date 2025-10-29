@@ -7,3 +7,4 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 $routes->get('/register', 'Registration::index', ['as' => 'register']);
+$routes->post('register/submit', 'Registration::register');
