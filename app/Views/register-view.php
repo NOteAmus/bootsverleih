@@ -15,14 +15,6 @@
   <input id="password" type="password" name="password" required><br><br>
 
   <input type="submit" value="Absenden">
+  <button type="submit">Anmelden</button>
 </form>
-
-<br>
-
-<form action="<?= route_to('register') ?>" method="get">
-  <button type="submit">Registriere dich</button>
-</form>
-
-<br>
-
-<a href="<?= route_to('/') ?>">Zurück zur Startseite</a>
+<button href="<?= route_to('/') ?>">Zurück zur Startseite</button>
