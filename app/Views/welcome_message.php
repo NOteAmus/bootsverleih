@@ -44,7 +44,8 @@
         header {
             background-color: rgba(10, 46, 92, 0.98);
             color: white;
-            padding: 1.2rem 0;
+            /* reduced vertical padding to decrease toolbar height */
+            padding: 0.5rem 0;
             position: fixed;
             width: 100%;
             top: 0;
@@ -55,31 +56,35 @@
 
         .header-content {
             display: flex;
-            justify-content: space-between;
+            justify-content: center; /* center the whole header content */
             align-items: center;
+            gap: 30px; /* spacing between main blocks */
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 15px;
+            /* allow logo to size naturally so header stays centered */
+            flex: 0 1 auto;
         }
 
         .logo-icon {
-            font-size: 2rem;
+            font-size: 1.6rem;
             color: var(--accent);
         }
 
         .logo-text h1 {
-            font-size: 1.6rem;
+            font-size: 1.15rem;
             font-weight: 600;
             letter-spacing: -0.5px;
+            width: 220px;
         }
 
         .logo-text p {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             opacity: 0.8;
-            margin-top: 3px;
+            margin-top: 2px;
         }
 
         nav ul {
@@ -94,7 +99,8 @@
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
-            padding: 8px 0;
+            /* reduce vertical padding to avoid increasing header height */
+            padding: 4px 0;
             position: relative;
             transition: color 0.3s;
         }
@@ -120,18 +126,23 @@
 
         .weather-header {
             display: flex;
+            flex-direction: row;
             align-items: center;
-            gap: 20px;
-            margin-left: 30px;
-            padding-left: 30px;
+            gap: 30px; /* more space between items */
+            margin-left: 0; /* no extra left spacing so it centers well */
+            padding-left: 12px;
             border-left: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: nowrap; /* keep items on one line */
+            font-size: 1rem; /* slightly larger for readability */
         }
 
         .weather-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            gap: 10px; /* slightly wider gap inside item */
+            font-size: 1rem;
+            white-space: nowrap; /* prevent line breaks inside each item */
+            padding: 0 6px; /* breathing room around each item */
         }
         
         /* Profil Icon */
@@ -143,15 +154,15 @@
         }
         
         .profile-icon {
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--accent), #e67e22);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--primary);
             cursor: pointer;
             transition: all 0.3s ease;
@@ -732,16 +743,27 @@
 
                 <div class="weather-header">
                     <div class="weather-item">
+                        <?php
+                            $tc = isset($weather['temperature_c']) ? $weather['temperature_c'] : null;
+                            $tf = isset($weather['temperature_f']) ? $weather['temperature_f'] : null;
+                            $prec = isset($weather['precipitation_probability']) ? $weather['precipitation_probability'] : null;
+                            $hum = isset($weather['humidity']) ? $weather['humidity'] : null;
+                            $wind = isset($weather['windspeed']) ? $weather['windspeed'] : null;
+                        ?>
                         <i class="fas fa-thermometer-half"></i>
-                        <span>22°C</span>
+                        <span style="font-weight:700"><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></span>
                     </div>
-                    <div class="weather-item">
+                    <div class="weather-item" style="margin-left:12px;">
+                        <i class="fas fa-cloud-showers-heavy"></i>
+                        <span><?= $prec !== null ? 'Niederschlag: ' . $prec . '%' : 'Niederschlag: n.v.' ?></span>
+                    </div>
+                    <div class="weather-item" style="margin-left:12px;">
+                        <i class="fas fa-tint"></i>
+                        <span><?= $hum !== null ? 'Luftfeuchte: ' . $hum . '%' : 'Luftfeuchte: n.v.' ?></span>
+                    </div>
+                    <div class="weather-item" style="margin-left:12px;">
                         <i class="fas fa-wind"></i>
-                        <span>12 km/h</span>
-                    </div>
-                    <div class="weather-item">
-                        <i class="fas fa-sun"></i>
-                        <span>Sonnig</span>
+                        <span><?= $wind !== null ? 'Wind: ' . $wind . ' km/h' : 'Wind: n.v.' ?></span>
                     </div>
                 </div>
 
@@ -890,46 +912,31 @@
                     </a>
                 </div>
                 <div class="weather-info fade-in">
+                    <?php
+                        // determine a simple icon class based on weathercode
+                        $iconClass = 'fa-sun';
+                        if (isset($weather['weathercode'])) {
+                            $wc = (int) $weather['weathercode'];
+                            if (in_array($wc, [1,2,3,45,48])) $iconClass = 'fa-cloud-sun';
+                            if (in_array($wc, [51,53,55,61,63,65,80,81,82])) $iconClass = 'fa-cloud-rain';
+                            if (in_array($wc, [71,73,75,85,86])) $iconClass = 'fa-snowflake';
+                            if (in_array($wc, [95,96,99])) $iconClass = 'fa-bolt';
+                        }
+                    ?>
                     <div class="weather-header-large">
                         <div>
                             <h3>Plau am See</h3>
-                            <p>Heute, 15. Juni</p>
+                            <p>Heute, <?= date('j. F') ?></p>
                         </div>
                         <div class="weather-icon">
-                            <i class="fas fa-sun" style="font-size: 2.5rem;"></i>
+                            <i class="fas <?= $iconClass ?>" style="font-size: 2.5rem;"></i>
                         </div>
                     </div>
-                    <div class="weather-temp">22°C</div>
-                    <p>Sonnig, leichter Wind aus Nordost</p>
-                    <div class="weather-details">
-                        <div class="weather-detail-item">
-                            <i class="fas fa-wind"></i>
-                            <div>
-                                <p>Wind</p>
-                                <p>12 km/h</p>
-                            </div>
-                        </div>
-                        <div class="weather-detail-item">
-                            <i class="fas fa-tint"></i>
-                            <div>
-                                <p>Luftfeuchtigkeit</p>
-                                <p>65%</p>
-                            </div>
-                        </div>
-                        <div class="weather-detail-item">
-                            <i class="fas fa-water"></i>
-                            <div>
-                                <p>Wassertemperatur</p>
-                                <p>18°C</p>
-                            </div>
-                        </div>
-                        <div class="weather-detail-item">
-                            <i class="fas fa-sun"></i>
-                            <div>
-                                <p>UV-Index</p>
-                                <p>5 (Mittel)</p>
-                            </div>
-                        </div>
+                    <div class="weather-temp"><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></div>
+                    <div style="margin-top:12px; font-size:0.95rem;">
+                        <div style="margin-bottom:6px;">Niederschlag: <?= $prec !== null ? $prec . '%' : 'n.v.' ?></div>
+                        <div style="margin-bottom:6px;">Luftfeuchte: <?= $hum !== null ? $hum . '%' : 'n.v.' ?></div>
+                        <div>Wind: <?= $wind !== null ? $wind . ' km/h' : 'n.v.' ?></div>
                     </div>
                 </div>
             </div>
