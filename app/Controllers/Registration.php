@@ -34,11 +34,20 @@ class Registration extends Controller
         ];
 
         if ($userModel->save($data)) {
-            return view('register_success', [
-                'firstName' => $data['vorname'],
-                'lastName'  => $data['nachname'],
-                'email'     => $data['email']
-            ]);
+            // Benutzer aus DB holen (inkl. ID)
+            $user = $userModel->where('email', $data['email'])->first();
+
+            // Session setzen (eingeloggt)
+            if ($user) {
+                session()->set('user', [
+                    'id' => $user['id'],
+                    'firstName' => $user['vorname'],
+                    'lastName'  => $user['nachname'],
+                    'email'     => $user['email']
+                ]);
+            }
+
+            return redirect()->to(site_url('/'));
         } else {
             return redirect()->to(site_url('register'))
                             ->withInput()

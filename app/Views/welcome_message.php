@@ -1010,6 +1010,7 @@
                 const data = await response.json();
                 
                 const profileSection = document.getElementById('profileSection');
+                const createAccountBtn = document.querySelector('.cta-buttons .btn-secondary');
                 
                 if (data.success && data.user) {
                     // Benutzer ist eingeloggt - Profil-Icon anzeigen
@@ -1038,6 +1039,8 @@
                             </div>
                         </div>
                     `;
+                    // Verstecke den "Konto erstellen" Button, falls vorhanden
+                    if (createAccountBtn) createAccountBtn.style.display = 'none';
                 } else {
                     // Kein Benutzer eingeloggt - Login Button anzeigen
                     profileSection.innerHTML = `
@@ -1045,6 +1048,7 @@
                             <i class="fas fa-sign-in-alt"></i> Anmelden
                         </a>
                     `;
+                    if (createAccountBtn) createAccountBtn.style.display = '';
                 }
             } catch (error) {
                 console.error('Fehler beim Laden der Benutzerdaten:', error);
@@ -1056,6 +1060,8 @@
                         <i class="fas fa-sign-in-alt"></i> Anmelden
                     </a>
                 `;
+                const createAccountBtn = document.querySelector('.cta-buttons .btn-secondary');
+                if (createAccountBtn) createAccountBtn.style.display = '';
             }
         }
 
