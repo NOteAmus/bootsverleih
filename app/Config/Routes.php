@@ -12,3 +12,4 @@ $routes->get('/login', 'Login::index');
 $routes->post('/login/submit', 'Login::authenticate');
 $routes->get('/logout', 'Login::logout');
 $routes->get('/api/current-user', 'ApiCurrentUser::getCurrentUser');
+$routes->get('/booking', 'Booking::index');
