@@ -436,95 +436,169 @@
             font-weight: normal;
         }
 
+        /* Verbesserte Services Section */
+        .services {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 1;
+        }
+
+        .service-card:hover::before {
+            opacity: 0.03;
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+            height: 90px;
+            width: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(10, 46, 92, 0.1) 0%, transparent 100%);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        .service-card p {
+            color: var(--gray);
+            line-height: 1.7;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Verbesserte Features Section */
         .features {
-            padding: 80px 0;
-            background-color: #f5f7fa;
+            padding: 100px 0;
+            background-color: white;
         }
 
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
         }
 
         .feature-card {
             background-color: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 40px 30px;
             text-align: center;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
         }
 
         .feature-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: rgba(10, 46, 92, 0.1);
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1);
         }
 
         .feature-icon {
-            font-size: 2.5rem;
+            font-size: 3rem;
             color: var(--primary);
             margin-bottom: 25px;
-            height: 80px;
-            width: 80px;
+            height: 90px;
+            width: 90px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: rgba(10, 46, 92, 0.05);
+            background: linear-gradient(135deg, rgba(10, 46, 92, 0.1) 0%, transparent 100%);
             border-radius: 50%;
             margin: 0 auto 25px;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
         }
 
         .feature-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
             color: var(--dark);
             font-weight: 600;
         }
 
         .feature-card p {
             color: var(--gray);
-            line-height: 1.6;
-        }
-
-        /* Services Section */
-        .services {
-            padding: 100px 0;
-            background-color: white;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-
-        .service-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary);
-        }
-
-        .service-card:hover {
-            background-color: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .service-icon {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .service-card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--dark);
+            line-height: 1.7;
         }
 
         /* Weather Footer Section */
@@ -707,6 +781,11 @@
                 margin-left: 0;
                 margin-top: 10px;
             }
+            
+            .services-grid,
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Animationen */
@@ -774,9 +853,49 @@
                         <li><a href="#services">Services</a></li>
                         <li><a href="#features">Features</a></li>
                         
-                        <!-- Dynamisches Profil-Icon -->
+                        <!-- Dynamisches Profil-Icon (serverseitig mit Session-Service) -->
                         <li class="profile-section" id="profileSection">
-                            <!-- Wird durch JavaScript befüllt -->
+                            <?php
+                                $session = service('session');
+                                $user = $session ? $session->get('user') : null;
+
+                                if ($user) {
+                                    $initials = '';
+                                    if (!empty($user['initials'])) {
+                                        $initials = $user['initials'];
+                                    } else {
+                                        $fn = isset($user['firstName']) ? $user['firstName'] : '';
+                                        $ln = isset($user['lastName']) ? $user['lastName'] : '';
+                                        $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
+                                    }
+
+                                    echo '<div class="profile-dropdown">\n'
+                                        . '<div class="profile-icon" id="profileInitials">' . esc($initials) . '</div>\n'
+                                        . '<div class="dropdown-menu">\n'
+                                            . '<div class="user-info">\n'
+                                                . '<div class="user-name">' . esc($user['firstName'] ?? '') . ' ' . esc($user['lastName'] ?? '') . '</div>\n'
+                                                . '<div class="user-email">' . esc($user['email'] ?? '') . '</div>\n'
+                                            . '</div>\n'
+                                            . '<a href="' . site_url('profile') . '">\n'
+                                                . '<i class="fas fa-user"></i> Mein Profil\n'
+                                            . '</a>\n'
+                                            . '<a href="' . site_url('bookings') . '">\n'
+                                                . '<i class="fas fa-calendar-alt"></i> Meine Buchungen\n'
+                                            . '</a>\n'
+                                            . '<a href="' . site_url('settings') . '">\n'
+                                                . '<i class="fas fa-cog"></i> Einstellungen\n'
+                                            . '</a>\n'
+                                            . '<a href="' . site_url('logout') . '">\n'
+                                                . '<i class="fas fa-sign-out-alt"></i> Abmelden\n'
+                                            . '</a>\n'
+                                        . '</div>\n'
+                                    . '</div>';
+                                } else {
+                                    echo '<a href="' . site_url('login') . '" class="login-btn">\n'
+                                        . '<i class="fas fa-sign-in-alt"></i> Anmelden\n'
+                                    . '</a>';
+                                }
+                            ?>
                         </li>
                     </ul>
                 </nav>
@@ -899,6 +1018,60 @@
         </div>
     </section>
 
+    <!-- Verbesserte Services Section -->
+    <section class="services" id="services">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Unsere Services</h2>
+                <p>Profitieren Sie von unseren umfangreichen Dienstleistungen rund um den Yachthafen und Bootsverleih.</p>
+            </div>
+            <div class="services-grid">
+                <div class="service-card fade-in">
+                    <div class="service-icon"><i class="fas fa-anchor"></i></div>
+                    <h3>Liegeplatzverwaltung</h3>
+                    <p>Digitale Verwaltung und Buchung von Liegeplätzen – einfach, schnell und transparent. Verwalten Sie Ihre Liegeplätze bequem online und sparen Sie Zeit und Aufwand.</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon"><i class="fas fa-ship"></i></div>
+                    <h3>Bootsverleih</h3>
+                    <p>Wählen Sie aus einer Vielzahl moderner Boote für Ihren perfekten Tag auf dem Wasser. Von Segelbooten bis zu Motorbooten - für jeden Anlass das passende Boot.</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon"><i class="fas fa-life-ring"></i></div>
+                    <h3>Rundum-Service</h3>
+                    <p>Von der Einweisung bis zum technischen Support – wir sind für Sie da. Unser Team steht Ihnen mit Rat und Tat zur Seite für ein sorgenfreies Bootserlebnis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Verbesserte Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>Unsere Features</h2>
+                <p>Entdecken Sie die Vorteile unseres modernen Yachthafens und digitalen Services.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Online-Buchung</h3>
+                    <p>Buchen Sie Liegeplätze und Boote bequem online – jederzeit und überall. Unser benutzerfreundliches System macht die Buchung zum Kinderspiel.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-wifi"></i></div>
+                    <h3>WLAN am Steg</h3>
+                    <p>Bleiben Sie auch auf dem Wasser immer verbunden mit kostenlosem WLAN. Schnelle Internetverbindung an jedem Liegeplatz.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Sichere Anlage</h3>
+                    <p>Modernste Sicherheitsstandards für Ihr Boot und Ihre Daten. Videoüberwachung und Sicherheitspersonal rund um die Uhr.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Weather Footer Section -->
     <section class="weather-footer">
         <div class="container">
@@ -973,7 +1146,7 @@
                     <ul>
                         <li><a href="#">Startseite</a></li>
                         <li><a href="#booking">Buchen</a></li>
-                        <li><a href="#features"><Wetter></Wetter></a></li>
+                        <li><a href="#features">Features</a></li>
                         <li><a href="#">AGB</a></li>
                         <li><a href="#">Datenschutz</a></li>
                     </ul>
