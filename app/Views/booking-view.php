@@ -770,32 +770,39 @@
                 <div class="dock-label" style="top: 40px; left: 48%;">Standard</div>
                 <div class="dock-label" style="top: 40px; left: 63%;">Economy</div>
                 
-                <!-- Slots - Reihe A (Premium) -->
-                <div class="slot premium" style="top: 95px; left: 16%;" data-slot="A1">A1</div>
-                <div class="slot premium occupied" style="top: 140px; left: 16%;" data-slot="A2">A2</div>
-                <div class="slot premium" style="top: 185px; left: 16%;" data-slot="A3">A3</div>
-                <div class="slot premium" style="top: 230px; left: 16%;" data-slot="A4">A4</div>
+                <!-- Slots - Dynamisch aus Datenbank generiert -->
+                <?php 
+                // Slots gruppieren nach Reihe
+                $slotsByRow = [];
+                foreach ($slots as $slot) {
+                    $slotsByRow[$slot['row']][] = $slot;
+                }
                 
-                <!-- Slots - Reihe B (Komfort) -->
-                <div class="slot comfort" style="top: 95px; left: 31%;" data-slot="B1">B1</div>
-                <div class="slot comfort" style="top: 140px; left: 31%;" data-slot="B2">B2</div>
-                <div class="slot comfort occupied" style="top: 185px; left: 31%;" data-slot="B3">B3</div>
-                <div class="slot comfort" style="top: 230px; left: 31%;" data-slot="B4">B4</div>
-                <div class="slot comfort" style="top: 275px; left: 31%;" data-slot="B5">B5</div>
+                // Position-Mapping für visuelle Darstellung
+                $rowPositions = ['A' => '16%', 'B' => '31%', 'C' => '46%', 'D' => '61%'];
+                $topStart = 95;
+                $topIncrement = 45;
                 
-                <!-- Slots - Reihe C (Standard) -->
-                <div class="slot standard" style="top: 95px; left: 46%;" data-slot="C1">C1</div>
-                <div class="slot standard" style="top: 140px; left: 46%;" data-slot="C2">C2</div>
-                <div class="slot standard" style="top: 185px; left: 46%;" data-slot="C3">C3</div>
-                <div class="slot standard occupied" style="top: 230px; left: 46%;" data-slot="C4">C4</div>
-                <div class="slot standard" style="top: 275px; left: 46%;" data-slot="C5">C5</div>
-                <div class="slot standard" style="top: 320px; left: 46%;" data-slot="C6">C6</div>
+                // Einige Slots als occupied markieren (simuliert)
+                $occupiedSlots = ['A2', 'B3', 'C4', 'D2'];
                 
-                <!-- Slots - Reihe D (Economy) -->
-                <div class="slot economy" style="top: 95px; left: 61%;" data-slot="D1">D1</div>
-                <div class="slot economy occupied" style="top: 140px; left: 61%;" data-slot="D2">D2</div>
-                <div class="slot economy" style="top: 185px; left: 61%;" data-slot="D3">D3</div>
-                <div class="slot economy" style="top: 230px; left: 61%;" data-slot="D4">D4</div>
+                foreach ($slotsByRow as $row => $rowSlots):
+                    $leftPos = $rowPositions[$row] ?? '16%';
+                    foreach ($rowSlots as $index => $slot):
+                        $topPos = $topStart + ($slot['position'] - 1) * $topIncrement;
+                        $isOccupied = in_array($slot['slot_number'], $occupiedSlots);
+                        $occupiedClass = $isOccupied ? ' occupied' : '';
+                ?>
+                <div class="slot <?= strtolower($slot['category']) ?><?= $occupiedClass ?>" 
+                     style="top: <?= $topPos ?>px; left: <?= $leftPos ?>;" 
+                     data-slot-id="<?= $slot['id'] ?>"
+                     data-slot="<?= $slot['slot_number'] ?>">
+                    <?= $slot['slot_number'] ?>
+                </div>
+                <?php 
+                    endforeach;
+                endforeach;
+                ?>
                 
                 <!-- Boote auf dem Wasser -->
                 <div class="boat-on-water" style="top: 135px; left: 20%;" data-slot="A2">
@@ -941,12 +948,11 @@
                         <label for="selectedBoat"><i class="fas fa-ship"></i> Gewünschtes Boot auswählen</label>
                         <select id="selectedBoat" name="boat_id" required>
                             <option value="">Bitte ein Boot auswählen...</option>
-                            <option value="1" data-price="350">Bavaria Cruiser 37 (Segelyacht - €350/Tag)</option>
-                            <option value="2" data-price="320">Hanse 388 (Segelyacht - €320/Tag)</option>
-                            <option value="3" data-price="280">Jeanneau Sun Odyssey 349 (Segelyacht - €280/Tag)</option>
-                            <option value="4" data-price="220">Quicksilver Activ 675 (Motorboot - €220/Tag)</option>
-                            <option value="5" data-price="180">Bayliner VR6 (Motorboot - €180/Tag)</option>
-                            <option value="6" data-price="90">Zodiac Cadet 310 (Schlauchboot - €90/Tag)</option>
+                            <?php foreach ($boats as $boat): ?>
+                                <option value="<?= $boat['id'] ?>" data-price="<?= $boat['price_per_day'] ?>">
+                                    <?= esc($boat['name']) ?> (<?= esc($boat['boat_type']) ?> - €<?= number_format($boat['price_per_day'], 0) ?>/Tag)
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group full-width">
@@ -1020,7 +1026,8 @@
     
     document.querySelectorAll('.slot:not(.occupied)').forEach(slot => {
         slot.addEventListener('click', function() {
-            const slotId = this.getAttribute('data-slot');
+            const slotId = this.getAttribute('data-slot-id'); // Echte DB-ID
+            const slotNumber = this.getAttribute('data-slot'); // Anzeigename (A1, B2, etc.)
             
             // Vorherige Auswahl entfernen
             if (selectedSlot) {
@@ -1030,7 +1037,8 @@
             // Neue Auswahl setzen
             this.classList.add('selected');
             selectedSlot = this;
-            document.getElementById('selectedSlot').value = slotId;
+            document.getElementById('selectedSlot').value = slotNumber; // Anzeige für User
+            document.getElementById('selectedSlot').setAttribute('data-id', slotId); // Echte ID für API
             
             // Zum Formular scrollen
             document.getElementById('slotReservationForm').scrollIntoView({ 
@@ -1119,33 +1127,55 @@
     document.getElementById('slotReservationForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const slotId = document.getElementById('selectedSlot').value;
+        const slotInput = document.getElementById('selectedSlot');
+        const slotId = slotInput.getAttribute('data-id'); // Echte DB-ID
+        
         if (!slotId) {
             alert('Bitte wählen Sie zuerst einen Liegeplatz aus der Marina-Ansicht aus.');
             return;
         }
         
-        const reservationNumber = 'SLOT-' + Date.now().toString().slice(-6);
-        const name = document.getElementById('slotCustomerName').value;
-        const dates = document.getElementById('slotStartDate').value + ' bis ' + document.getElementById('slotEndDate').value;
+        // Formular-Daten sammeln
+        const formData = {
+            item_id: parseInt(slotId), // Echte DB-ID als Integer
+            customer_name: document.getElementById('slotCustomerName').value,
+            customer_email: document.getElementById('slotCustomerEmail').value,
+            customer_phone: document.getElementById('slotCustomerPhone').value,
+            start_date: document.getElementById('slotStartDate').value,
+            end_date: document.getElementById('slotEndDate').value,
+            payment_method: 'paypal'
+        };
+
+        // Ladeanzeige
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
         
-        // Erfolgsmeldung
-        alert(`✅ Liegeplatz erfolgreich reserviert!\n\nReservierungsnummer: ${reservationNumber}\nName: ${name}\nLiegeplatz: ${slotId}\nZeitraum: ${dates}\n\nEine Bestätigung wurde an Ihre E-Mail gesendet.`);
-        
-        // Formular zurücksetzen
-        this.reset();
-        document.getElementById('selectedSlot').value = '';
-        
-        if (selectedSlot) {
-            selectedSlot.classList.remove('selected');
-            selectedSlot = null;
-        }
-        
-        // Heutiges Datum wieder setzen
-        const today = new Date().toISOString().split('T')[0];
-        document.querySelectorAll('#slotReservationForm input[type="date"]').forEach(input => {
-            input.value = today;
-            input.min = today;
+        // API-Aufruf
+        fetch('/booking/makeSlotReservation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Zur Payment-Seite weiterleiten
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Fehler: ' + (data.message || 'Reservierung konnte nicht erstellt werden'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Fehler bei der Reservierung. Bitte versuchen Sie es erneut.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
         });
     });
 
@@ -1158,19 +1188,50 @@
             return;
         }
         
-        const boatName = boatSelect.options[boatSelect.selectedIndex].text;
-        const boatPrice = boatSelect.options[boatSelect.selectedIndex].getAttribute('data-price');
-        const customerName = document.getElementById('boatCustomerName').value;
-        const customerEmail = document.getElementById('boatCustomerEmail').value;
-        const customerPhone = document.getElementById('boatCustomerPhone').value;
-        const startDate = document.getElementById('boatStartDate').value;
-        const endDate = document.getElementById('boatEndDate').value;
-        const experience = document.getElementById('boatExperience').value;
-        const equipment = document.getElementById('boatRequests').value;
+        // Formular-Daten sammeln
+        const formData = {
+            item_id: parseInt(boatSelect.value),
+            customer_name: document.getElementById('boatCustomerName').value,
+            customer_email: document.getElementById('boatCustomerEmail').value,
+            customer_phone: document.getElementById('boatCustomerPhone').value,
+            start_date: document.getElementById('boatStartDate').value,
+            end_date: document.getElementById('boatEndDate').value,
+            experience_level: document.getElementById('boatExperience').value,
+            additional_equipment: document.getElementById('boatRequests').value,
+            payment_method: 'paypal'
+        };
+
+        // Ladeanzeige
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
         
-        // Zur Zahlungsseite weiterleiten mit allen Buchungsdaten
-        const paymentUrl = `/payment?boat=${encodeURIComponent(boatName)}&name=${encodeURIComponent(customerName)}&email=${encodeURIComponent(customerEmail)}&phone=${encodeURIComponent(customerPhone)}&start=${startDate}&end=${endDate}&price=${boatPrice}&experience=${encodeURIComponent(experience)}&equipment=${encodeURIComponent(equipment)}`;
-        window.location.href = paymentUrl;
+        // API-Aufruf
+        fetch('/booking/makeBoatReservation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Zur Payment-Seite weiterleiten
+                window.location.href = data.redirect_url;
+            } else {
+                alert('Fehler: ' + (data.message || 'Reservierung konnte nicht erstellt werden'));
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Fehler bei der Reservierung. Bitte versuchen Sie es erneut.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+        });
     });
 
     // Datumseingaben vorbelegen

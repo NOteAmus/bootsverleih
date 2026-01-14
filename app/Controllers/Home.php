@@ -18,91 +18,77 @@ class Home extends BaseController
         return view('welcome_message', ['weather' => $weather]);
     }
 
-    public function payment(): string
+    public function payment($reservationId = null): string
     {
-        return view('payment-view');
+        if (!$reservationId) {
+            return redirect()->to('/booking')->with('error', 'Keine Reservierung gefunden');
+        }
+
+        $reservationModel = new \App\Models\ReservationModel();
+        $reservation = $reservationModel->find($reservationId);
+
+        if (!$reservation) {
+            return redirect()->to('/booking')->with('error', 'Reservierung nicht gefunden');
+        }
+
+        if ($reservation['payment_status'] === 'paid') {
+            return redirect()->to('/my-bookings')->with('info', 'Diese Reservierung wurde bereits bezahlt');
+        }
+
+        return view('payment-view', ['reservation' => $reservation]);
     }
 
     public function processPayment()
     {
         $reservationModel = new \App\Models\ReservationModel();
 
-        // Daten aus POST holen
-        $boatName = $this->request->getPost('boat');
-        $customerName = $this->request->getPost('name');
-        $customerEmail = $this->request->getPost('email');
-        $customerPhone = $this->request->getPost('phone');
-        $startDate = $this->request->getPost('start');
-        $endDate = $this->request->getPost('end');
-        $pricePerDay = $this->request->getPost('price');
-        $experienceLevel = $this->request->getPost('experience');
-        $additionalEquipment = $this->request->getPost('equipment');
+        // Reservierungs-ID aus POST holen
+        $reservationId = $this->request->getPost('reservation_id');
         $paymentMethod = $this->request->getPost('payment_method');
 
-        // Tage berechnen
-        $start = new \DateTime($startDate);
-        $end = new \DateTime($endDate);
-        $days = $start->diff($end)->days;
-        if ($days < 1) $days = 1;
-
-        // Preise berechnen
-        $boatPrice = $pricePerDay * $days;
-        $serviceFee = 25;
-        $insurance = 35;
-        $totalAmount = $boatPrice + $serviceFee + $insurance;
-
-        // Reservierungsnummer generieren
-        $reservationNumber = $reservationModel->generateReservationNumber();
-
-        // User ID aus Session holen
-        $session = session();
-        $userId = $session->get('user')['id'] ?? null;
-
-        if (!$userId) {
+        if (!$reservationId) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Sie müssen eingeloggt sein, um eine Buchung vorzunehmen.',
+                'message' => 'Keine Reservierungs-ID angegeben'
             ]);
         }
 
-        // Daten in Datenbank speichern
-        $data = [
-            'user_id' => $userId,
-            'reservation_number' => $reservationNumber,
-            'customer_name' => $customerName,
-            'customer_email' => $customerEmail,
-            'customer_phone' => $customerPhone,
-            'boat_name' => $boatName,
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'days' => $days,
-            'price_per_day' => $pricePerDay,
-            'boat_price' => $boatPrice,
-            'service_fee' => $serviceFee,
-            'insurance' => $insurance,
-            'total_amount' => $totalAmount,
-            'payment_method' => $paymentMethod ?? 'paypal',
+        // Reservierung laden
+        $reservation = $reservationModel->find($reservationId);
+
+        if (!$reservation) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Reservierung nicht gefunden'
+            ]);
+        }
+
+        if ($reservation['payment_status'] === 'paid') {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Diese Reservierung wurde bereits bezahlt'
+            ]);
+        }
+
+        // Zahlungsstatus aktualisieren
+        $updateData = [
             'payment_status' => 'paid',
-            'experience_level' => $experienceLevel,
-            'additional_equipment' => $additionalEquipment,
+            'payment_method' => $paymentMethod
         ];
 
-        try {
-            $reservationModel->insert($data);
-            
-            // Erfolg zurückgeben
+        if ($reservationModel->update($reservationId, $updateData)) {
             return $this->response->setJSON([
                 'success' => true,
-                'reservation_number' => $reservationNumber,
-                'total_amount' => $totalAmount,
-            ]);
-        } catch (\Exception $e) {
-            // Fehler zurückgeben
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Fehler beim Speichern der Reservierung: ' . $e->getMessage(),
+                'message' => 'Zahlung erfolgreich',
+                'reservation_number' => $reservation['reservation_number'],
+                'reservation_type' => $reservation['reservation_type']
             ]);
         }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Fehler beim Aktualisieren der Reservierung'
+        ]);
     }
 
     public function myBookings(): string

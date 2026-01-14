@@ -350,8 +350,13 @@
 
                         <div class="boat-info">
                             <div class="boat-name">
-                                <i class="fas fa-ship"></i>
-                                <?= esc($booking['boat_name']) ?>
+                                <?php if ($booking['reservation_type'] === 'boot'): ?>
+                                    <i class="fas fa-ship"></i>
+                                    <?= esc($booking['item_name'] ?? $booking['boat_name']) ?>
+                                <?php else: ?>
+                                    <i class="fas fa-anchor"></i>
+                                    Liegeplatz <?= esc($booking['slot_number'] ?? $booking['item_name']) ?>
+                                <?php endif; ?>
                             </div>
                         </div>
 

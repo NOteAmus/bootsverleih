@@ -521,7 +521,8 @@
                             <tr>
                                 <th>Reservierungs-Nr.</th>
                                 <th>Kunde</th>
-                                <th>Boot</th>
+                                <th>Typ</th>
+                                <th>Boot / Liegeplatz</th>
                                 <th>Zeitraum</th>
                                 <th>Tage</th>
                                 <th>Betrag</th>
@@ -540,7 +541,20 @@
                                         <strong><?= esc($booking['customer_name']) ?></strong><br>
                                         <small style="color: var(--text-light);"><?= esc($booking['customer_email']) ?></small>
                                     </td>
-                                    <td><?= esc($booking['boat_name']) ?></td>
+                                    <td>
+                                        <?php if ($booking['reservation_type'] === 'boot'): ?>
+                                            <i class="fas fa-ship"></i> Boot
+                                        <?php else: ?>
+                                            <i class="fas fa-anchor"></i> Liegeplatz
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if ($booking['reservation_type'] === 'boot'): ?>
+                                            <?= esc($booking['item_name'] ?? $booking['boat_name']) ?>
+                                        <?php else: ?>
+                                            Liegeplatz <?= esc($booking['slot_number'] ?? $booking['item_name']) ?>
+                                        <?php endif; ?>
+                                    </td>
                                     <td>
                                         <?= date('d.m.Y', strtotime($booking['start_date'])) ?><br>
                                         <small style="color: var(--text-light);">bis <?= date('d.m.Y', strtotime($booking['end_date'])) ?></small>

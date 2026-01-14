@@ -15,6 +15,8 @@ class ReservationModel extends Model
     protected $allowedFields = [
         'user_id',
         'reservation_number',
+        'reservation_type',
+        'item_id',
         'customer_name',
         'customer_email',
         'customer_phone',
@@ -74,10 +76,12 @@ class ReservationModel extends Model
     /**
      * Generate unique reservation number
      */
-    public function generateReservationNumber(): string
+    public function generateReservationNumber(string $type = 'boot'): string
     {
+        $prefix = $type === 'liegeplatz' ? 'BERTH-' : 'BOAT-';
+        
         do {
-            $number = 'BOAT-' . date('Ymd') . '-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
+            $number = $prefix . date('Ymd') . '-' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
         } while ($this->where('reservation_number', $number)->first());
 
         return $number;
@@ -98,8 +102,10 @@ class ReservationModel extends Model
      */
     public function getUserReservations(int $userId): array
     {
-        return $this->where('user_id', $userId)
-            ->orderBy('created_at', 'DESC')
+        return $this->select('reservations.*, items.name as item_name, items.type as item_type, items.slot_number')
+            ->join('items', 'items.id = reservations.item_id', 'left')
+            ->where('reservations.user_id', $userId)
+            ->orderBy('reservations.created_at', 'DESC')
             ->findAll();
     }
 
@@ -116,8 +122,9 @@ class ReservationModel extends Model
      */
     public function getAllReservationsWithUser(): array
     {
-        return $this->select('reservations.*, users.vorname, users.nachname, users.email as user_email')
+        return $this->select('reservations.*, users.vorname, users.nachname, users.email as user_email, items.name as item_name, items.type as item_type, items.slot_number')
             ->join('users', 'users.id = reservations.user_id', 'left')
+            ->join('items', 'items.id = reservations.item_id', 'left')
             ->orderBy('reservations.created_at', 'DESC')
             ->findAll();
     }
@@ -128,5 +135,74 @@ class ReservationModel extends Model
     public function cancelReservation(int $id): bool
     {
         return $this->update($id, ['payment_status' => 'cancelled']);
+    }
+
+    /**
+     * Get all boat reservations
+     */
+    public function getBoatReservations(int $userId = null): array
+    {
+        $builder = $this->where('reservation_type', 'boot');
+        
+        if ($userId !== null) {
+            $builder->where('user_id', $userId);
+        }
+        
+        return $builder->orderBy('created_at', 'DESC')->findAll();
+    }
+
+    /**
+     * Get all berth reservations (Liegeplätze)
+     */
+    public function getBerthReservations(int $userId = null): array
+    {
+        $builder = $this->where('reservation_type', 'liegeplatz');
+        
+        if ($userId !== null) {
+            $builder->where('user_id', $userId);
+        }
+        
+        return $builder->orderBy('created_at', 'DESC')->findAll();
+    }
+
+    /**
+     * Get reservations by type
+     */
+    public function getReservationsByType(string $type, int $userId = null): array
+    {
+        $builder = $this->where('reservation_type', $type);
+        
+        if ($userId !== null) {
+            $builder->where('user_id', $userId);
+        }
+        
+        return $builder->orderBy('created_at', 'DESC')->findAll();
+    }
+
+    /**
+     * Get reservations for a specific item
+     */
+    public function getItemReservations(int $itemId): array
+    {
+        return $this->where('item_id', $itemId)
+            ->where('payment_status !=', 'cancelled')
+            ->orderBy('start_date', 'ASC')
+            ->findAll();
+    }
+
+    /**
+     * Check if an item is available for the given date range
+     */
+    public function isItemAvailable(int $itemId, string $startDate, string $endDate): bool
+    {
+        $overlapping = $this->where('item_id', $itemId)
+            ->where('payment_status !=', 'cancelled')
+            ->groupStart()
+                ->where('start_date <=', $endDate)
+                ->where('end_date >=', $startDate)
+            ->groupEnd()
+            ->countAllResults();
+        
+        return $overlapping === 0;
     }
 }

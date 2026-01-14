@@ -449,39 +449,35 @@
     </div>
 
     <script>
-        // Buchungsdaten aus URL-Parametern holen
-        const urlParams = new URLSearchParams(window.location.search);
+        // Buchungsdaten aus PHP-Variable (von der Datenbank)
+        const reservation = <?= json_encode($reservation) ?>;
+        
         const bookingData = {
-            name: urlParams.get('name') || '-',
-            email: urlParams.get('email') || '-',
-            boat: urlParams.get('boat') || '-',
-            startDate: urlParams.get('start') || '-',
-            endDate: urlParams.get('end') || '-',
-            pricePerDay: parseFloat(urlParams.get('price')) || 0
+            id: reservation.id,
+            reservationNumber: reservation.reservation_number,
+            reservationType: reservation.reservation_type,
+            name: reservation.customer_name,
+            email: reservation.customer_email,
+            boat: reservation.boat_name,
+            startDate: reservation.start_date,
+            endDate: reservation.end_date,
+            days: reservation.days,
+            boatPrice: parseFloat(reservation.boat_price),
+            serviceFee: parseFloat(reservation.service_fee),
+            insurance: parseFloat(reservation.insurance),
+            totalAmount: parseFloat(reservation.total_amount)
         };
-
-        // Anzahl der Tage berechnen
-        let days = 1;
-        if (bookingData.startDate !== '-' && bookingData.endDate !== '-') {
-            const start = new Date(bookingData.startDate);
-            const end = new Date(bookingData.endDate);
-            days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        }
-
-        // Preise berechnen
-        const boatPrice = bookingData.pricePerDay * days;
-        const serviceFee = 25;
-        const insurance = 35;
-        const totalAmount = boatPrice + serviceFee + insurance;
 
         // Zusammenfassung anzeigen
         document.getElementById('summaryBoat').textContent = bookingData.boat;
         document.getElementById('summaryName').textContent = bookingData.name;
         document.getElementById('summaryEmail').textContent = bookingData.email;
         document.getElementById('summaryDates').textContent = `${bookingData.startDate} bis ${bookingData.endDate}`;
-        document.getElementById('summaryDuration').textContent = `${days} Tag${days !== 1 ? 'e' : ''}`;
-        document.getElementById('boatPrice').textContent = `€${boatPrice}`;
-        document.getElementById('totalAmount').textContent = `€${totalAmount}`;
+        document.getElementById('summaryDuration').textContent = `${bookingData.days} Tag${bookingData.days !== 1 ? 'e' : ''}`;
+        document.getElementById('boatPrice').textContent = `€${bookingData.boatPrice.toFixed(2)}`;
+        document.getElementById('serviceFee').textContent = `€${bookingData.serviceFee.toFixed(2)}`;
+        document.getElementById('insurance').textContent = `€${bookingData.insurance.toFixed(2)}`;
+        document.getElementById('totalAmount').textContent = `€${bookingData.totalAmount.toFixed(2)}`;
 
         // Zahlungsmethoden-Wechsel
         document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
@@ -526,15 +522,7 @@
 
             // Daten sammeln
             const formData = new FormData();
-            formData.append('boat', bookingData.boat);
-            formData.append('name', bookingData.name);
-            formData.append('email', bookingData.email);
-            formData.append('phone', urlParams.get('phone') || '');
-            formData.append('start', bookingData.startDate);
-            formData.append('end', bookingData.endDate);
-            formData.append('price', bookingData.pricePerDay);
-            formData.append('experience', urlParams.get('experience') || '');
-            formData.append('equipment', urlParams.get('equipment') || '');
+            formData.append('reservation_id', bookingData.id);
             
             const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             formData.append('payment_method', paymentMethod);
@@ -547,11 +535,10 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Erfolgreiche Zahlung - zurück zur Booking-Seite
+                    // Erfolgreiche Zahlung - zu My Bookings weiterleiten
                     setTimeout(() => {
-                        const returnUrl = `/booking?success=true&boat=${encodeURIComponent(bookingData.boat)}&name=${encodeURIComponent(bookingData.name)}&start=${bookingData.startDate}&end=${bookingData.endDate}&total=${totalAmount}&reservation=${data.reservation_number}`;
-                        window.location.href = returnUrl;
-                    }, 2000);
+                        window.location.href = '/my-bookings?success=true&reservation=' + data.reservation_number;
+                    }, 1500);
                 } else {
                     alert('Fehler bei der Zahlung: ' + (data.message || 'Unbekannter Fehler'));
                     document.getElementById('loadingOverlay').classList.remove('active');
