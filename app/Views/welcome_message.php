@@ -1105,9 +1105,9 @@
                             <h3>Tagesliegeplatz</h3>
                             <p>Für Boote bis 8m Länge. Inklusive Strom- und Wasseranschluss.</p>
                             <div class="price">€25 <span>/ Tag</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -1117,9 +1117,9 @@
                             <h3>Wochenliegeplatz</h3>
                             <p>Für Boote bis 10m Länge. Inklusive aller Annehmlichkeiten.</p>
                             <div class="price">€150 <span>/ Woche</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -1129,9 +1129,9 @@
                             <h3>Saisonliegeplatz</h3>
                             <p>Für die gesamte Saison April-Oktober. Inklusive Winterlager.</p>
                             <div class="price">€1.200 <span>/ Saison</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -1146,9 +1146,9 @@
                             <h3>Motorboot</h3>
                             <p>Für 6 Personen, 40 PS Motor. Perfekt für Familienausflüge.</p>
                             <div class="price">€90 <span>/ 4 Stunden</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -1158,9 +1158,9 @@
                             <h3>Segelboot</h3>
                             <p>Für 4 Personen, 25 Fuß. Erleben Sie pure Segelfreude.</p>
                             <div class="price">€120 <span>/ Tag</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
 
@@ -1170,9 +1170,9 @@
                             <h3>Elektroboot</h3>
                             <p>Leise und umweltfreundlich. Für 8 Personen, inkl. Picknick-Tisch.</p>
                             <div class="price">€70 <span>/ 3 Stunden</span></div>
-                            <button class="btn" style="width: 100%;">
+                            <a href="/booking" class="btn" style="width: 100%;">
                                 <i class="fas fa-shopping-cart"></i> Jetzt buchen
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
