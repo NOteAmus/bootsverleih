@@ -53,7 +53,7 @@
             background-size: cover;
             background-position: center;
             color: var(--white);
-            padding: 5rem 0;
+            padding: 9rem 0;
             text-align: center;
             position: relative;
         }
@@ -89,14 +89,6 @@
             margin-right: auto;
         }
 
-        .hero-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
         .btn {
             padding: 1rem 2rem;
             border: none;
@@ -120,17 +112,6 @@
             background: var(--secondary-light);
             transform: translateY(-3px);
             box-shadow: 0 10px 20px rgba(212, 172, 13, 0.2);
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--white);
-            border: 2px solid var(--white);
-        }
-
-        .btn-outline:hover {
-            background: var(--white);
-            color: var(--primary);
         }
 
         /* Navigation Tabs */
@@ -685,21 +666,16 @@
     </style>
 </head>
 <body>
+<?= view('header', ['weather' => $weather ?? null]) ?>
+
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
         <div class="hero-content">
             <h1>Yachthafen Plau am See</h1>
             <div class="slogan">Premium Liegeplatzverwaltung & Bootsverleih</div>
-            <p class="subtitle">Entdecken Sie die digitale Exzellenz am Plauer See - Buchen Sie direkt online Ihren Liegeplatz oder mieten Sie eines unserer Premium-Boote für unvergessliche Stunden auf dem Wasser.</p>
-            <div class="hero-buttons">
-                <a href="#booking" class="btn btn-primary">
-                    <i class="fas fa-anchor"></i>Liegeplatz buchen
-                </a>
-                <a href="#boats" class="btn btn-outline">
-                    <i class="fas fa-ship"></i>Boot mieten
-                </a>
-            </div>
+            <p class="subtitle">Entdecken Sie die digitale Exzellenz am Plauer See - Buchen Sie direkt online Ihren
+                Liegeplatz oder mieten Sie eines unserer Premium-Boote für unvergessliche Stunden auf dem Wasser.</p>
         </div>
     </div>
 </section>
@@ -713,32 +689,6 @@
         <button class="nav-tab" data-tab="boats">
             <i class="fas fa-ship"></i>Bootsverleih
         </button>
-    </div>
-</div>
-
-<!-- Status Legend -->
-<div class="container">
-    <div class="status-legend">
-        <div class="status-item">
-            <div class="status-color premium-color"></div>
-            <span>Premium Plätze</span>
-        </div>
-        <div class="status-item">
-            <div class="status-color comfort-color"></div>
-            <span>Komfort Plätze</span>
-        </div>
-        <div class="status-item">
-            <div class="status-color standard-color"></div>
-            <span>Standard Plätze</span>
-        </div>
-        <div class="status-item">
-            <div class="status-color economy-color"></div>
-            <span>Economy Plätze</span>
-        </div>
-        <div class="status-item">
-            <div class="status-color occupied-color"></div>
-            <span>Belegte Plätze</span>
-        </div>
     </div>
 </div>
 
