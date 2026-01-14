@@ -240,7 +240,7 @@
             border-radius: var(--border-radius);
             overflow: hidden;
             position: relative;
-            background: url('https://images.unsplash.com/photo-1580250864656-cd501faa9c76?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80');
+            background: url('https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=');
             background-size: cover;
             background-position: center;
             border: 3px solid var(--primary);
