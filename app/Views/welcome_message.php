@@ -87,6 +87,59 @@
             margin-top: 2px;
         }
 
+        /* Temperaturanzeige neben Logo */
+        .temp-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 25px;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .temp-display i {
+            display: none;
+        }
+
+        .temp-display span {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+        }
+
         nav ul {
             display: flex;
             list-style: none;
@@ -753,15 +806,113 @@
         }
 
         @media (max-width: 768px) {
+            /* Mobile Header Layout */
+            header {
+                padding: 0.5rem 0;
+            }
+
             .header-content {
-                flex-direction: column;
-                gap: 15px;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            /* Hide logo text on mobile, keep only icon */
+            .logo-text {
+                display: none;
+            }
+
+            .logo {
+                flex: 0 0 auto;
+                gap: 0;
+            }
+
+            .logo-icon {
+                font-size: 1.8rem;
+            }
+
+            /* Temperatur neben Logo auch auf Mobile */
+            .temp-display {
+                margin-left: 5px;
+                font-size: 1rem;
+            }
+
+            .temp-display i {
+                display: none;
+            }
+
+            .temp-display span {
+                font-size: 1.1rem;
+            }
+
+            /* Show hamburger menu and profile on mobile */
+            .hamburger {
+                display: flex;
+                order: 2;
+                margin-left: auto;
+            }
+
+            /* Profile section visible on mobile, positioned right */
+            .profile-section {
+                order: 3;
+                margin-left: 15px !important;
+                margin-top: 0 !important;
+                position: relative;
+            }
+
+            .profile-dropdown .dropdown-menu {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                margin-top: 10px;
+            }
+
+            .login-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            /* Hide desktop navigation on mobile */
+            nav {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(10, 46, 92, 0.98);
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1001;
+            }
+
+            nav.mobile-nav-open {
+                display: block;
             }
 
             nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 15px;
+                flex-direction: column;
+                gap: 0;
+                align-items: stretch;
+            }
+
+            nav ul li {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            nav ul li:last-child {
+                border-bottom: none;
+            }
+
+            /* Hide profile from nav list on mobile since it's in header */
+            nav ul li.profile-section {
+                display: none;
+            }
+
+            nav a {
+                display: block;
+                padding: 15px 10px;
+                font-size: 1rem;
             }
 
             .hero h2 {
@@ -775,11 +926,6 @@
 
             .section-title h2 {
                 font-size: 2rem;
-            }
-            
-            .profile-section {
-                margin-left: 0;
-                margin-top: 10px;
             }
             
             .services-grid,
@@ -820,6 +966,22 @@
                     </div>
                 </div>
 
+                <!-- Temperaturanzeige direkt neben Logo -->
+                <div class="temp-display">
+                    <?php
+                        $tc = isset($weather['temperature_c']) ? $weather['temperature_c'] : null;
+                    ?>
+                    <i class="fas fa-thermometer-half"></i>
+                    <span><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></span>
+                </div>
+
+                <!-- Hamburger Menu Button -->
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
                 <div class="weather-header">
                     <div class="weather-item">
                         <?php
@@ -852,53 +1014,53 @@
                         <li><a href="#booking">Buchen</a></li>
                         <li><a href="#services">Services</a></li>
                         <li><a href="#features">Features</a></li>
-                        
-                        <!-- Dynamisches Profil-Icon (serverseitig mit Session-Service) -->
-                        <li class="profile-section" id="profileSection">
-                            <?php
-                                $session = service('session');
-                                $user = $session ? $session->get('user') : null;
-
-                                if ($user) {
-                                    $initials = '';
-                                    if (!empty($user['initials'])) {
-                                        $initials = $user['initials'];
-                                    } else {
-                                        $fn = isset($user['firstName']) ? $user['firstName'] : '';
-                                        $ln = isset($user['lastName']) ? $user['lastName'] : '';
-                                        $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
-                                    }
-
-                                    echo '<div class="profile-dropdown">\n'
-                                        . '<div class="profile-icon" id="profileInitials">' . esc($initials) . '</div>\n'
-                                        . '<div class="dropdown-menu">\n'
-                                            . '<div class="user-info">\n'
-                                                . '<div class="user-name">' . esc($user['firstName'] ?? '') . ' ' . esc($user['lastName'] ?? '') . '</div>\n'
-                                                . '<div class="user-email">' . esc($user['email'] ?? '') . '</div>\n'
-                                            . '</div>\n'
-                                            . '<a href="' . site_url('profile') . '">\n'
-                                                . '<i class="fas fa-user"></i> Mein Profil\n'
-                                            . '</a>\n'
-                                            . '<a href="' . site_url('bookings') . '">\n'
-                                                . '<i class="fas fa-calendar-alt"></i> Meine Buchungen\n'
-                                            . '</a>\n'
-                                            . '<a href="' . site_url('settings') . '">\n'
-                                                . '<i class="fas fa-cog"></i> Einstellungen\n'
-                                            . '</a>\n'
-                                            . '<a href="' . site_url('logout') . '">\n'
-                                                . '<i class="fas fa-sign-out-alt"></i> Abmelden\n'
-                                            . '</a>\n'
-                                        . '</div>\n'
-                                    . '</div>';
-                                } else {
-                                    echo '<a href="' . site_url('login') . '" class="login-btn">\n'
-                                        . '<i class="fas fa-sign-in-alt"></i> Anmelden\n'
-                                    . '</a>';
-                                }
-                            ?>
-                        </li>
                     </ul>
                 </nav>
+
+                <!-- Dynamisches Profil-Icon (außerhalb nav für mobile Sichtbarkeit) -->
+                <div class="profile-section" id="profileSection">
+                    <?php
+                        $session = service('session');
+                        $user = $session ? $session->get('user') : null;
+
+                        if ($user) {
+                            $initials = '';
+                            if (!empty($user['initials'])) {
+                                $initials = $user['initials'];
+                            } else {
+                                $fn = isset($user['firstName']) ? $user['firstName'] : '';
+                                $ln = isset($user['lastName']) ? $user['lastName'] : '';
+                                $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
+                            }
+
+                            echo '<div class="profile-dropdown">\n'
+                                . '<div class="profile-icon" id="profileInitials">' . esc($initials) . '</div>\n'
+                                . '<div class="dropdown-menu">\n'
+                                    . '<div class="user-info">\n'
+                                        . '<div class="user-name">' . esc($user['firstName'] ?? '') . ' ' . esc($user['lastName'] ?? '') . '</div>\n'
+                                        . '<div class="user-email">' . esc($user['email'] ?? '') . '</div>\n'
+                                    . '</div>\n'
+                                    . '<a href="' . site_url('profile') . '">\n'
+                                        . '<i class="fas fa-user"></i> Mein Profil\n'
+                                    . '</a>\n'
+                                    . '<a href="' . site_url('bookings') . '">\n'
+                                        . '<i class="fas fa-calendar-alt"></i> Meine Buchungen\n'
+                                    . '</a>\n'
+                                    . '<a href="' . site_url('settings') . '">\n'
+                                        . '<i class="fas fa-cog"></i> Einstellungen\n'
+                                    . '</a>\n'
+                                    . '<a href="' . site_url('logout') . '">\n'
+                                        . '<i class="fas fa-sign-out-alt"></i> Abmelden\n'
+                                    . '</a>\n'
+                                . '</div>\n'
+                            . '</div>';
+                        } else {
+                            echo '<a href="' . site_url('login') . '" class="login-btn">\n'
+                                . '<i class="fas fa-sign-in-alt"></i> Anmelden\n'
+                            . '</a>';
+                        }
+                    ?>
+                </div>
             </div>
         </div>
     </header>
@@ -938,7 +1100,7 @@
             <div class="tab-content active" id="berths">
                 <div class="booking-grid">
                     <div class="booking-card fade-in">
-                        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Tagesliegeplatz">
+                        <img src="https://media.delius-klasing.de/dk-wassersport/images/dpr_auto,fl_progressive,f_auto,c_fill,g_face:auto,h_600,w_1068/q_auto:eco/yacht/M3421059_d3206a659a2c702bc9f1d70d2e05e207/marinas-liegeplatz-reservierung-per-app-grosse-marktuebersicht" alt="Tagesliegeplatz">
                         <div class="booking-card-content">
                             <h3>Tagesliegeplatz</h3>
                             <p>Für Boote bis 8m Länge. Inklusive Strom- und Wasseranschluss.</p>
@@ -950,7 +1112,7 @@
                     </div>
 
                     <div class="booking-card fade-in">
-                        <img src="https://images.unsplash.com/photo-1577717903315-1691ae25ab3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Wochenliegeplatz">
+                        <img src="https://media.delius-klasing.de/dk-wassersport/images/dpr_auto,fl_progressive,f_auto,c_fill,g_face:auto,h_712,w_1068/q_auto:eco/yacht/modern-classics-2016-hafen-2016-kan-ka201609091338_5df6296934a17a66b38dc9173980ece6/im-paeckchen-liegen-ist-in-der-hochsaison-vielerorts-ueblich-daneben-gibt-es-noch-andere-arten-einen-platz-im-vollen-hafen-zu-ergattern" alt="Wochenliegeplatz">
                         <div class="booking-card-content">
                             <h3>Wochenliegeplatz</h3>
                             <p>Für Boote bis 10m Länge. Inklusive aller Annehmlichkeiten.</p>
@@ -979,7 +1141,7 @@
             <div class="tab-content" id="boats">
                 <div class="booking-grid">
                     <div class="booking-card fade-in">
-                        <img src="https://images.unsplash.com/photo-1501950183564-3c8ac97d08f0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Motorboot">
+                        <img src="https://www.boat24.com/img/blog/uploads/motor--oder-segelboot-439-1673450068-xlarge.jpg" alt="Motorboot">
                         <div class="booking-card-content">
                             <h3>Motorboot</h3>
                             <p>Für 6 Personen, 40 PS Motor. Perfekt für Familienausflüge.</p>
@@ -991,7 +1153,7 @@
                     </div>
 
                     <div class="booking-card fade-in">
-                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Segelboot">
+                        <img src="https://www.bootsurlaub.de/wp-content/uploads/2020/11/Typ-Segelboot.webp" alt="Segelboot">
                         <div class="booking-card-content">
                             <h3>Segelboot</h3>
                             <p>Für 4 Personen, 25 Fuß. Erleben Sie pure Segelfreude.</p>
@@ -1003,7 +1165,7 @@
                     </div>
 
                     <div class="booking-card fade-in">
-                        <img src="https://images.unsplash.com/photo-1536984700892-1bcf6c7c2e0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Elektroboot">
+                        <img src="https://marianboats.at/wp-content/uploads/2018/08/Unbenan33nt-1.jpg" alt="Elektroboot">
                         <div class="booking-card-content">
                             <h3>Elektroboot</h3>
                             <p>Leise und umweltfreundlich. Für 8 Personen, inkl. Picknick-Tisch.</p>
@@ -1081,7 +1243,7 @@
                     <p>Planen Sie Ihren Bootsausflug mit unseren detaillierten Wetterinformationen. Wir bieten Echtzeit-Daten und Vorhersagen für die nächsten Tage.</p>
                     <p>Die Wassertemperatur, Windgeschwindigkeit und UV-Index helfen Ihnen, den perfekten Tag für Ihre Bootstour zu finden.</p>
                     <a href="#" class="btn">
-                        <i class="fas fa-wind"></i> Detaillierte Wettervorhersage
+                        <i class="fas fa-wind" href="https://www.wetter.com/"></i>
                     </a>
                 </div>
                 <div class="weather-info fade-in">
@@ -1239,6 +1401,34 @@
         }
 
         function initializePage() {
+            // Hamburger Menu Funktionalität
+            const hamburger = document.getElementById('hamburger');
+            const nav = document.querySelector('nav');
+            
+            if (hamburger && nav) {
+                hamburger.addEventListener('click', () => {
+                    hamburger.classList.toggle('active');
+                    nav.classList.toggle('mobile-nav-open');
+                });
+
+                // Schließe das Menu wenn auf einen Link geklickt wird
+                const navLinks = nav.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.classList.remove('active');
+                        nav.classList.remove('mobile-nav-open');
+                    });
+                });
+
+                // Schließe das Menu wenn außerhalb geklickt wird
+                document.addEventListener('click', (e) => {
+                    if (!hamburger.contains(e.target) && !nav.contains(e.target)) {
+                        hamburger.classList.remove('active');
+                        nav.classList.remove('mobile-nav-open');
+                    }
+                });
+            }
+
             // Tab-Funktionalität
             const tabBtns = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
