@@ -1232,7 +1232,7 @@
             capacity: 8,
             price_per_day: 350,
             features: ['2 Kabinen', 'Vollküche', 'WC mit Dusche', 'GPS', 'Autopilot'],
-            image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://res.cloudinary.com/dk-wassersport/image/upload/v1740666784/yacht/yacht_20250219_202505_new-img_75_4_img-Z6Q0P0Qy.jpg'
         },
         {
             id: 2,
@@ -1244,7 +1244,7 @@
             capacity: 6,
             price_per_day: 320,
             features: ['3 Kabinen', 'Kombüse', 'Elektrowinde', 'Badeplattform', 'Sonnenliege'],
-            image: 'https://images.unsplash.com/photo-1572271971229-5c1c5c5d6c5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://res.cloudinary.com/dk-wassersport/image/upload/v1687436145/yacht/hanse-388-segeln-lavagna-2018-mst-7553_ef16a87fb0075501318c20c50a281a6a.jpg'
         },
         {
             id: 3,
@@ -1256,7 +1256,7 @@
             capacity: 6,
             price_per_day: 280,
             features: ['Großraum', 'Kühlschrank', 'Heizung', 'Badeleiter', 'Stereoanlage'],
-            image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://www.pitter-yachting.com/images/yacht/sun-odyssey-349/23971630-nala/23971630-main.jpg'
         },
         {
             id: 4,
@@ -1268,7 +1268,7 @@
             capacity: 8,
             price_per_day: 220,
             features: ['115 PS', 'Sonnendeck', 'Badeplattform', 'Kühlbox', 'USB-Anschluss'],
-            image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlymDneY3tolTqia68b61rdHnxxw9NZzakxQ&s'
         },
         {
             id: 5,
@@ -1280,7 +1280,7 @@
             capacity: 6,
             price_per_day: 180,
             features: ['Mercury 150 PS', 'Ski-Torpedo', 'Badeleiter', 'Sportlenkung', 'Bluetooth'],
-            image: 'https://images.unsplash.com/photo-1536985507665-8d89d6d55670?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://www.bootscenter-keser.de/wp-content/uploads/2024/03/Bayliner-VR6-Cuddy-7.webp'
         },
         {
             id: 6,
@@ -1292,7 +1292,7 @@
             capacity: 4,
             price_per_day: 90,
             features: ['20 PS Motor', 'Leicht & wendig', 'Einfache Bedienung', 'Schnell abpumpbar'],
-            image: 'https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            image: 'https://www.marinawassersport.de/cdn/shop/files/2015_Zodiac_310Alu_01_6edc392e-22e9-469e-a766-9d8670794f46.jpg?v=1740217353&width=1445'
         }
     ];
 
