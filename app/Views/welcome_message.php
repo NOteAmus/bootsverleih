@@ -1043,9 +1043,14 @@
                                     . '<a href="' . site_url('profile') . '">\n'
                                         . '<i class="fas fa-user"></i> Mein Profil\n'
                                     . '</a>\n'
-                                    . '<a href="' . site_url('bookings') . '">\n'
+                                    . '<a href="' . site_url('my-bookings') . '">\n'
                                         . '<i class="fas fa-calendar-alt"></i> Meine Buchungen\n'
                                     . '</a>\n'
+                                    . (in_array($user['role'] ?? 'user', ['admin', 'worker']) 
+                                        ? '<a href="' . site_url('admin/bookings') . '">\n'
+                                            . '<i class="fas fa-tasks"></i> Verwaltung\n'
+                                        . '</a>\n'
+                                        : '')
                                     . '<a href="' . site_url('settings') . '">\n'
                                         . '<i class="fas fa-cog"></i> Einstellungen\n'
                                     . '</a>\n'
@@ -1362,9 +1367,14 @@
                                 <a href="/profile">
                                     <i class="fas fa-user"></i> Mein Profil
                                 </a>
-                                <a href="/bookings">
+                                <a href="/my-bookings">
                                     <i class="fas fa-calendar-alt"></i> Meine Buchungen
                                 </a>
+                                ${['admin', 'worker'].includes(user.role) ? `
+                                <a href="/admin/bookings">
+                                    <i class="fas fa-tasks"></i> Verwaltung
+                                </a>
+                                ` : ''}
                                 <a href="/settings">
                                     <i class="fas fa-cog"></i> Einstellungen
                                 </a>

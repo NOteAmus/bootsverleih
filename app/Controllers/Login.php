@@ -47,7 +47,8 @@ class Login extends Controller
             'id' => $user['id'],
             'firstName' => $user['vorname'],
             'lastName'  => $user['nachname'],
-            'email'     => $user['email']
+            'email'     => $user['email'],
+            'role'      => $user['role'] ?? 'user'
         ]);
 
         return redirect()->to(site_url('/'));

@@ -886,6 +886,23 @@
 
     <!-- Bootsverleih Tab -->
     <div class="tab-content" id="boats-tab">
+        <!-- Erfolgsmeldung -->
+        <div id="successMessage" class="booking-form" style="display: none; background: linear-gradient(135deg, #28a745, #20c997); color: white; text-align: center;">
+            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
+            <h2 class="section-title" style="color: white;">Buchung erfolgreich!</h2>
+            <div style="font-size: 1.2rem; margin: 1.5rem 0;">
+                <p style="margin-bottom: 0.5rem;"><strong>Reservierungsnummer:</strong> <span id="confirmedReservation"></span></p>
+                <p style="margin-bottom: 0.5rem;"><strong>Boot:</strong> <span id="confirmedBoat"></span></p>
+                <p style="margin-bottom: 0.5rem;"><strong>Name:</strong> <span id="confirmedName"></span></p>
+                <p style="margin-bottom: 0.5rem;"><strong>Zeitraum:</strong> <span id="confirmedDates"></span></p>
+                <p style="margin-bottom: 0.5rem;"><strong>Gesamtpreis:</strong> €<span id="confirmedTotal"></span></p>
+            </div>
+            <p style="font-size: 1.1rem; margin: 1.5rem 0;">Eine Bestätigungsmail wurde an Ihre E-Mail-Adresse gesendet.</p>
+            <button class="btn btn-primary" onclick="location.reload()" style="background: white; color: #28a745;">
+                <i class="fas fa-plus"></i> Neue Buchung
+            </button>
+        </div>
+
         <!-- Boots Buchungsformular -->
         <div class="booking-form">
             <h2 class="section-title">Boot Reservierung</h2>
@@ -1141,23 +1158,19 @@
             return;
         }
         
-        const reservationNumber = 'BOAT-' + Date.now().toString().slice(-6);
         const boatName = boatSelect.options[boatSelect.selectedIndex].text;
-        const name = document.getElementById('boatCustomerName').value;
-        const dates = document.getElementById('boatStartDate').value + ' bis ' + document.getElementById('boatEndDate').value;
+        const boatPrice = boatSelect.options[boatSelect.selectedIndex].getAttribute('data-price');
+        const customerName = document.getElementById('boatCustomerName').value;
+        const customerEmail = document.getElementById('boatCustomerEmail').value;
+        const customerPhone = document.getElementById('boatCustomerPhone').value;
+        const startDate = document.getElementById('boatStartDate').value;
+        const endDate = document.getElementById('boatEndDate').value;
+        const experience = document.getElementById('boatExperience').value;
+        const equipment = document.getElementById('boatRequests').value;
         
-        // Erfolgsmeldung
-        alert(`✅ Boot erfolgreich reserviert!\n\nReservierungsnummer: ${reservationNumber}\nName: ${name}\nBoot: ${boatName}\nZeitraum: ${dates}\n\nEine Bestätigung wurde an Ihre E-Mail gesendet.`);
-        
-        // Formular zurücksetzen
-        this.reset();
-        
-        // Heutiges Datum wieder setzen
-        const today = new Date().toISOString().split('T')[0];
-        document.querySelectorAll('#boatReservationForm input[type="date"]').forEach(input => {
-            input.value = today;
-            input.min = today;
-        });
+        // Zur Zahlungsseite weiterleiten mit allen Buchungsdaten
+        const paymentUrl = `/payment?boat=${encodeURIComponent(boatName)}&name=${encodeURIComponent(customerName)}&email=${encodeURIComponent(customerEmail)}&phone=${encodeURIComponent(customerPhone)}&start=${startDate}&end=${endDate}&price=${boatPrice}&experience=${encodeURIComponent(experience)}&equipment=${encodeURIComponent(equipment)}`;
+        window.location.href = paymentUrl;
     });
 
     // Datumseingaben vorbelegen
@@ -1400,6 +1413,33 @@
 
     // Boot-Positionen beim Laden zufällig setzen
     window.addEventListener('load', randomizeBoatPositions);
+
+    // Prüfen ob Buchung erfolgreich war (von Zahlungsseite zurück)
+    window.addEventListener('load', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            // Zum Boots-Tab wechseln
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector('.nav-tab[data-tab="boats"]').classList.add('active');
+            document.getElementById('boats-tab').classList.add('active');
+            
+            // Erfolgsmeldung anzeigen
+            document.getElementById('successMessage').style.display = 'block';
+            document.getElementById('boatReservationForm').parentElement.style.display = 'none';
+            document.querySelector('.boats-grid').parentElement.style.display = 'none';
+            
+            // Daten in Erfolgsmeldung einfügen
+            document.getElementById('confirmedReservation').textContent = decodeURIComponent(urlParams.get('reservation') || 'N/A');
+            document.getElementById('confirmedBoat').textContent = decodeURIComponent(urlParams.get('boat') || '');
+            document.getElementById('confirmedName').textContent = decodeURIComponent(urlParams.get('name') || '');
+            document.getElementById('confirmedDates').textContent = `${urlParams.get('start')} bis ${urlParams.get('end')}`;
+            document.getElementById('confirmedTotal').textContent = urlParams.get('total') || '0';
+            
+            // Zum Erfolgsbereich scrollen
+            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
 </script>
 </body>
 </html>

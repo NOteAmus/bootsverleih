@@ -28,6 +28,7 @@ class ApiCurrentUser extends Controller
             'firstName' => $u['firstName'] ?? '',
             'lastName'  => $u['lastName'] ?? '',
             'email'     => $u['email'] ?? '',
+            'role'      => $u['role'] ?? 'user',
             'initials'  => $initials
         ];
 
