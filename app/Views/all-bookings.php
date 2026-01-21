@@ -604,15 +604,39 @@
     </div>
 
     <script>
-        // Live Search Functionality
+        // Live Search Functionality with Persistent No Results Message
         document.getElementById('searchInput')?.addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('#bookingsTable tbody tr');
+            const tbody = document.querySelector('#bookingsTable tbody');
+            let hasResults = false;
 
             rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
+                const text = row.innerText.toLowerCase(); // Use innerText for better compatibility
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
             });
+
+            // Ensure 'No results found' message is always displayed when no results are found
+            let noResultsRow = document.getElementById('noResultsRow');
+            if (!hasResults) {
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.id = 'noResultsRow';
+                    noResultsRow.innerHTML = `<td colspan="10" style="text-align: center; color: var(--text-light);">Keine Suchergebnisse gefunden</td>`;
+                    tbody.appendChild(noResultsRow);
+                } else {
+                    noResultsRow.style.display = '';
+                }
+            } else {
+                if (noResultsRow) {
+                    noResultsRow.style.display = 'none';
+                }
+            }
         });
     </script>
 </body>
