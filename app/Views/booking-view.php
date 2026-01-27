@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/header.css">
+    <link rel="stylesheet" href="/assets/css/marina-style.css">
+
     <title>Yachthafen Plau am See - Premium Liegeplätze & Bootsverleih</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
         }
 
         :root {
@@ -668,7 +672,6 @@
 <body>
 <?= view('header', ['weather' => $weather ?? null]) ?>
 
-<!-- Hero Section -->
 <section class="hero">
     <div class="container">
         <div class="hero-content">
@@ -680,777 +683,147 @@
     </div>
 </section>
 
-<!-- Navigation Tabs -->
-<div class="container">
-    <div class="nav-tabs" id="booking">
-        <button class="nav-tab active" data-tab="slots">
-            <i class="fas fa-anchor"></i>Liegeplätze & Marina
-        </button>
-        <button class="nav-tab" data-tab="boats">
-            <i class="fas fa-ship"></i>Bootsverleih
-        </button>
-    </div>
-</div>
-
-<!-- Liegeplätze Tab -->
-<div class="container">
-    <div class="tab-content active" id="slots-tab">
-        <div class="marina-map-container">
-            <h2 class="section-title">Marina Übersicht - Plauer See</h2>
-            <p class="text-center mb-2" style="color: var(--text-light); max-width: 800px; margin: 0 auto 2rem;">
-                Klicken Sie auf einen verfügbaren Liegeplatz, um ihn auszuwählen. Ziehen Sie die Boote, um sie auf dem See zu verschieben.
-            </p>
-            
-            <div class="marina-view" id="marinaView">
-                <!-- Natürliches See-Bild als Hintergrund -->
-                
-                <!-- Hauptsteg -->
-                <div class="dock" style="width: 85%; height: 25px; top: 60px; left: 7.5%;"></div>
-                
-                <!-- Docks -->
-                <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 15%;"></div>
-                <div class="dock" style="width: 20px; height: 250px; top: 85px; left: 30%;"></div>
-                <div class="dock" style="width: 20px; height: 300px; top: 85px; left: 45%;"></div>
-                <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 60%;"></div>
-                <div class="dock" style="width: 20px; height: 180px; top: 85px; left: 75%;"></div>
-                
-                <!-- Dock Labels -->
-                <div class="dock-label" style="top: 40px; left: 18%;">Premium</div>
-                <div class="dock-label" style="top: 40px; left: 33%;">Komfort</div>
-                <div class="dock-label" style="top: 40px; left: 48%;">Standard</div>
-                <div class="dock-label" style="top: 40px; left: 63%;">Economy</div>
-                
-                <!-- Slots - Dynamisch aus Datenbank generiert -->
-                <?php 
-                // Slots gruppieren nach Reihe
-                $slotsByRow = [];
-                foreach ($slots as $slot) {
-                    $slotsByRow[$slot['row']][] = $slot;
-                }
-                
-                // Position-Mapping für visuelle Darstellung
-                $rowPositions = ['A' => '16%', 'B' => '31%', 'C' => '46%', 'D' => '61%'];
-                $topStart = 95;
-                $topIncrement = 45;
-                
-                // Einige Slots als occupied markieren (simuliert)
-                $occupiedSlots = ['A2', 'B3', 'C4', 'D2'];
-                
-                foreach ($slotsByRow as $row => $rowSlots):
-                    $leftPos = $rowPositions[$row] ?? '16%';
-                    foreach ($rowSlots as $index => $slot):
-                        $topPos = $topStart + ($slot['position'] - 1) * $topIncrement;
-                        $isOccupied = in_array($slot['slot_number'], $occupiedSlots);
-                        $occupiedClass = $isOccupied ? ' occupied' : '';
-                ?>
-                <div class="slot <?= strtolower($slot['category']) ?><?= $occupiedClass ?>" 
-                     style="top: <?= $topPos ?>px; left: <?= $leftPos ?>;" 
-                     data-slot-id="<?= $slot['id'] ?>"
-                     data-slot="<?= $slot['slot_number'] ?>">
-                    <?= $slot['slot_number'] ?>
-                </div>
-                <?php 
-                    endforeach;
-                endforeach;
-                ?>
-                
-                <!-- Boote auf dem Wasser -->
-                <div class="boat-on-water" style="top: 135px; left: 20%;" data-slot="A2">
-                    A2
-                    <div class="boat-wave"></div>
-                </div>
-                <div class="boat-on-water" style="top: 180px; left: 35%;" data-slot="B3">
-                    B3
-                    <div class="boat-wave"></div>
-                </div>
-                <div class="boat-on-water" style="top: 225px; left: 50%;" data-slot="C4">
-                    C4
-                    <div class="boat-wave"></div>
-                </div>
-                <div class="boat-on-water" style="top: 135px; left: 65%;" data-slot="D2">
-                    D2
-                    <div class="boat-wave"></div>
-                </div>
-                
-                <!-- Zusätzliche frei schwimmende Boote -->
-                <div class="boat-on-water" style="top: 350px; left: 25%;" data-boat="Segelyacht">
-                    Bavaria
-                    <div class="boat-wave"></div>
-                </div>
-                <div class="boat-on-water" style="top: 400px; left: 70%;" data-boat="Motorboot">
-                    Quicksilver
-                    <div class="boat-wave"></div>
-                </div>
-                <div class="boat-on-water" style="top: 280px; left: 80%;" data-boat="Schlauchboot">
-                    Zodiac
-                    <div class="boat-wave"></div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-3">
-                <p style="color: var(--text-light); font-style: italic;">
-                    <i class="fas fa-info-circle"></i> Realistische Ansicht des Plauer Sees mit interaktiven Booten
-                </p>
-            </div>
-        </div>
-
-        <!-- Liegeplatz Buchungsformular -->
-        <div class="booking-form">
-            <h2 class="section-title">Liegeplatz Reservierung</h2>
-            <form id="slotReservationForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="slotCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
-                        <input type="text" id="slotCustomerName" name="customer_name" required placeholder="Max Mustermann">
-                    </div>
-                    <div class="form-group">
-                        <label for="slotCustomerEmail"><i class="fas fa-envelope"></i> E-Mail Adresse</label>
-                        <input type="email" id="slotCustomerEmail" name="customer_email" required placeholder="max@mustermann.de">
-                    </div>
-                    <div class="form-group">
-                        <label for="slotCustomerPhone"><i class="fas fa-phone"></i> Telefonnummer</label>
-                        <input type="tel" id="slotCustomerPhone" name="customer_phone" required placeholder="+49 123 456789">
-                    </div>
-                    <div class="form-group">
-                        <label for="boatLength"><i class="fas fa-ruler"></i> Bootslänge (in Metern)</label>
-                        <input type="number" id="boatLength" name="boat_length" min="4" max="25" step="0.1" required placeholder="z.B. 8.5">
-                    </div>
-                    <div class="form-group">
-                        <label for="slotStartDate"><i class="fas fa-calendar-day"></i> Ankunftsdatum</label>
-                        <input type="date" id="slotStartDate" name="start_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="slotEndDate"><i class="fas fa-calendar-day"></i> Abreisedatum</label>
-                        <input type="date" id="slotEndDate" name="end_date" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="selectedSlot"><i class="fas fa-anchor"></i> Ausgewählter Liegeplatz</label>
-                        <input type="text" id="selectedSlot" name="slot_id" readonly placeholder="Klicken Sie auf einen verfügbaren Liegeplatz in der Marina-Ansicht">
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="specialRequests"><i class="fas fa-comments"></i> Besondere Wünsche</label>
-                        <textarea id="specialRequests" name="special_requests" rows="3" placeholder="Stromanschluss benötigt, besondere Manövrierhilfen, etc..."></textarea>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check-circle"></i> Liegeplatz jetzt reservieren
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Bootsverleih Tab -->
-    <div class="tab-content" id="boats-tab">
-        <!-- Erfolgsmeldung -->
-        <div id="successMessage" class="booking-form" style="display: none; background: linear-gradient(135deg, #28a745, #20c997); color: white; text-align: center;">
-            <i class="fas fa-check-circle" style="font-size: 4rem; margin-bottom: 1rem;"></i>
-            <h2 class="section-title" style="color: white;">Buchung erfolgreich!</h2>
-            <div style="font-size: 1.2rem; margin: 1.5rem 0;">
-                <p style="margin-bottom: 0.5rem;"><strong>Reservierungsnummer:</strong> <span id="confirmedReservation"></span></p>
-                <p style="margin-bottom: 0.5rem;"><strong>Boot:</strong> <span id="confirmedBoat"></span></p>
-                <p style="margin-bottom: 0.5rem;"><strong>Name:</strong> <span id="confirmedName"></span></p>
-                <p style="margin-bottom: 0.5rem;"><strong>Zeitraum:</strong> <span id="confirmedDates"></span></p>
-                <p style="margin-bottom: 0.5rem;"><strong>Gesamtpreis:</strong> €<span id="confirmedTotal"></span></p>
-            </div>
-            <p style="font-size: 1.1rem; margin: 1.5rem 0;">Eine Bestätigungsmail wurde an Ihre E-Mail-Adresse gesendet.</p>
-            <button class="btn btn-primary" onclick="location.reload()" style="background: white; color: #28a745;">
-                <i class="fas fa-plus"></i> Neue Buchung
+<div id="app">
+    <div class="container">
+        <div class="nav-tabs" id="booking">
+            <button class="nav-tab" :class="{ active: activeTab === 'slots' }" @click="activeTab = 'slots'">
+                <i class="fas fa-anchor"></i> Liegeplätze & Marina
+            </button>
+            <button class="nav-tab" :class="{ active: activeTab === 'boats' }" @click="activeTab = 'boats'">
+                <i class="fas fa-ship"></i> Bootsverleih
             </button>
         </div>
+    </div>
 
-        <!-- Boots Buchungsformular -->
-        <div class="booking-form">
-            <h2 class="section-title">Boot Reservierung</h2>
-            <form id="boatReservationForm">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="boatCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
-                        <input type="text" id="boatCustomerName" name="customer_name" required placeholder="Max Mustermann">
+    <div class="container" v-if="activeTab === 'slots'">
+        <div class="tab-content active">
+            <div class="marina-map-container">
+                <h2 class="section-title">Marina Übersicht - Plauer See</h2>
+                <p class="text-center mb-2" style="color: var(--text-light); max-width: 800px; margin: 0 auto 2rem;">
+                    Ziehen Sie ein Boot aus dem See auf einen freien Liegeplatz, um diesen auszuwählen.
+                </p>
+
+                <div class="marina-view" id="marinaView">
+                    <div class="dock" style="width: 85%; height: 25px; top: 60px; left: 7.5%;"></div>
+                    <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 15%;"></div>
+                    <div class="dock" style="width: 20px; height: 250px; top: 85px; left: 30%;"></div>
+                    <div class="dock" style="width: 20px; height: 300px; top: 85px; left: 45%;"></div>
+                    <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 60%;"></div>
+
+                    <div v-for="slot in slots"
+                         :key="slot.id"
+                         class="slot"
+                         :class="[slot.category.toLowerCase(), { 'occupied': slot.isOccupied, 'drag-over': dragOverId === slot.id, 'selected': selectedSlotId === slot.id }]"
+                         :style="getSlotStyle(slot)"
+                         @dragover.prevent="onDragOver(slot.id)"
+                         @dragleave="dragOverId = null"
+                         @drop="onDrop(slot)"
+                         @click="selectSlot(slot)">
+                        {{ slot.slot_number }}
+
+                        <div v-if="slot.isOccupied" class="boat-in-slot">
+                            <i class="fas fa-ship"></i>
+                            <small>{{ slot.boatName }}</small>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="boatCustomerEmail"><i class="fas fa-envelope"></i> E-Mail Adresse</label>
-                        <input type="email" id="boatCustomerEmail" name="customer_email" required placeholder="max@mustermann.de">
-                    </div>
-                    <div class="form-group">
-                        <label for="boatCustomerPhone"><i class="fas fa-phone"></i> Telefonnummer</label>
-                        <input type="tel" id="boatCustomerPhone" name="customer_phone" required placeholder="+49 123 456789">
-                    </div>
-                    <div class="form-group">
-                        <label for="boatExperience"><i class="fas fa-ship"></i> Segel-/Bootserfahrung</label>
-                        <select id="boatExperience" name="experience" required>
-                            <option value="">Bitte auswählen</option>
-                            <option value="beginner">Anfänger</option>
-                            <option value="intermediate">Erfahren</option>
-                            <option value="expert">Experte</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="boatStartDate"><i class="fas fa-calendar-day"></i> Abholdatum</label>
-                        <input type="date" id="boatStartDate" name="start_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="boatEndDate"><i class="fas fa-calendar-day"></i> Rückgabedatum</label>
-                        <input type="date" id="boatEndDate" name="end_date" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="selectedBoat"><i class="fas fa-ship"></i> Gewünschtes Boot auswählen</label>
-                        <select id="selectedBoat" name="boat_id" required>
-                            <option value="">Bitte ein Boot auswählen...</option>
-                            <?php foreach ($boats as $boat): ?>
-                                <option value="<?= $boat['id'] ?>" data-price="<?= $boat['price_per_day'] ?>">
-                                    <?= esc($boat['name']) ?> (<?= esc($boat['boat_type']) ?> - €<?= number_format($boat['price_per_day'], 0) ?>/Tag)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="boatRequests"><i class="fas fa-tools"></i> Zusätzliche Ausrüstung</label>
-                        <textarea id="boatRequests" name="additional_equipment" rows="3" placeholder="z.B. Sonnendach, Grill, Wasserski, zusätzliche Schwimmwesten..."></textarea>
+
+                    <div v-for="boat in boatsInWater"
+                         :key="boat.id"
+                         class="boat-on-water draggable-boat"
+                         draggable="true"
+                         @dragstart="onDragStart($event, boat)"
+                         :style="boat.style">
+                        {{ boat.name }}
+                        <div class="boat-wave"></div>
                     </div>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-ship"></i> Boot jetzt reservieren
-                    </button>
-                </div>
-            </form>
-        </div>
+            </div>
 
-        <!-- Boote Übersicht -->
-        <div class="marina-section">
-            <h2 class="section-title">Unsere Bootsflotte</h2>
-            <p class="text-center mb-2" style="color: var(--text-light);">Wählen Sie aus unserer modernen und gut ausgestatteten Flotte</p>
-            <div class="boats-grid" id="boatsGrid">
-                <!-- Boot Cards werden hier dynamisch generiert -->
+            <div class="booking-form" id="slotReservationForm">
+                <h2 class="section-title">Liegeplatz Reservierung</h2>
+                <form @submit.prevent="submitSlotBooking">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Name</label>
+                            <input type="text" v-model="formData.name" required placeholder="Max Mustermann">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> E-Mail</label>
+                            <input type="email" v-model="formData.email" required placeholder="max@mustermann.de">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-day"></i> Ankunft</label>
+                            <input type="date" v-model="formData.start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar-day"></i> Abreise</label>
+                            <input type="date" v-model="formData.end_date" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label><i class="fas fa-anchor"></i> Ausgewählter Liegeplatz</label>
+                            <input type="text" :value="selectedSlotName" readonly placeholder="Ziehen Sie ein Boot auf einen Platz oder klicken Sie einen an">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" :disabled="!selectedSlotId">
+                            <i class="fas fa-check-circle"></i> Jetzt reservieren
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+
+    <div class="container" v-if="activeTab === 'boats'">
+        <div class="tab-content active">
+            <div class="marina-section">
+                <h2 class="section-title">Unsere Bootsflotte</h2>
+                <div class="boats-grid">
+                    <div v-for="boat in boats" :key="boat.id" class="boat-card">
+                        <div class="boat-image" :style="{ backgroundImage: 'url(' + boat.image_url + ')' }">
+                            <div class="boat-category">{{ boat.boat_type }}</div>
+                        </div>
+                        <div class="boat-content">
+                            <div class="boat-header">
+                                <div class="boat-name">{{ boat.name }}</div>
+                                <div class="boat-price">€{{ boat.price_per_day }}<span>/Tag</span></div>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%" @click="selectBoatForRental(boat)">
+                                Dieses Boot wählen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Kontakt</h3>
+                    <p><i class="fas fa-phone"></i> +49 38735 12345</p>
+                    <p><i class="fas fa-envelope"></i> info@yachthafen-plau.de</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Öffnungszeiten</h3>
+                    <p>Mo-Fr: 8:00-18:00</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 Yachthafen Plau am See. Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
 </div>
-
-<!-- Footer -->
-<footer class="footer" id="contact">
-    <div class="container">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>Kontakt</h3>
-                <p><i class="fas fa-phone"></i> +49 38735 12345</p>
-                <p><i class="fas fa-envelope"></i> info@yachthafen-plau.de</p>
-                <p><i class="fas fa-map-marker-alt"></i> Hafenstraße 1, 19395 Plau am See</p>
-            </div>
-            <div class="footer-section">
-                <h3>Öffnungszeiten</h3>
-                <p>Mo-Fr: 8:00-18:00</p>
-                <p>Sa: 9:00-16:00</p>
-                <p>So: 10:00-14:00</p>
-            </div>
-            <div class="footer-section">
-                <h3>Service</h3>
-                <p><a href="#"><i class="fas fa-file-contract"></i> AGB</a></p>
-                <p><a href="#"><i class="fas fa-shield-alt"></i> Datenschutz</a></p>
-                <p><a href="#"><i class="fas fa-building"></i> Impressum</a></p>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>&copy; 2023 Yachthafen Plau am See. Alle Rechte vorbehalten.</p>
-        </div>
-    </div>
-</footer>
-
 <script>
-    // Tab Funktionalität
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            this.classList.add('active');
-            const tabId = this.getAttribute('data-tab');
-            document.getElementById(tabId + '-tab').classList.add('active');
-        });
-    });
-
-    // Liegeplatz Auswahl in der Marina
-    let selectedSlot = null;
-    
-    document.querySelectorAll('.slot:not(.occupied)').forEach(slot => {
-        slot.addEventListener('click', function() {
-            const slotId = this.getAttribute('data-slot-id'); // Echte DB-ID
-            const slotNumber = this.getAttribute('data-slot'); // Anzeigename (A1, B2, etc.)
-            
-            // Vorherige Auswahl entfernen
-            if (selectedSlot) {
-                selectedSlot.classList.remove('selected');
-            }
-            
-            // Neue Auswahl setzen
-            this.classList.add('selected');
-            selectedSlot = this;
-            document.getElementById('selectedSlot').value = slotNumber; // Anzeige für User
-            document.getElementById('selectedSlot').setAttribute('data-id', slotId); // Echte ID für API
-            
-            // Zum Formular scrollen
-            document.getElementById('slotReservationForm').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
-        });
-    });
-
-    // Boot Drag & Drop Funktionalität
-    document.querySelectorAll('.boat-on-water').forEach(boat => {
-        let isDragging = false;
-        let offsetX, offsetY;
-        
-        boat.addEventListener('mousedown', startDrag);
-        boat.addEventListener('touchstart', startDragTouch);
-        
-        function startDrag(e) {
-            isDragging = true;
-            boat.classList.add('dragging');
-            const rect = boat.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDrag);
-            e.preventDefault();
-        }
-        
-        function startDragTouch(e) {
-            isDragging = true;
-            boat.classList.add('dragging');
-            const touch = e.touches[0];
-            const rect = boat.getBoundingClientRect();
-            offsetX = touch.clientX - rect.left;
-            offsetY = touch.clientY - rect.top;
-            
-            document.addEventListener('touchmove', dragTouch);
-            document.addEventListener('touchend', stopDrag);
-            e.preventDefault();
-        }
-        
-        function drag(e) {
-            if (!isDragging) return;
-            const marina = document.getElementById('marinaView');
-            const marinaRect = marina.getBoundingClientRect();
-            
-            let x = e.clientX - marinaRect.left - offsetX;
-            let y = e.clientY - marinaRect.top - offsetY;
-            
-            // Begrenzungen (innerhalb des See-Bildes)
-            x = Math.max(10, Math.min(x, marinaRect.width - boat.offsetWidth - 10));
-            y = Math.max(10, Math.min(y, marinaRect.height - boat.offsetHeight - 10));
-            
-            boat.style.left = x + 'px';
-            boat.style.top = y + 'px';
-        }
-        
-        function dragTouch(e) {
-            if (!isDragging) return;
-            const touch = e.touches[0];
-            const marina = document.getElementById('marinaView');
-            const marinaRect = marina.getBoundingClientRect();
-            
-            let x = touch.clientX - marinaRect.left - offsetX;
-            let y = touch.clientY - marinaRect.top - offsetY;
-            
-            x = Math.max(10, Math.min(x, marinaRect.width - boat.offsetWidth - 10));
-            y = Math.max(10, Math.min(y, marinaRect.height - boat.offsetHeight - 10));
-            
-            boat.style.left = x + 'px';
-            boat.style.top = y + 'px';
-        }
-        
-        function stopDrag() {
-            isDragging = false;
-            boat.classList.remove('dragging');
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('touchmove', dragTouch);
-            document.removeEventListener('mouseup', stopDrag);
-            document.removeEventListener('touchend', stopDrag);
-        }
-    });
-
-    // Formular Absenden
-    document.getElementById('slotReservationForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const slotInput = document.getElementById('selectedSlot');
-        const slotId = slotInput.getAttribute('data-id'); // Echte DB-ID
-        
-        if (!slotId) {
-            alert('Bitte wählen Sie zuerst einen Liegeplatz aus der Marina-Ansicht aus.');
-            return;
-        }
-        
-        // Formular-Daten sammeln
-        const formData = {
-            item_id: parseInt(slotId), // Echte DB-ID als Integer
-            customer_name: document.getElementById('slotCustomerName').value,
-            customer_email: document.getElementById('slotCustomerEmail').value,
-            customer_phone: document.getElementById('slotCustomerPhone').value,
-            start_date: document.getElementById('slotStartDate').value,
-            end_date: document.getElementById('slotEndDate').value,
-            payment_method: 'paypal'
-        };
-
-        // Ladeanzeige
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
-        
-        // API-Aufruf
-        fetch('/booking/makeSlotReservation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Zur Payment-Seite weiterleiten
-                window.location.href = data.redirect_url;
-            } else {
-                alert('Fehler: ' + (data.message || 'Reservierung konnte nicht erstellt werden'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Fehler bei der Reservierung. Bitte versuchen Sie es erneut.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        });
-    });
-
-    document.getElementById('boatReservationForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const boatSelect = document.getElementById('selectedBoat');
-        if (!boatSelect.value) {
-            alert('Bitte wählen Sie zuerst ein Boot aus.');
-            return;
-        }
-        
-        // Formular-Daten sammeln
-        const formData = {
-            item_id: parseInt(boatSelect.value),
-            customer_name: document.getElementById('boatCustomerName').value,
-            customer_email: document.getElementById('boatCustomerEmail').value,
-            customer_phone: document.getElementById('boatCustomerPhone').value,
-            start_date: document.getElementById('boatStartDate').value,
-            end_date: document.getElementById('boatEndDate').value,
-            experience_level: document.getElementById('boatExperience').value,
-            additional_equipment: document.getElementById('boatRequests').value,
-            payment_method: 'paypal'
-        };
-
-        // Ladeanzeige
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
-        
-        // API-Aufruf
-        fetch('/booking/makeBoatReservation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Zur Payment-Seite weiterleiten
-                window.location.href = data.redirect_url;
-            } else {
-                alert('Fehler: ' + (data.message || 'Reservierung konnte nicht erstellt werden'));
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Fehler bei der Reservierung. Bitte versuchen Sie es erneut.');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
-        });
-    });
-
-    // Datumseingaben vorbelegen
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    const formatDate = (date) => date.toISOString().split('T')[0];
-    
-    // Heutiges Datum setzen
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.value = formatDate(today);
-        input.min = formatDate(today);
-    });
-    
-    // Enddatum für Liegeplätze auf morgen setzen
-    document.getElementById('slotEndDate').value = formatDate(tomorrow);
-    
-    // Datum-Validierung
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.addEventListener('change', function() {
-            const startDate = document.getElementById(this.id.includes('Start') ? this.id : this.id.replace('End', 'Start'));
-            const endDate = document.getElementById(this.id.includes('End') ? this.id : this.id.replace('Start', 'End'));
-            
-            if (startDate && endDate) {
-                if (new Date(endDate.value) <= new Date(startDate.value)) {
-                    const nextDay = new Date(startDate.value);
-                    nextDay.setDate(nextDay.getDate() + 1);
-                    endDate.value = formatDate(nextDay);
-                }
-            }
-        });
-    });
-
-    // Smooth Scroll für Anchor Links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-            
-            if (targetId === '#boats') {
-                // Zum Boots-Tab wechseln
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                document.querySelector('.nav-tab[data-tab="boats"]').classList.add('active');
-                document.getElementById('boats-tab').classList.add('active');
-                
-                // Zum Tab-Inhalt scrollen
-                document.getElementById('boats-tab').scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start' 
-                });
-            } else {
-                const target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        });
-    });
-
-    // Boots-Daten für die Anzeige
-    const boatsData = [
-        {
-            id: 1,
-            name: 'Bavaria Cruiser 37',
-            type: 'Segelyacht',
-            category: 'premium',
-            length: 11.3,
-            year: 2023,
-            capacity: 8,
-            price_per_day: 350,
-            features: ['2 Kabinen', 'Vollküche', 'WC mit Dusche', 'GPS', 'Autopilot'],
-            image: 'https://res.cloudinary.com/dk-wassersport/image/upload/v1740666784/yacht/yacht_20250219_202505_new-img_75_4_img-Z6Q0P0Qy.jpg'
-        },
-        {
-            id: 2,
-            name: 'Hanse 388',
-            type: 'Segelyacht',
-            category: 'premium',
-            length: 11.4,
-            year: 2022,
-            capacity: 6,
-            price_per_day: 320,
-            features: ['3 Kabinen', 'Kombüse', 'Elektrowinde', 'Badeplattform', 'Sonnenliege'],
-            image: 'https://res.cloudinary.com/dk-wassersport/image/upload/v1687436145/yacht/hanse-388-segeln-lavagna-2018-mst-7553_ef16a87fb0075501318c20c50a281a6a.jpg'
-        },
-        {
-            id: 3,
-            name: 'Jeanneau Sun Odyssey 349',
-            type: 'Segelyacht',
-            category: 'comfort',
-            length: 10.3,
-            year: 2021,
-            capacity: 6,
-            price_per_day: 280,
-            features: ['Großraum', 'Kühlschrank', 'Heizung', 'Badeleiter', 'Stereoanlage'],
-            image: 'https://www.pitter-yachting.com/images/yacht/sun-odyssey-349/23971630-nala/23971630-main.jpg'
-        },
-        {
-            id: 4,
-            name: 'Quicksilver Activ 675',
-            type: 'Motorboot',
-            category: 'comfort',
-            length: 6.75,
-            year: 2023,
-            capacity: 8,
-            price_per_day: 220,
-            features: ['115 PS', 'Sonnendeck', 'Badeplattform', 'Kühlbox', 'USB-Anschluss'],
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlymDneY3tolTqia68b61rdHnxxw9NZzakxQ&s'
-        },
-        {
-            id: 5,
-            name: 'Bayliner VR6',
-            type: 'Motorboot',
-            category: 'standard',
-            length: 6.1,
-            year: 2022,
-            capacity: 6,
-            price_per_day: 180,
-            features: ['Mercury 150 PS', 'Ski-Torpedo', 'Badeleiter', 'Sportlenkung', 'Bluetooth'],
-            image: 'https://www.bootscenter-keser.de/wp-content/uploads/2024/03/Bayliner-VR6-Cuddy-7.webp'
-        },
-        {
-            id: 6,
-            name: 'Zodiac Cadet 310',
-            type: 'Schlauchboot',
-            category: 'economy',
-            length: 3.1,
-            year: 2023,
-            capacity: 4,
-            price_per_day: 90,
-            features: ['20 PS Motor', 'Leicht & wendig', 'Einfache Bedienung', 'Schnell abpumpbar'],
-            image: 'https://www.marinawassersport.de/cdn/shop/files/2015_Zodiac_310Alu_01_6edc392e-22e9-469e-a766-9d8670794f46.jpg?v=1740217353&width=1445'
-        }
-    ];
-
-    // Boots-Karten dynamisch generieren
-    const boatsGrid = document.getElementById('boatsGrid');
-    boatsData.forEach(boat => {
-        const boatCard = document.createElement('div');
-        boatCard.className = 'boat-card';
-        boatCard.setAttribute('data-boat-id', boat.id);
-
-        boatCard.innerHTML = `
-            <div class="boat-image" style="background-image: url('${boat.image}');">
-                <div class="boat-category">
-                    ${boat.category === 'premium' ? '⭐ Premium' : boat.category === 'comfort' ? '✨ Komfort' : boat.category === 'standard' ? '✓ Standard' : '💫 Economy'}
-                </div>
-            </div>
-            <div class="boat-content">
-                <div class="boat-header">
-                    <div>
-                        <div class="boat-name">${boat.name}</div>
-                        <div class="boat-type">${boat.type} • ${boat.year}</div>
-                    </div>
-                    <div class="boat-price">€${boat.price_per_day}<span>/Tag</span></div>
-                </div>
-                <div class="boat-details">
-                    <div class="detail-item">
-                        <i class="fas fa-ruler"></i>
-                        <span>${boat.length}m</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-users"></i>
-                        <span>${boat.capacity} Pers.</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-tag"></i>
-                        <span>${boat.category.charAt(0).toUpperCase() + boat.category.slice(1)}</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-calendar"></i>
-                        <span>${boat.year}</span>
-                    </div>
-                </div>
-                <div class="boat-features">
-                    ${boat.features.map(feature => `<span class="feature-tag">${feature}</span>`).join('')}
-                </div>
-                <button class="btn btn-primary select-boat-btn" data-boat-id="${boat.id}" style="width: 100%; margin-top: 1rem;">
-                    <i class="fas fa-check"></i> Boot auswählen
-                </button>
-            </div>
-        `;
-
-        boatsGrid.appendChild(boatCard);
-    });
-
-    // Event Listener für Bootsauswahl-Buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('select-boat-btn') || e.target.closest('.select-boat-btn')) {
-            const btn = e.target.classList.contains('select-boat-btn') ? e.target : e.target.closest('.select-boat-btn');
-            const boatId = btn.getAttribute('data-boat-id');
-            
-            // Zum Boots-Tab wechseln
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector('.nav-tab[data-tab="boats"]').classList.add('active');
-            document.getElementById('boats-tab').classList.add('active');
-            
-            // Boot im Formular auswählen
-            document.getElementById('selectedBoat').value = boatId;
-            
-            // Zum Formular scrollen
-            document.getElementById('boatReservationForm').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
-            
-            // Visuelles Feedback für Boot-Auswahl
-            const boatCard = btn.closest('.boat-card');
-            boatCard.style.transform = 'translateY(-5px)';
-            boatCard.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.1)';
-            
-            setTimeout(() => {
-                boatCard.style.transform = '';
-                boatCard.style.boxShadow = '';
-            }, 300);
-        }
-    });
-
-    // Zufällige Boot-Positionen für natürlicheren Look
-    function randomizeBoatPositions() {
-        const boats = document.querySelectorAll('.boat-on-water');
-        const marina = document.getElementById('marinaView');
-        const marinaRect = marina.getBoundingClientRect();
-        
-        boats.forEach((boat, index) => {
-            // Nicht die Boote an Liegeplätzen bewegen
-            if (boat.getAttribute('data-slot')) return;
-            
-            const x = 20 + Math.random() * (marinaRect.width - 140);
-            const y = 250 + Math.random() * (marinaRect.height - 300);
-            
-            boat.style.left = x + 'px';
-            boat.style.top = y + 'px';
-        });
-    }
-
-    // Boot-Positionen beim Laden zufällig setzen
-    window.addEventListener('load', randomizeBoatPositions);
-
-    // Prüfen ob Buchung erfolgreich war (von Zahlungsseite zurück)
-    window.addEventListener('load', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
-            // Zum Boots-Tab wechseln
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelector('.nav-tab[data-tab="boats"]').classList.add('active');
-            document.getElementById('boats-tab').classList.add('active');
-            
-            // Erfolgsmeldung anzeigen
-            document.getElementById('successMessage').style.display = 'block';
-            document.getElementById('boatReservationForm').parentElement.style.display = 'none';
-            document.querySelector('.boats-grid').parentElement.style.display = 'none';
-            
-            // Daten in Erfolgsmeldung einfügen
-            document.getElementById('confirmedReservation').textContent = decodeURIComponent(urlParams.get('reservation') || 'N/A');
-            document.getElementById('confirmedBoat').textContent = decodeURIComponent(urlParams.get('boat') || '');
-            document.getElementById('confirmedName').textContent = decodeURIComponent(urlParams.get('name') || '');
-            document.getElementById('confirmedDates').textContent = `${urlParams.get('start')} bis ${urlParams.get('end')}`;
-            document.getElementById('confirmedTotal').textContent = urlParams.get('total') || '0';
-            
-            // Zum Erfolgsbereich scrollen
-            document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-        }
-    });
+    // Daten von PHP an JS übergeben
+    const INITIAL_SLOTS = <?= json_encode($slots) ?>;
+    const INITIAL_BOATS = <?= json_encode($boats) ?>;
 </script>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/assets/js/marina-app.js"></script>
 </body>
 </html>
