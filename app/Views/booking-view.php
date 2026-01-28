@@ -6,8 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/assets/css/header.css">
     <link rel="stylesheet" href="/assets/css/marina-style.css">
-
-    <title>Yachthafen Plau am See - Premium Liegeplätze & Bootsverleih</title>
+    <title><?= esc($title ?? 'Yachthafen Plau am See - Premium Liegeplätze & Bootsverleih') ?></title>
     <style>
         * {
             margin: 0;
@@ -34,6 +33,7 @@
             --shadow: rgba(0, 0, 0, 0.1);
             --border-radius: 12px;
             --transition: all 0.3s ease;
+            --grid-color: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -53,7 +53,7 @@
         /* Hero Section */
         .hero {
             background: linear-gradient(rgba(26, 82, 118, 0.9), rgba(13, 60, 90, 0.9)),
-                        url('https://images.unsplash.com/photo-1534215754734-18e55d13e346?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            url('https://images.unsplash.com/photo-1534215754734-18e55d13e346?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
             color: var(--white);
@@ -208,7 +208,7 @@
             border-radius: 2px;
         }
 
-        /* Marina View mit realistischem See-Bild */
+        /* Marina View mit Raster */
         .marina-map-container {
             background: var(--white);
             border-radius: var(--border-radius);
@@ -221,27 +221,34 @@
 
         .marina-view {
             width: 100%;
-            height: 600px;
+            height: 700px;
             border-radius: var(--border-radius);
             overflow: hidden;
             position: relative;
-            background: url('https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=');
+            background:
+                    linear-gradient(0deg, rgba(26, 82, 118, 0.2), rgba(26, 82, 118, 0.2)),
+                    url('https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=');
             background-size: cover;
             background-position: center;
             border: 3px solid var(--primary);
         }
 
-        .marina-view::before {
-            content: '';
+        /* Raster-Gitter über den See */
+        .water-grid {
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            width: 100%;
+            height: 100%;
+            background-image:
+                    linear-gradient(var(--grid-color) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: 1;
+            pointer-events: none;
         }
 
+        /* Dock- und Steg-Bereiche */
         .dock {
             position: absolute;
             background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
@@ -258,12 +265,14 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
             z-index: 5;
             background: rgba(26, 82, 118, 0.8);
-            padding: 5px 15px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 25px;
             border: 2px solid var(--secondary);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .slot {
+        /* Raster-Slots (NEU für das Raster-System) */
+        .grid-slot {
             position: absolute;
             border-radius: 8px;
             cursor: pointer;
@@ -273,74 +282,116 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             z-index: 3;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            min-width: 90px;
-            min-height: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            min-width: 80px;
+            min-height: 40px;
             backdrop-filter: blur(2px);
+            text-align: center;
+            padding: 5px;
+            user-select: none;
         }
 
-        .slot:hover:not(.occupied) {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        .grid-slot:hover:not(.occupied):not(.booked) {
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             z-index: 10;
+            border-color: var(--white);
         }
 
-        .slot.selected {
+        .grid-slot.selected {
             border-color: var(--white);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 5px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 8px 25px rgba(0, 0, 0, 0.6);
             animation: pulse 2s infinite;
+            transform: scale(1.05);
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7), 0 8px 25px rgba(0, 0, 0, 0.6); }
+            70% { box-shadow: 0 0 0 12px rgba(255, 255, 255, 0), 0 8px 25px rgba(0, 0, 0, 0.6); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0), 0 8px 25px rgba(0, 0, 0, 0.6); }
         }
 
-        .slot.premium { 
+        /* Slot-Zustände für Raster-System */
+        .grid-slot.available {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.85) 0%, rgba(52, 152, 219, 0.85) 100%);
+            border-color: var(--success);
+        }
+
+        .grid-slot.booked {
             background: linear-gradient(135deg, rgba(212, 172, 13, 0.9) 0%, rgba(241, 196, 15, 0.9) 100%);
             border-color: var(--secondary);
+            animation: booked-pulse 1.5s infinite alternate;
         }
-        .slot.comfort { 
-            background: linear-gradient(135deg, rgba(23, 162, 184, 0.9) 0%, rgba(91, 192, 222, 0.9) 100%);
-            border-color: var(--accent);
+
+        @keyframes booked-pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.03); }
         }
-        .slot.standard { 
-            background: linear-gradient(135deg, rgba(46, 134, 193, 0.9) 0%, rgba(52, 152, 219, 0.9) 100%);
-            border-color: var(--primary-light);
-        }
-        .slot.economy { 
-            background: linear-gradient(135deg, rgba(149, 165, 166, 0.9) 0%, rgba(127, 140, 141, 0.9) 100%);
-            border-color: #7f8c8d;
-        }
-        .slot.occupied { 
+
+        .grid-slot.occupied {
             background: linear-gradient(135deg, rgba(220, 53, 69, 0.9) 0%, rgba(192, 57, 43, 0.9) 100%);
-            cursor: not-allowed;
             border-color: var(--danger);
+            cursor: not-allowed;
+        }
+
+        .grid-slot.drag-over {
+            background: linear-gradient(135deg, rgba(23, 162, 184, 0.7) 0%, rgba(91, 192, 222, 0.7) 100%) !important;
+            border: 3px dashed var(--white);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(23, 162, 184, 0.5);
+            z-index: 20;
+        }
+
+        /* Slot-Inhalt */
+        .slot-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .slot-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .slot-status {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Boote auf dem See */
         .boat-on-water {
             position: absolute;
             width: 100px;
-            height: 35px;
+            height: 40px;
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: move;
             z-index: 4;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 0.8rem;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             transition: var(--transition);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.4);
             user-select: none;
+            overflow: hidden;
         }
 
         .boat-on-water::before {
@@ -349,40 +400,122 @@
             top: 50%;
             left: 10px;
             transform: translateY(-50%);
-            width: 15px;
-            height: 15px;
+            width: 12px;
+            height: 12px;
             background: #e74c3c;
             border-radius: 50%;
             box-shadow: 0 0 8px rgba(231, 76, 60, 0.7);
         }
 
+        .boat-on-water::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 2px;
+        }
+
         .boat-on-water:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(1.1) rotate(1deg);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            border-color: rgba(255, 255, 255, 0.8);
         }
 
         .boat-on-water.dragging {
-            transform: scale(1.1);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            z-index: 100;
+            transform: scale(1.15) rotate(2deg);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            opacity: 0.9;
+            border-color: var(--secondary);
         }
 
-        /* Wellen-Effekt auf den Booten */
+        .boat-name {
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .boat-size {
+            font-size: 0.65rem;
+            opacity: 0.9;
+        }
+
+        /* Wellen-Effekt */
         .boat-wave {
             position: absolute;
-            bottom: -3px;
+            bottom: -2px;
             left: 0;
             right: 0;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.3);
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             border-radius: 50%;
-            animation: wave 2s infinite;
+            animation: wave 2s infinite linear;
         }
 
         @keyframes wave {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1); opacity: 0.3; }
-            100% { transform: scale(0.8); opacity: 0.5; }
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Kontroll-Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .control-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .control-btn.reset {
+            background: var(--danger);
+        }
+
+        .control-btn.reset:hover {
+            background: #c82333;
+        }
+
+        /* Status Info */
+        .booking-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            border-left: 4px solid var(--secondary);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         /* Boots Grid */
@@ -484,23 +617,6 @@
             text-align: center;
         }
 
-        .boat-features {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-tag {
-            background: var(--light-bg);
-            color: var(--text-dark);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            border: 1px solid var(--light-gray);
-        }
-
         /* Forms */
         .booking-form {
             background: var(--white);
@@ -588,11 +704,13 @@
             border: 2px solid rgba(255, 255, 255, 0.8);
         }
 
+        .available-color { background: var(--success); }
+        .booked-color { background: var(--secondary); }
+        .occupied-color { background: var(--danger); }
         .premium-color { background: var(--secondary); }
         .comfort-color { background: var(--accent); }
         .standard-color { background: var(--primary-light); }
         .economy-color { background: #95a5a6; }
-        .occupied-color { background: var(--danger); }
 
         /* Footer */
         .footer {
@@ -639,7 +757,8 @@
 
         /* Responsive Design */
         @media (max-width: 1200px) {
-            .marina-view { height: 500px; }
+            .marina-view { height: 600px; }
+            .grid-slot { min-width: 70px; min-height: 35px; font-size: 0.8rem; }
         }
 
         @media (max-width: 992px) {
@@ -647,26 +766,30 @@
             .hero .slogan { font-size: 1.5rem; }
             .form-grid { grid-template-columns: 1fr; }
             .nav-tabs { flex-direction: column; }
+            .marina-view { height: 500px; }
         }
 
         @media (max-width: 768px) {
-            .hero { padding: 3rem 0; }
+            .hero { padding: 6rem 0; }
             .hero h1 { font-size: 2.2rem; }
             .hero .slogan { font-size: 1.3rem; }
             .section-title { font-size: 1.8rem; }
             .marina-section, .booking-form { padding: 2rem; }
+            .marina-view { height: 400px; }
+            .grid-slot { min-width: 60px; min-height: 30px; font-size: 0.7rem; }
+            .boat-on-water { width: 80px; height: 35px; font-size: 0.7rem; }
+            .controls { flex-direction: column; align-items: center; }
+            .control-btn { width: 80%; }
             .boats-grid { grid-template-columns: 1fr; }
             .status-legend { gap: 1rem; }
             .status-item { padding: 0.6rem 1rem; }
-            .marina-view { height: 400px; }
-            .boat-on-water { width: 80px; height: 30px; font-size: 0.7rem; }
-            .slot { min-width: 80px; min-height: 30px; }
         }
 
         /* Utility Classes */
         .text-center { text-align: center; }
         .mb-2 { margin-bottom: 2rem; }
         .mt-3 { margin-top: 3rem; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -675,10 +798,9 @@
 <section class="hero">
     <div class="container">
         <div class="hero-content">
-            <h1>Yachthafen Plau am See</h1>
-            <div class="slogan">Premium Liegeplatzverwaltung & Bootsverleih</div>
-            <p class="subtitle">Entdecken Sie die digitale Exzellenz am Plauer See - Buchen Sie direkt online Ihren
-                Liegeplatz oder mieten Sie eines unserer Premium-Boote für unvergessliche Stunden auf dem Wasser.</p>
+            <h1><?= esc($marina_info['name'] ?? 'Yachthafen Plau am See') ?></h1>
+            <div class="slogan"><?= esc($marina_info['slogan'] ?? 'Premium Liegeplatzverwaltung & Bootsverleih') ?></div>
+            <p class="subtitle"><?= esc($marina_info['description'] ?? 'Ziehen Sie Boote auf das Raster, um Plätze zu buchen. Einfach und visuell!') ?></p>
         </div>
     </div>
 </section>
@@ -687,7 +809,7 @@
     <div class="container">
         <div class="nav-tabs" id="booking">
             <button class="nav-tab" :class="{ active: activeTab === 'slots' }" @click="activeTab = 'slots'">
-                <i class="fas fa-anchor"></i> Liegeplätze & Marina
+                <i class="fas fa-anchor"></i> Raster-Buchung
             </button>
             <button class="nav-tab" :class="{ active: activeTab === 'boats' }" @click="activeTab = 'boats'">
                 <i class="fas fa-ship"></i> Bootsverleih
@@ -698,51 +820,91 @@
     <div class="container" v-if="activeTab === 'slots'">
         <div class="tab-content active">
             <div class="marina-map-container">
-                <h2 class="section-title">Marina Übersicht - Plauer See</h2>
+                <h2 class="section-title">Interaktives Liegeplatz-Raster</h2>
                 <p class="text-center mb-2" style="color: var(--text-light); max-width: 800px; margin: 0 auto 2rem;">
-                    Ziehen Sie ein Boot aus dem See auf einen freien Liegeplatz, um diesen auszuwählen.
+                    Ziehen Sie ein Boot aus dem See auf einen <strong>grünen</strong> Raster-Platz.
+                    Gebuchte Plätze werden <strong>golden</strong>, belegte <strong>rot</strong> angezeigt.
                 </p>
 
-                <div class="marina-view" id="marinaView">
-                    <div class="dock" style="width: 85%; height: 25px; top: 60px; left: 7.5%;"></div>
-                    <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 15%;"></div>
-                    <div class="dock" style="width: 20px; height: 250px; top: 85px; left: 30%;"></div>
-                    <div class="dock" style="width: 20px; height: 300px; top: 85px; left: 45%;"></div>
-                    <div class="dock" style="width: 20px; height: 200px; top: 85px; left: 60%;"></div>
+                <div class="controls">
+                    <button class="control-btn" @click="resetAllBookings">
+                        <i class="fas fa-redo"></i> Alle Buchungen zurücksetzen
+                    </button>
+                    <button class="control-btn" @click="simulateRandomBooking">
+                        <i class="fas fa-random"></i> Zufällige Buchung simulieren
+                    </button>
+                    <button class="control-btn reset" @click="resetDrag">
+                        <i class="fas fa-times"></i> Zurücksetzen (Boote im See)
+                    </button>
+                </div>
 
-                    <div v-for="slot in slots"
+                <div class="marina-view" id="marinaView">
+                    <!-- Raster-Gitter -->
+                    <div class="water-grid"></div>
+
+                    <!-- Dock-Bereich -->
+                    <div class="dock" style="width: 85%; height: 25px; top: 60px; left: 7.5%;">
+                        <div class="dock-label" style="top: -45px; left: 50%; transform: translateX(-50%);">
+                            Hauptsteg
+                        </div>
+                    </div>
+
+                    <!-- Raster-Slots (NEUES System) -->
+                    <div v-for="slot in gridSlots"
                          :key="slot.id"
-                         class="slot"
-                         :class="[slot.category.toLowerCase(), { 'occupied': slot.isOccupied, 'drag-over': dragOverId === slot.id, 'selected': selectedSlotId === slot.id }]"
-                         :style="getSlotStyle(slot)"
+                         class="grid-slot"
+                         :class="[slot.status, { 'selected': selectedSlotId === slot.id, 'drag-over': dragOverId === slot.id }]"
+                         :style="getGridSlotStyle(slot)"
                          @dragover.prevent="onDragOver(slot.id)"
                          @dragleave="dragOverId = null"
                          @drop="onDrop(slot)"
                          @click="selectSlot(slot)">
-                        {{ slot.slot_number }}
 
-                        <div v-if="slot.isOccupied" class="boat-in-slot">
-                            <i class="fas fa-ship"></i>
-                            <small>{{ slot.boatName }}</small>
+                        <div class="slot-content">
+                            <div class="slot-number">#{{ slot.slot_number || slot.id }}</div>
+                            <div class="slot-status">
+                                <template v-if="slot.status === 'available'">Frei</template>
+                                <template v-else-if="slot.status === 'booked'">Gebucht</template>
+                                <template v-else-if="slot.status === 'occupied'">Belegt</template>
+                            </div>
+                            <small v-if="slot.boatName">{{ slot.boatName }}</small>
                         </div>
                     </div>
 
+                    <!-- Boote im See -->
                     <div v-for="boat in boatsInWater"
-                         :key="boat.id"
+                         :key="'boat-' + boat.id"
                          class="boat-on-water draggable-boat"
                          draggable="true"
                          @dragstart="onDragStart($event, boat)"
-                         :style="boat.style">
-                        {{ boat.name }}
+                         @dragend="onDragEnd"
+                         :style="getBoatStyle(boat)">
+                        <div class="boat-name">{{ boat.name }}</div>
+                        <div class="boat-size">{{ boat.length }}m</div>
                         <div class="boat-wave"></div>
+                    </div>
+
+                    <!-- Info Box für gezogenes Boot -->
+                    <div v-if="draggedBoat" class="booking-status">
+                        <i class="fas fa-ship" style="color: var(--secondary); margin-right: 8px;"></i>
+                        Ziehen Sie <strong>{{ draggedBoat.name }}</strong> auf einen freien Platz
                     </div>
                 </div>
             </div>
 
+            <!-- Buchungsformular -->
             <div class="booking-form" id="slotReservationForm">
                 <h2 class="section-title">Liegeplatz Reservierung</h2>
-                <form @submit.prevent="submitSlotBooking">
+                <form @submit.prevent="submitBooking">
                     <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-anchor"></i> Ausgewählter Platz</label>
+                            <input type="text" :value="selectedSlotInfo" readonly placeholder="Kein Platz ausgewählt">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-ship"></i> Ausgewähltes Boot</label>
+                            <input type="text" :value="selectedBoatInfo" readonly placeholder="Kein Boot ausgewählt">
+                        </div>
                         <div class="form-group">
                             <label><i class="fas fa-user"></i> Name</label>
                             <input type="text" v-model="formData.name" required placeholder="Max Mustermann">
@@ -752,21 +914,25 @@
                             <input type="email" v-model="formData.email" required placeholder="max@mustermann.de">
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-calendar-day"></i> Ankunft</label>
+                            <label><i class="fas fa-calendar-day"></i> Von</label>
                             <input type="date" v-model="formData.start_date" required>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-calendar-day"></i> Abreise</label>
+                            <label><i class="fas fa-calendar-day"></i> Bis</label>
                             <input type="date" v-model="formData.end_date" required>
                         </div>
                         <div class="form-group full-width">
-                            <label><i class="fas fa-anchor"></i> Ausgewählter Liegeplatz</label>
-                            <input type="text" :value="selectedSlotName" readonly placeholder="Ziehen Sie ein Boot auf einen Platz oder klicken Sie einen an">
+                            <label><i class="fas fa-comment"></i> Bemerkungen</label>
+                            <textarea v-model="formData.notes" rows="3" placeholder="Besondere Wünsche oder Anforderungen..."></textarea>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" :disabled="!selectedSlotId">
-                            <i class="fas fa-check-circle"></i> Jetzt reservieren
+                        <button type="submit" class="btn btn-primary" :disabled="!canSubmitBooking">
+                            <i class="fas fa-check-circle"></i>
+                            {{ selectedSlotId ? 'Platz buchen' : 'Zuerst Platz auswählen' }}
+                        </button>
+                        <button type="button" class="btn" style="margin-left: 1rem;" @click="showAllBookings">
+                            <i class="fas fa-list"></i> Alle Buchungen anzeigen
                         </button>
                     </div>
                 </form>
@@ -779,14 +945,24 @@
             <div class="marina-section">
                 <h2 class="section-title">Unsere Bootsflotte</h2>
                 <div class="boats-grid">
-                    <div v-for="boat in boats" :key="boat.id" class="boat-card">
+                    <div v-for="boat in boatsList" :key="boat.id" class="boat-card">
                         <div class="boat-image" :style="{ backgroundImage: 'url(' + boat.image_url + ')' }">
-                            <div class="boat-category">{{ boat.boat_type }}</div>
+                            <div class="boat-category">{{ boat.boat_type || 'Boot' }}</div>
                         </div>
                         <div class="boat-content">
                             <div class="boat-header">
                                 <div class="boat-name">{{ boat.name }}</div>
                                 <div class="boat-price">€{{ boat.price_per_day }}<span>/Tag</span></div>
+                            </div>
+                            <div class="boat-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-ruler"></i>
+                                    <span>{{ boat.length || '0' }}m Länge</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>{{ boat.category || 'Standard' }}</span>
+                                </div>
                             </div>
                             <button class="btn btn-primary" style="width: 100%" @click="selectBoatForRental(boat)">
                                 Dieses Boot wählen
@@ -803,8 +979,8 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Kontakt</h3>
-                    <p><i class="fas fa-phone"></i> +49 38735 12345</p>
-                    <p><i class="fas fa-envelope"></i> info@yachthafen-plau.de</p>
+                    <p><i class="fas fa-phone"></i> <?= esc($marina_info['contact']['phone'] ?? '+49 38735 12345') ?></p>
+                    <p><i class="fas fa-envelope"></i> <?= esc($marina_info['contact']['email'] ?? 'info@yachthafen-plau.de') ?></p>
                 </div>
                 <div class="footer-section">
                     <h3>Öffnungszeiten</h3>
@@ -817,13 +993,395 @@
         </div>
     </footer>
 </div>
+
 <script>
     // Daten von PHP an JS übergeben
-    const INITIAL_SLOTS = <?= json_encode($slots) ?>;
-    const INITIAL_BOATS = <?= json_encode($boats) ?>;
+    const APP_DATA = {
+        slots: <?= json_encode($slots ?? []) ?>,
+        boats: <?= json_encode($boats ?? []) ?>,
+        boats_list: <?= json_encode($boats_list ?? []) ?>,
+        marina_info: <?= json_encode($marina_info ?? []) ?>
+    };
+
+    // Legacy-Variablen für Kompatibilität
+    const INITIAL_SLOTS = <?= json_encode($slots ?? []) ?>;
+    const INITIAL_BOATS = <?= json_encode($boats ?? []) ?>;
 </script>
 
 <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="/assets/js/marina-app.js"></script>
+<script>
+    const { createApp } = Vue;
+
+    createApp({
+        data() {
+            return {
+                activeTab: 'slots',
+
+                // Neue Datenstruktur für Raster-System
+                gridSlots: APP_DATA.slots || [],
+                boatsInWater: APP_DATA.boats || [],
+                boatsList: APP_DATA.boats_list || [],
+
+                // Zustände
+                draggedBoat: null,
+                dragOverId: null,
+                selectedSlotId: null,
+                selectedBoatId: null,
+
+                // Formular
+                formData: {
+                    name: '',
+                    email: '',
+                    start_date: '',
+                    end_date: '',
+                    notes: '',
+                    customer_phone: '',
+                    payment_method: 'paypal'
+                }
+            }
+        },
+
+        computed: {
+            selectedSlotInfo() {
+                if (!this.selectedSlotId) return 'Kein Platz ausgewählt';
+                const slot = this.gridSlots.find(s => s.id === this.selectedSlotId);
+                if (!slot) return 'Platz nicht gefunden';
+
+                const statusMap = {
+                    'available': 'Frei',
+                    'booked': 'Gebucht',
+                    'occupied': 'Belegt'
+                };
+
+                return `Platz ${slot.slot_number || slot.id} - ${statusMap[slot.status] || 'Unbekannt'}`;
+            },
+
+            selectedBoatInfo() {
+                if (!this.selectedBoatId) return 'Kein Boot ausgewählt';
+                const boat = this.boatsInWater.find(b => b.id === this.selectedBoatId);
+                if (!boat) return 'Boot nicht gefunden';
+
+                return `${boat.name} (${boat.length}m, ${boat.type})`;
+            },
+
+            canSubmitBooking() {
+                return this.selectedSlotId &&
+                    this.selectedBoatId &&
+                    this.formData.name &&
+                    this.formData.email &&
+                    this.formData.start_date &&
+                    this.formData.end_date;
+            }
+        },
+
+        methods: {
+            // Positionierung im Raster
+            getGridSlotStyle(slot) {
+                const rowIndex = slot.row ? slot.row.charCodeAt(0) - 65 : 0;
+                const colIndex = slot.col ? slot.col - 1 : slot.position ? slot.position - 1 : 0;
+
+                const cellSize = 70;
+                const padding = 10;
+                const startX = 50;
+                const startY = 120;
+
+                const left = startX + (colIndex * (cellSize + padding));
+                const top = startY + (rowIndex * (cellSize + padding));
+
+                return {
+                    top: `${top}px`,
+                    left: `${left}px`,
+                    width: `${cellSize}px`,
+                    height: `${cellSize}px`
+                };
+            },
+
+            getBoatStyle(boat) {
+                // Falls Boote keine Positionen haben, zufällige Werte generieren
+                return {
+                    top: `${boat.top || Math.floor(Math.random() * 400 + 200)}px`,
+                    left: `${boat.left || Math.floor(Math.random() * 70 + 5)}%`,
+                    background: this.getBoatColor(boat.category),
+                    width: '100px',
+                    height: '40px'
+                };
+            },
+
+            getBoatColor(category) {
+                const colors = {
+                    premium: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                    comfort: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
+                    standard: 'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)',
+                    economy: 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)'
+                };
+                return colors[category] || colors.standard;
+            },
+
+            // Drag & Drop
+            onDragStart(event, boat) {
+                this.draggedBoat = boat;
+                this.selectedBoatId = boat.id;
+                event.dataTransfer.setData('text/plain', boat.id);
+                event.dataTransfer.effectAllowed = 'move';
+                event.target.classList.add('dragging');
+            },
+
+            onDragEnd() {
+                this.draggedBoat = null;
+                document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+            },
+
+            onDragOver(slotId) {
+                const slot = this.gridSlots.find(s => s.id === slotId);
+                if (slot && slot.status === 'available') {
+                    this.dragOverId = slotId;
+                    return true;
+                }
+                return false;
+            },
+
+            onDrop(slot) {
+                if (!this.draggedBoat || slot.status !== 'available') {
+                    this.dragOverId = null;
+                    return;
+                }
+
+                // Client-seitige Aktualisierung
+                slot.status = 'booked';
+                slot.boatName = this.draggedBoat.name;
+
+                // Slot auswählen
+                this.selectedSlotId = slot.id;
+
+                // Boot aus See entfernen (visuell)
+                this.boatsInWater = this.boatsInWater.filter(b => b.id !== this.draggedBoat.id);
+
+                this.draggedBoat = null;
+                this.dragOverId = null;
+
+                // Feedback an Benutzer
+                alert(`Boot "${slot.boatName}" auf Platz ${slot.slot_number || slot.id} gebucht!`);
+            },
+
+            // Slot per Klick auswählen
+            selectSlot(slot) {
+                if (slot.status === 'available') {
+                    this.selectedSlotId = slot.id;
+
+                    // Automatisch ein Boot auswählen, falls keins ausgewählt ist
+                    if (!this.selectedBoatId && this.boatsInWater.length > 0) {
+                        this.selectedBoatId = this.boatsInWater[0].id;
+                    }
+                }
+            },
+
+            // Boot für Verleih auswählen
+            selectBoatForRental(boat) {
+                this.selectedBoatId = boat.id;
+                this.activeTab = 'slots';
+                alert(`Boot "${boat.name}" wurde für die Buchung ausgewählt. Bitte ziehen Sie es auf einen freien Platz.`);
+            },
+
+            // Buchung an Server senden
+            async submitBooking() {
+                if (!this.canSubmitBooking) {
+                    alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+                    return;
+                }
+
+                const slot = this.gridSlots.find(s => s.id === this.selectedSlotId);
+                const boat = this.boatsInWater.find(b => b.id === this.selectedBoatId);
+
+                if (!slot || !boat) {
+                    alert('Fehler: Slot oder Boot nicht gefunden.');
+                    return;
+                }
+
+                const bookingData = {
+                    slot_id: slot.id,
+                    boat_id: boat.id,
+                    boat_name: boat.name,
+                    ...this.formData
+                };
+
+                try {
+                    const response = await fetch('/booking/bookSlot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(bookingData)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        alert('Buchung erfolgreich! ' + result.message);
+                        // Formular zurücksetzen
+                        this.resetForm();
+                    } else {
+                        alert('Fehler: ' + (result.message || 'Unbekannter Fehler'));
+                    }
+                } catch (error) {
+                    alert('Netzwerkfehler: ' + error.message);
+                }
+            },
+
+            // Hilfsfunktionen
+            resetForm() {
+                this.formData = {
+                    name: '',
+                    email: '',
+                    start_date: '',
+                    end_date: '',
+                    notes: '',
+                    customer_phone: '',
+                    payment_method: 'paypal'
+                };
+                this.selectedSlotId = null;
+                this.selectedBoatId = null;
+            },
+
+            resetDrag() {
+                // Wenn keine Boote da sind, Demo-Boote erstellen
+                if (this.boatsInWater.length === 0) {
+                    this.createDemoBoats();
+                } else {
+                    // Boote zurück auf zufällige Positionen setzen
+                    this.boatsInWater = this.boatsInWater.map(boat => ({
+                        ...boat,
+                        top: Math.floor(Math.random() * 400 + 200),
+                        left: Math.floor(Math.random() * 70 + 5)
+                    }));
+                }
+
+                this.draggedBoat = null;
+                this.dragOverId = null;
+                alert('Boote wurden zurück auf den See gesetzt.');
+            },
+
+            createDemoBoats() {
+                // Demo-Boote erstellen, falls keine vorhanden sind
+                this.boatsInWater = [
+                    {
+                        id: 1,
+                        name: 'Seestern',
+                        type: 'Segelyacht',
+                        category: 'premium',
+                        length: 12,
+                        top: Math.floor(Math.random() * 400 + 200),
+                        left: Math.floor(Math.random() * 70 + 5)
+                    },
+                    {
+                        id: 2,
+                        name: 'Windspiel',
+                        type: 'Segelboot',
+                        category: 'comfort',
+                        length: 8,
+                        top: Math.floor(Math.random() * 400 + 200),
+                        left: Math.floor(Math.random() * 70 + 5)
+                    },
+                    {
+                        id: 3,
+                        name: 'Wassermann',
+                        type: 'Motorboot',
+                        category: 'standard',
+                        length: 10,
+                        top: Math.floor(Math.random() * 400 + 200),
+                        left: Math.floor(Math.random() * 70 + 5)
+                    },
+                    {
+                        id: 4,
+                        name: 'Neptun',
+                        type: 'Luxusyacht',
+                        category: 'premium',
+                        length: 15,
+                        top: Math.floor(Math.random() * 400 + 200),
+                        left: Math.floor(Math.random() * 70 + 5)
+                    }
+                ];
+            },
+
+            async simulateRandomBooking() {
+                try {
+                    const response = await fetch('/booking/simulateBooking', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const result = await response.json();
+                    alert(result.message || 'Zufällige Buchung durchgeführt');
+                    // Seite neu laden für Aktualisierung
+                    location.reload();
+                } catch (error) {
+                    alert('Fehler: ' + error.message);
+                }
+            },
+
+            async resetAllBookings() {
+                if (!confirm('Alle Buchungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.')) {
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/booking/resetBookings', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const result = await response.json();
+                    alert(result.message);
+                    location.reload();
+                } catch (error) {
+                    alert('Fehler: ' + error.message);
+                }
+            },
+
+            async showAllBookings() {
+                try {
+                    const response = await fetch('/booking/getAllBookings', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    const result = await response.json();
+
+                    if (result.success && result.bookings.length > 0) {
+                        const bookingList = result.bookings.map(b =>
+                            `• ${b.reservation_number}: ${b.customer_name} (${b.start_date} - ${b.end_date})`
+                        ).join('\n');
+
+                        alert(`Aktuelle Buchungen:\n\n${bookingList}`);
+                    } else {
+                        alert('Keine Buchungen vorhanden.');
+                    }
+                } catch (error) {
+                    alert('Fehler beim Laden der Buchungen: ' + error.message);
+                }
+            }
+        },
+
+        mounted() {
+            // Heutiges Datum setzen
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+            this.formData.start_date = today;
+            this.formData.end_date = tomorrow;
+
+            // Falls keine Boote im Wasser sind, Demo-Boote erstellen
+            if (this.boatsInWater.length === 0) {
+                this.createDemoBoats();
+            }
+
+            // Demo: Einige Plätze als belegt markieren (nur visuell)
+            setTimeout(() => {
+                const demoSlots = ['A3', 'B5', 'C2'];
+                demoSlots.forEach(slotId => {
+                    const slot = this.gridSlots.find(s => s.id === slotId || s.slot_number === slotId);
+                    if (slot && slot.status === 'available') {
+                        slot.status = 'booked';
+                        slot.boatName = 'Demo-Boot';
+                    }
+                });
+            }, 1000);
+        }
+    }).mount('#app');
+</script>
 </body>
 </html>

@@ -2,19 +2,23 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
-use App\Models\ReservationModel;
 use App\Models\ItemModel;
+use App\Models\ReservationModel;
 
-class Booking extends Controller
+class Booking extends BaseController
 {
     public function index(): string
     {
         $itemModel = new ItemModel();
-        
-        $data['slots'] = $itemModel->getBerths(); // Liegeplätze aus Datenbank laden
-        $data['boats'] = $itemModel->getBoats(); // Boote aus Datenbank laden
-        $data['marina_info'] = $this->getMarinaInfo();
+
+        $data = [
+            'title' => 'Yachthafen Plau am See - Premium Liegeplätze & Bootsverleih',
+            'slots' => $itemModel->getBerthsForGrid(), // NEUE Methode für Vue.js Raster
+            'boats' => $itemModel->getBoatsInWater(),  // NEUE Methode für Boote im See
+            'boats_list' => $itemModel->getBoatsForGrid(), // Für die Bootsliste im Bootsverleih-Tab
+            'marina_info' => $this->getMarinaInfo(),
+            'weather' => $this->getWeatherData() ?? null
+        ];
 
         return view('booking-view', $data);
     }
@@ -24,379 +28,200 @@ class Booking extends Controller
         return [
             'name' => 'Yachthafen Plau am See',
             'slogan' => 'Premium Liegeplatzverwaltung & Bootsverleih',
-            'subtitle' => 'Digitale Exzellenz am Plauer See',
-            'description' => 'Buchen Sie direkt online Ihren Liegeplatz oder mieten Sie ein Boot für Ihren perfekten Tag auf dem Wasser. Einfach, schnell und transparent.',
+            'subtitle' => 'Interaktive Liegeplatzbuchung',
+            'description' => 'Ziehen Sie Boote auf das Raster, um Plätze zu buchen. Einfach und visuell!',
             'contact' => [
-                'phone' => '+49 123 456789',
+                'phone' => '+49 38735 12345',
                 'email' => 'info@yachthafen-plau.de',
                 'address' => 'Hafenstraße 1, 19395 Plau am See'
             ]
         ];
     }
 
-    private function getPremiumSlots()
+    private function getWeatherData()
     {
-        $slots = [];
-
-        // Premium Reihe A - direkt am Steg
-        for ($i = 1; $i <= 6; $i++) {
-            $slots[] = [
-                'id' => 'A' . $i,
-                'number' => 'A' . $i,
-                'row' => 'A',
-                'position' => $i,
-                'available' => $i % 3 !== 0,
-                'type' => 'premium',
-                'price_per_day' => 45.00,
-                'max_length' => 15,
-                'features' => ['Strom', 'Wasser', 'WLAN', 'Premium-Steg']
-            ];
-        }
-
-        // Komfort Reihe B
-        for ($i = 1; $i <= 8; $i++) {
-            $slots[] = [
-                'id' => 'B' . $i,
-                'number' => 'B' . $i,
-                'row' => 'B',
-                'position' => $i,
-                'available' => $i % 4 !== 0,
-                'type' => 'comfort',
-                'price_per_day' => 35.00,
-                'max_length' => 12,
-                'features' => ['Strom', 'Wasser', 'WLAN']
-            ];
-        }
-
-        // Standard Reihe C
-        for ($i = 1; $i <= 10; $i++) {
-            $slots[] = [
-                'id' => 'C' . $i,
-                'number' => 'C' . $i,
-                'row' => 'C',
-                'position' => $i,
-                'available' => $i % 5 !== 0,
-                'type' => 'standard',
-                'price_per_day' => 25.00,
-                'max_length' => 10,
-                'features' => ['Strom', 'Wasser']
-            ];
-        }
-
-        // Economy Reihe D
-        for ($i = 1; $i <= 8; $i++) {
-            $slots[] = [
-                'id' => 'D' . $i,
-                'number' => 'D' . $i,
-                'row' => 'D',
-                'position' => $i,
-                'available' => $i % 2 !== 0,
-                'type' => 'economy',
-                'price_per_day' => 18.00,
-                'max_length' => 8,
-                'features' => ['Strom']
-            ];
-        }
-
-        return $slots;
+        // Falls du Wetterdaten integrieren möchtest, hier die Logik
+        return null;
     }
 
-    private function getPremiumBoats()
+    public function bookSlot()
     {
-        return [
-            [
-                'id' => 1,
-                'name' => 'Bavaria Cruiser 37',
-                'type' => 'Segelyacht',
-                'category' => 'premium',
-                'length' => 11.3,
-                'year' => 2023,
-                'capacity' => 8,
-                'price_per_day' => 350,
-                'image' => 'bavaria-cruiser.jpg',
-                'features' => ['Kajüt', 'Küche', 'WC', 'GPS', 'Autopilot']
-            ],
-            [
-                'id' => 2,
-                'name' => 'Hanse 388',
-                'type' => 'Segelyacht',
-                'category' => 'premium',
-                'length' => 11.4,
-                'year' => 2022,
-                'capacity' => 6,
-                'price_per_day' => 320,
-                'image' => 'hanse-388.jpg',
-                'features' => ['2 Kabinen', 'Kombüse', 'Dusche', 'Elektrowinde']
-            ],
-            [
-                'id' => 3,
-                'name' => 'Jeanneau Sun Odyssey 349',
-                'type' => 'Segelyacht',
-                'category' => 'comfort',
-                'length' => 10.3,
-                'year' => 2021,
-                'capacity' => 6,
-                'price_per_day' => 280,
-                'image' => 'jeanneau-349.jpg',
-                'features' => ['Großraum', 'Kühlschrank', 'Heizung', 'Badeleiter']
-            ],
-            [
-                'id' => 4,
-                'name' => 'Quicksilver Activ 675',
-                'type' => 'Motorboot',
-                'category' => 'comfort',
-                'length' => 6.75,
-                'year' => 2023,
-                'capacity' => 8,
-                'price_per_day' => 220,
-                'image' => 'quicksilver-675.jpg',
-                'features' => ['Sonnenliege', 'Badeplattform', 'Kühlbox', 'USB-Anschluss']
-            ],
-            [
-                'id' => 5,
-                'name' => 'Bayliner VR6',
-                'type' => 'Motorboot',
-                'category' => 'standard',
-                'length' => 6.1,
-                'year' => 2022,
-                'capacity' => 6,
-                'price_per_day' => 180,
-                'image' => 'bayliner-vr6.jpg',
-                'features' => ['Ski-Torpedo', 'Badeleiter', 'Sportlenkung', 'Stereoanlage']
-            ],
-            [
-                'id' => 6,
-                'name' => 'Zodiac Cadet 310',
-                'type' => 'Schlauchboot',
-                'category' => 'economy',
-                'length' => 3.1,
-                'year' => 2023,
-                'capacity' => 4,
-                'price_per_day' => 90,
-                'image' => 'zodiac-310.jpg',
-                'features' => ['Leicht', 'Wendig', 'Einfache Bedienung', 'Transportabel']
-            ]
-        ];
-    }
-
-    public function getAvailability()
-    {
-        $date = $this->request->getGet('date');
-        $type = $this->request->getGet('type');
-
-        if ($type === 'boat') {
-            $availability = $this->getPremiumBoats();
-        } else {
-            $availability = $this->getPremiumSlots();
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
         }
 
-        return $this->response->setJSON($availability);
-    }
-
-    public function makeBoatReservation()
-    {
-        $data = $this->request->getJSON(true); // true = als Array zurückgeben
-        $reservationModel = new ReservationModel();
         $itemModel = new ItemModel();
-        
-        // Get user from session
-        $session = session();
-        $userId = $session->get('user')['id'] ?? null;
+        $reservationModel = new ReservationModel();
 
-        // Validate input
-        if (!isset($data['item_id']) || !isset($data['start_date']) || !isset($data['end_date'])) {
+        $data = $this->request->getJSON(true);
+
+        // Validierung
+        $validation = \Config\Services::validation();
+        $validation->setRules([
+            'slot_id' => 'required',
+            'boat_id' => 'required',
+            'customer_name' => 'required|max_length[255]',
+            'customer_email' => 'required|valid_email|max_length[255]',
+            'start_date' => 'required|valid_date',
+            'end_date' => 'required|valid_date'
+        ]);
+
+        if (!$validation->run($data)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Fehlende Pflichtfelder'
+                'errors' => $validation->getErrors()
             ]);
         }
 
-        // Convert item_id to integer
-        $itemId = (int) $data['item_id'];
+        try {
+            // Slot- und Boot-Daten abrufen
+            $slot = $itemModel->find($data['slot_id']);
+            $boat = $itemModel->find($data['boat_id']);
 
-        // Check availability
-        if (!$reservationModel->isItemAvailable($itemId, $data['start_date'], $data['end_date'])) {
+            if (!$slot || !$boat) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Slot oder Boot nicht gefunden'
+                ]);
+            }
+
+            // Verfügbarkeit prüfen
+            if (!$reservationModel->isItemAvailable($slot['id'], $data['start_date'], $data['end_date'])) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Der gewählte Platz ist im angegebenen Zeitraum nicht verfügbar'
+                ]);
+            }
+
+            // Tagesberechnung
+            $startDate = new \DateTime($data['start_date']);
+            $endDate = new \DateTime($data['end_date']);
+            $days = $startDate->diff($endDate)->days + 1;
+
+            // Preisberechnung
+            $slotPrice = $days * ($slot['price_per_day'] ?? 0);
+            $serviceFee = 10.00;
+            $totalAmount = $slotPrice + $serviceFee;
+
+            // Reservierung erstellen
+            $reservationData = [
+                'reservation_number' => $reservationModel->generateReservationNumber('liegeplatz'),
+                'reservation_type' => 'liegeplatz',
+                'item_id' => $slot['id'],
+                'customer_name' => $data['customer_name'],
+                'customer_email' => $data['customer_email'],
+                'customer_phone' => $data['customer_phone'] ?? null,
+                'boat_name' => $boat['name'],
+                'boat_type' => $boat['boat_type'] ?? 'Boot',
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'days' => $days,
+                'price_per_day' => $slot['price_per_day'] ?? 0,
+                'boat_price' => $slotPrice,
+                'service_fee' => $serviceFee,
+                'insurance' => 0.00,
+                'total_amount' => $totalAmount,
+                'payment_method' => $data['payment_method'] ?? 'paypal',
+                'payment_status' => 'pending',
+                'notes' => $data['notes'] ?? null
+            ];
+
+            // User-ID aus Session falls vorhanden
+            $session = session();
+            if ($session->has('user_id')) {
+                $reservationData['user_id'] = $session->get('user_id');
+            }
+
+            $reservationId = $reservationModel->insert($reservationData);
+
+            if ($reservationId) {
+                // Slot-Status aktualisieren
+                $itemModel->updateBerthStatus($slot['id'], 'booked', $boat['name']);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Buchung erfolgreich erstellt',
+                    'booking_id' => $reservationId,
+                    'reservation_number' => $reservationData['reservation_number']
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            log_message('error', 'Booking error: ' . $e->getMessage());
+
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Boot ist im gewählten Zeitraum nicht verfügbar'
-            ]);
-        }
-
-        // Get boat details
-        $boat = $itemModel->find($itemId);
-        if (!$boat || $boat['type'] !== 'boot') {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Boot nicht gefunden'
-            ]);
-        }
-
-        // Calculate days and price
-        $startDate = new \DateTime($data['start_date']);
-        $endDate = new \DateTime($data['end_date']);
-        $days = $startDate->diff($endDate)->days + 1;
-        $boatPrice = $days * $boat['price_per_day'];
-        $serviceFee = 25.00;
-        $insurance = 35.00;
-        $totalAmount = $boatPrice + $serviceFee + $insurance;
-
-        // Create reservation with pending status
-        $reservationData = [
-            'user_id' => $userId,
-            'reservation_number' => $reservationModel->generateReservationNumber('boot'),
-            'reservation_type' => 'boot',
-            'item_id' => $itemId,
-            'customer_name' => $data['customer_name'] ?? '',
-            'customer_email' => $data['customer_email'] ?? '',
-            'customer_phone' => $data['customer_phone'] ?? null,
-            'boat_name' => $boat['name'],
-            'boat_type' => $boat['boat_type'],
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'days' => $days,
-            'price_per_day' => $boat['price_per_day'],
-            'boat_price' => $boatPrice,
-            'service_fee' => $serviceFee,
-            'insurance' => $insurance,
-            'total_amount' => $totalAmount,
-            'payment_method' => $data['payment_method'] ?? 'paypal',
-            'payment_status' => 'pending',
-            'additional_equipment' => $data['additional_equipment'] ?? null,
-            'experience_level' => $data['experience_level'] ?? null,
-        ];
-
-        $reservationId = $reservationModel->insert($reservationData);
-        
-        if ($reservationId) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Reservierung erstellt. Weiterleitung zur Zahlung...',
-                'reservation_id' => $reservationId,
-                'reservation_number' => $reservationData['reservation_number'],
-                'redirect_url' => base_url('payment/' . $reservationId)
+                'message' => 'Ein Fehler ist aufgetreten: ' . $e->getMessage()
             ]);
         }
 
         return $this->response->setJSON([
             'success' => false,
-            'message' => 'Fehler beim Erstellen der Reservierung'
+            'message' => 'Fehler bei der Buchung'
         ]);
     }
 
-    public function makeSlotReservation()
+    public function simulateBooking()
     {
-        $data = $this->request->getJSON(true); // true = als Array zurückgeben
-        $reservationModel = new ReservationModel();
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405);
+        }
+
         $itemModel = new ItemModel();
-        
-        // Get user from session
-        $session = session();
-        $userId = $session->get('user')['id'] ?? null;
+        $result = $itemModel->simulateRandomBooking();
 
-        // Validate input
-        if (!isset($data['item_id']) || !isset($data['start_date']) || !isset($data['end_date'])) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Fehlende Pflichtfelder'
-            ]);
+        return $this->response->setJSON($result);
+    }
+
+    public function resetBookings()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405);
         }
 
-        // Convert item_id to integer
-        $itemId = (int) $data['item_id'];
-
-        // Check availability
-        if (!$reservationModel->isItemAvailable($itemId, $data['start_date'], $data['end_date'])) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Liegeplatz ist im gewählten Zeitraum nicht verfügbar'
-            ]);
-        }
-
-        // Get berth details
-        $berth = $itemModel->find($itemId);
-        if (!$berth || $berth['type'] !== 'liegeplatz') {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Liegeplatz nicht gefunden'
-            ]);
-        }
-
-        // Calculate days and price
-        $startDate = new \DateTime($data['start_date']);
-        $endDate = new \DateTime($data['end_date']);
-        $days = $startDate->diff($endDate)->days + 1;
-        $berthPrice = $days * $berth['price_per_day'];
-        $serviceFee = 10.00; // Lower service fee for berths
-        $totalAmount = $berthPrice + $serviceFee;
-
-        // Create reservation with pending status
-        $reservationData = [
-            'user_id' => $userId,
-            'reservation_number' => $reservationModel->generateReservationNumber('liegeplatz'),
-            'reservation_type' => 'liegeplatz',
-            'item_id' => $itemId,
-            'customer_name' => $data['customer_name'] ?? '',
-            'customer_email' => $data['customer_email'] ?? '',
-            'customer_phone' => $data['customer_phone'] ?? null,
-            'boat_name' => 'Liegeplatz ' . $berth['slot_number'],
-            'boat_type' => 'Liegeplatz',
-            'start_date' => $data['start_date'],
-            'end_date' => $data['end_date'],
-            'days' => $days,
-            'price_per_day' => $berth['price_per_day'],
-            'boat_price' => $berthPrice,
-            'service_fee' => $serviceFee,
-            'insurance' => 0.00, // No insurance for berths
-            'total_amount' => $totalAmount,
-            'payment_method' => $data['payment_method'] ?? 'paypal',
-            'payment_status' => 'pending',
-        ];
-
-        $reservationId = $reservationModel->insert($reservationData);
-        
-        if ($reservationId) {
-            return $this->response->setJSON([
-                'success' => true,
-                'message' => 'Reservierung erstellt. Weiterleitung zur Zahlung...',
-                'reservation_id' => $reservationId,
-                'reservation_number' => $reservationData['reservation_number'],
-                'redirect_url' => base_url('payment/' . $reservationId)
-            ]);
-        }
+        $itemModel = new ItemModel();
+        $success = $itemModel->resetAllBookings();
 
         return $this->response->setJSON([
-            'success' => false,
-            'message' => 'Fehler beim Erstellen der Reservierung'
+            'success' => $success,
+            'message' => $success ? 'Alle Buchungen wurden zurückgesetzt' : 'Fehler beim Zurücksetzen'
         ]);
     }
 
-    /**
-     * Get available items by type
-     */
-    public function getAvailableItems()
+    public function checkAvailability()
     {
-        $type = $this->request->getGet('type');
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405);
+        }
+
+        $itemModel = new ItemModel();
         $startDate = $this->request->getGet('start_date');
         $endDate = $this->request->getGet('end_date');
+        $type = $this->request->getGet('type', 'liegeplatz');
 
-        if (!$type || !in_array($type, ['boot', 'liegeplatz'])) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Ungültiger Typ'
-            ]);
-        }
-
-        $itemModel = new ItemModel();
-
-        if ($startDate && $endDate) {
-            $items = $itemModel->getAvailableItems($type, $startDate, $endDate);
-        } else {
-            $items = $type === 'boot' ? $itemModel->getBoats() : $itemModel->getBerths();
-        }
+        $items = $itemModel->getAvailableItems($type, $startDate, $endDate);
 
         return $this->response->setJSON([
             'success' => true,
             'items' => $items
+        ]);
+    }
+
+    public function getAllBookings()
+    {
+        if (!$this->request->isAJAX()) {
+            return $this->response->setStatusCode(405);
+        }
+
+        $reservationModel = new ReservationModel();
+        $bookings = $reservationModel->orderBy('created_at', 'DESC')->findAll();
+
+        return $this->response->setJSON([
+            'success' => true,
+            'bookings' => $bookings
         ]);
     }
 }
