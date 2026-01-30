@@ -1,28 +1,66 @@
-/* Der Slot leuchtet auf, wenn ein Boot darüber gehalten wird */
-.slot.drag-over {
-    background-color: rgba(40, 167, 69, 0.4) !important;
-    border: 2px dashed #28a745;
-    transform: scale(1.1);
-    transition: all 0.2s ease;
+/* Der Slot leuchtet auf und signalisiert 'Bereit zum Anlegen' */
+.grid-slot.drag-over {
+    background-color: rgba(46, 204, 113, 0.25) !important;
+    border: 2px solid #2ecc71 !important;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+    transform: scale(1.05);
+    z-index: 20;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Das Boot innerhalb eines Slots */
+/* Das Boot innerhalb eines Slots (nach dem Drop) */
 .boat-in-slot {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #1a5f7a;
-    color: white;
+    width: 80%; /* Etwas schmaler als der Slot für realistische Optik */
+    height: 95%;
+    background: linear-gradient(180deg, #f8f9fa 0%, #d1d8e0 100%); /* Weißer Rumpf */
+    color: #2c3e50;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    animation: fadeIn 0.3s ease;
+
+    /* Bootsform: Vorne spitz (Bug), hinten flach (Heck) */
+    clip-path: polygon(50% 0%, 100% 20%, 100% 100%, 0% 100%, 0% 20%);
+    border-radius: 0 0 4px 4px;
+
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px 2px;
+    animation: boatDrop 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Kleine Details für das Boot im Slot */
+.boat-in-slot::after {
+    content: '';
+    position: absolute;
+    top: 25%;
+    width: 60%;
+    height: 30%;
+    background: rgba(52, 152, 219, 0.3); /* Windschutzscheibe / Kajüte */
+    border-radius: 2px;
+}
+
+@keyframes boatDrop {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Status-Farben für das Raster */
+.grid-slot.booked {
+    background: rgba(241, 196, 15, 0.1);
+    border: 1px solid #f1c40f;
+}
+
+.grid-slot.occupied {
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid #e74c3c;
 }

@@ -45,12 +45,9 @@ createApp({
         },
 
         selectedBoatInfo() {
-            if (!this.selectedBoatId) return 'Kein Boot ausgewählt';
-            const boat = this.boatsInWater.find(b => b.id === this.selectedBoatId);
-            if (!boat) return 'Boot nicht gefunden';
-
-            return `${boat.name} (${boat.length}m, ${boat.type})`;
+            return 'Reservierung (Symbol)';
         },
+
 
         canSubmitBooking() {
             return this.selectedSlotId &&
@@ -64,31 +61,44 @@ createApp({
 
     methods: {
         // Positionierung im Raster
+        // In deinen Vue Methods ersetzen:
         getGridSlotStyle(slot) {
-            const rowIndex = slot.row ? slot.row.charCodeAt(0) - 65 : 0;
-            const colIndex = slot.col ? slot.col - 1 : slot.position ? slot.position - 1 : 0;
+            const isEven = slot.col % 2 === 0;
+            const cellSizeW = 60; // Breite eines Platzes
+            const cellSizeH = 100; // Länge eines Platzes (Boote sind lang)
+            const gap = 40; // Platz für den Fingersteg zwischen den Booten
 
-            const cellSize = 70;
-            const padding = 10;
-            const startX = 50;
-            const startY = 120;
+            const startX = 100;
+            const startY = 85; // Direkt unter dem Hauptsteg
 
-            const left = startX + (colIndex * (cellSize + padding));
-            const top = startY + (rowIndex * (cellSize + padding));
+            // Berechnung: Wir gruppieren immer 2 Plätze zwischen zwei Fingerstegen
+            const groupOffset = Math.floor((slot.col - 1) / 2) * (2 * cellSizeW + gap);
+            const sideOffset = ((slot.col - 1) % 2) * cellSizeW;
+
+            const left = startX + groupOffset + sideOffset;
+            const top = startY;
 
             return {
                 top: `${top}px`,
                 left: `${left}px`,
-                width: `${cellSize}px`,
-                height: `${cellSize}px`
+                width: `${cellSizeW - 4}px`,
+                height: `${cellSizeH}px`,
+                position: 'absolute',
+                zIndex: 2
             };
         },
 
+// Boots-Stil für die Ansicht im Wasser
         getBoatStyle(boat) {
             return {
-                top: `${boat.top || 300}px`,
-                left: `${boat.left || 30}%`,
-                background: this.getBoatColor(boat.category)
+                top: `${boat.top}px`,
+                left: `${boat.left}px`,
+                width: '40px',
+                height: '80px',
+                background: this.getBoatColor(boat.category),
+                position: 'absolute',
+                zIndex: 10,
+                transform: 'rotate(15deg)' // Leicht schräg im Wasser treibend
             };
         },
 
@@ -131,21 +141,16 @@ createApp({
                 return;
             }
 
-            // Client-seitige Aktualisierung
             slot.status = 'booked';
-            slot.boatName = this.draggedBoat.name;
+            slot.boatName = 'Reserviert';
 
-            // Auswahl setzen
             this.selectedSlotId = slot.id;
 
-            // Boot aus See entfernen
-            this.boatsInWater = this.boatsInWater.filter(b => b.id !== this.draggedBoat.id);
-
-            this.draggedBoat = null;
             this.dragOverId = null;
 
-            alert(`Boot "${slot.boatName}" auf Platz ${slot.slot_number || slot.id} gebucht!`);
-        },
+            alert(`Platz ${slot.slot_number || slot.id} wurde reserviert.`);
+        }
+        ,
 
         // Slot per Klick auswählen
         selectSlot(slot) {
@@ -225,20 +230,6 @@ createApp({
             };
             this.selectedSlotId = null;
             this.selectedBoatId = null;
-        },
-
-        async simulateRandomBooking() {
-            try {
-                const response = await fetch('/booking/simulateBooking', {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const result = await response.json();
-                alert(result.message || 'Zufällige Buchung durchgeführt');
-                // Seite neu laden für Aktualisierung
-                location.reload();
-            } catch (error) {
-                alert('Fehler: ' + error.message);
-            }
         },
 
         async resetAllBookings() {
