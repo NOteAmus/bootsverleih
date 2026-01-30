@@ -1,282 +1,438 @@
+/* app.js
+ * Vue 3 App:
+ * - Filter/Suche
+ * - Drag & Drop + Klick-Auswahl
+ * - Validierung (E-Mail, Datum, Status)
+ * - Preisvorschau
+ * - Toasts statt alert()
+ * - Optional API Submit (APP_CONFIG.saveBookingUrl)
+ */
+
 const { createApp } = Vue;
+
+function uid() {
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+}
+
+function parseISODate(d) {
+    // returns Date at 00:00 local
+    if (!d) return null;
+    const [y, m, day] = String(d).split("-").map(Number);
+    if (!y || !m || !day) return null;
+    return new Date(y, m - 1, day, 0, 0, 0, 0);
+}
+
+function daysBetweenInclusive(startISO, endISO) {
+    const s = parseISODate(startISO);
+    const e = parseISODate(endISO);
+    if (!s || !e) return 0;
+    const ms = e.getTime() - s.getTime();
+    const days = Math.round(ms / 86400000);
+    return Math.max(0, days);
+}
+
+function isEmail(v) {
+    // pragmatisch, gut genug für UI-Validierung
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || "").trim());
+}
 
 createApp({
     data() {
+        const demo = {
+            slots: [
+                { id: "S1", slot_number: "1", status: "available", pier: "Steg A", length_m: 10, max_beam_m: 3.2, price_per_day: 18 },
+                { id: "S2", slot_number: "2", status: "booked", pier: "Steg A", length_m: 12, max_beam_m: 3.5, price_per_day: 22 },
+                { id: "S3", slot_number: "3", status: "occupied", pier: "Steg A", length_m: 8, max_beam_m: 2.8, price_per_day: 15 },
+                { id: "S4", slot_number: "4", status: "available", pier: "Steg A", length_m: 9, max_beam_m: 3.0, price_per_day: 16 },
+
+                { id: "S5", slot_number: "5", status: "available", pier: "Steg B", length_m: 11, max_beam_m: 3.3, price_per_day: 20 },
+                { id: "S6", slot_number: "6", status: "available", pier: "Steg B", length_m: 13, max_beam_m: 3.8, price_per_day: 24 },
+                { id: "S7", slot_number: "7", status: "booked", pier: "Steg B", length_m: 10, max_beam_m: 3.2, price_per_day: 19 },
+                { id: "S8", slot_number: "8", status: "available", pier: "Steg B", length_m: 7, max_beam_m: 2.6, price_per_day: 14 },
+
+                { id: "S9", slot_number: "9", status: "available", pier: "Steg C", length_m: 14, max_beam_m: 4.0, price_per_day: 26 },
+                { id: "S10", slot_number: "10", status: "occupied", pier: "Steg C", length_m: 12, max_beam_m: 3.5, price_per_day: 22 },
+                { id: "S11", slot_number: "11", status: "available", pier: "Steg C", length_m: 9, max_beam_m: 3.0, price_per_day: 16 },
+                { id: "S12", slot_number: "12", status: "booked", pier: "Steg C", length_m: 8, max_beam_m: 2.8, price_per_day: 15 },
+            ],
+            boats: [],
+            boats_list: [
+                { id: "B1", name: "Segler", category: "Sail", length_m: 10 },
+                { id: "B2", name: "Motorboot", category: "Motor", length_m: 8 },
+                { id: "B3", name: "Yacht", category: "Yacht", length_m: 12 },
+                { id: "B4", name: "Kleinboot", category: "Small", length_m: 6 },
+            ],
+        };
+
+        const data = window.APP_DATA || demo;
+
+        const todayISO = new Date().toISOString().split("T")[0];
+        const tomorrowISO = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+
         return {
-            activeTab: 'slots',
+            activeTab: "slots",
 
-            // Neue Datenstruktur für Raster-System
-            gridSlots: APP_DATA.slots || [],
-            boatsInWater: APP_DATA.boats || [],
-            boatsList: APP_DATA.boats_list || [],
+            gridSlots: Array.isArray(data.slots) ? data.slots : [],
+            boatsInWater: Array.isArray(data.boats) ? data.boats : [],
+            boatsList: Array.isArray(data.boats_list) ? data.boats_list : [],
 
-            // Zustände
+            slotFilter: "all",
+            slotSearch: "",
+            boatSearch: "",
+            showOnlyWithPrice: false,
+
             draggedBoat: null,
             dragOverId: null,
             selectedSlotId: null,
             selectedBoatId: null,
 
-            // Formular
             formData: {
-                name: '',
-                email: '',
-                start_date: '',
-                end_date: '',
-                notes: '',
-                customer_phone: '',
-                payment_method: 'paypal'
-            }
+                name: "",
+                email: "",
+                customer_phone: "",
+                payment_method: "paypal",
+                start_date: todayISO,
+                end_date: tomorrowISO,
+                notes: "",
+            },
+
+            toasts: [],
         };
     },
 
     computed: {
-        selectedSlotInfo() {
-            if (!this.selectedSlotId) return 'Kein Platz ausgewählt';
-            const slot = this.gridSlots.find(s => s.id === this.selectedSlotId);
-            if (!slot) return 'Platz nicht gefunden';
-
-            const statusMap = {
-                'available': 'Frei',
-                'booked': 'Gebucht',
-                'occupied': 'Belegt'
-            };
-
-            return `Platz ${slot.slot_number || slot.id} - ${statusMap[slot.status] || 'Unbekannt'}`;
+        selectedSlot() {
+            if (!this.selectedSlotId) return null;
+            return this.gridSlots.find((s) => s.id === this.selectedSlotId) || null;
         },
 
-        selectedBoatInfo() {
-            return 'Reservierung (Symbol)';
+        selectedBoat() {
+            if (!this.selectedBoatId) return null;
+            return this.boatsList.find((b) => b.id === this.selectedBoatId) || null;
         },
 
+        filteredSlots() {
+            let slots = [...this.gridSlots];
+
+            // Status Filter
+            if (this.slotFilter !== "all") {
+                slots = slots.filter((s) => s.status === this.slotFilter);
+            }
+
+            // "nur mit Preis"
+            if (this.showOnlyWithPrice) {
+                slots = slots.filter((s) => Number(s.price_per_day) > 0);
+            }
+
+            // Suche (slot_number, id, pier)
+            const q = this.slotSearch.trim().toLowerCase();
+            if (q) {
+                slots = slots.filter((s) => {
+                    const label = this.slotLabel(s).toLowerCase();
+                    const pier = String(s.pier || "").toLowerCase();
+                    return label.includes(q) || pier.includes(q);
+                });
+            }
+
+            // Sort: pier, then numeric slot_number
+            slots.sort((a, b) => {
+                const pa = String(a.pier || "");
+                const pb = String(b.pier || "");
+                if (pa !== pb) return pa.localeCompare(pb, "de");
+                const na = Number(a.slot_number || a.id.replace(/\D+/g, "")) || 0;
+                const nb = Number(b.slot_number || b.id.replace(/\D+/g, "")) || 0;
+                return na - nb;
+            });
+
+            return slots;
+        },
+
+        filteredBoatsList() {
+            let list = [...this.boatsList];
+            const q = this.boatSearch.trim().toLowerCase();
+            if (q) {
+                list = list.filter((b) => {
+                    const name = String(b.name || "").toLowerCase();
+                    const cat = String(b.category || "").toLowerCase();
+                    return name.includes(q) || cat.includes(q);
+                });
+            }
+            return list;
+        },
+
+        selectedSlotDisplay() {
+            if (!this.selectedSlot) return "—";
+            return `${this.slotLabel(this.selectedSlot)} · ${this.statusText(this.selectedSlot.status)}`;
+        },
+
+        selectedBoatDisplay() {
+            if (!this.selectedBoat) return "—";
+            return `${this.selectedBoat.name || "Reservierung"}${this.selectedBoat.length_m ? ` · ${this.selectedBoat.length_m}m` : ""}`;
+        },
+
+        validationHint() {
+            if (!this.selectedSlotId) return "Bitte einen Platz auswählen.";
+            if (!this.selectedBoatId) return "Bitte ein Bootssymbol auswählen.";
+            if (this.selectedSlot && this.selectedSlot.status !== "available") return "Dieser Platz ist nicht frei.";
+
+            if (!this.formData.name.trim()) return "Bitte Name eintragen.";
+            if (!isEmail(this.formData.email)) return "Bitte gültige E-Mail eintragen.";
+            if (!this.formData.start_date || !this.formData.end_date) return "Bitte Start- und Enddatum wählen.";
+
+            const s = parseISODate(this.formData.start_date);
+            const e = parseISODate(this.formData.end_date);
+            if (!s || !e) return "Ungültiges Datum.";
+            if (e <= s) return "Enddatum muss nach dem Startdatum liegen.";
+
+            return "";
+        },
 
         canSubmitBooking() {
-            return this.selectedSlotId &&
-                this.selectedBoatId &&
-                this.formData.name &&
-                this.formData.email &&
-                this.formData.start_date &&
-                this.formData.end_date;
-        }
+            return !this.validationHint;
+        },
+
+        pricePreview() {
+            if (!this.selectedSlot || !this.selectedSlot.price_per_day) return "—";
+            const nights = daysBetweenInclusive(this.formData.start_date, this.formData.end_date);
+            const price = Number(this.selectedSlot.price_per_day) * nights;
+            if (!nights) return `${this.formatPrice(this.selectedSlot.price_per_day)}/Tag`;
+            return `${this.formatPrice(price)} gesamt (${nights} Nacht${nights === 1 ? "" : "en"})`;
+        },
     },
 
     methods: {
-        // Positionierung im Raster
-        // In deinen Vue Methods ersetzen:
-        getGridSlotStyle(slot) {
-            const isEven = slot.col % 2 === 0;
-            const cellSizeW = 60; // Breite eines Platzes
-            const cellSizeH = 100; // Länge eines Platzes (Boote sind lang)
-            const gap = 40; // Platz für den Fingersteg zwischen den Booten
+        // ---------- UI helpers ----------
+        toast(message, type = "info", ttl = 3500) {
+            const id = uid();
+            this.toasts.push({ id, message, type });
+            window.setTimeout(() => this.removeToast(id), ttl);
+        },
 
-            const startX = 100;
-            const startY = 85; // Direkt unter dem Hauptsteg
+        removeToast(id) {
+            this.toasts = this.toasts.filter((t) => t.id !== id);
+        },
 
-            // Berechnung: Wir gruppieren immer 2 Plätze zwischen zwei Fingerstegen
-            const groupOffset = Math.floor((slot.col - 1) / 2) * (2 * cellSizeW + gap);
-            const sideOffset = ((slot.col - 1) % 2) * cellSizeW;
+        statusText(status) {
+            const map = { available: "Frei", booked: "Gebucht", occupied: "Belegt" };
+            return map[status] || "Unbekannt";
+        },
 
-            const left = startX + groupOffset + sideOffset;
-            const top = startY;
-
+        badgeClass(status) {
             return {
-                top: `${top}px`,
-                left: `${left}px`,
-                width: `${cellSizeW - 4}px`,
-                height: `${cellSizeH}px`,
-                position: 'absolute',
-                zIndex: 2
+                "badge--free": status === "available",
+                "badge--booked": status === "booked",
+                "badge--occupied": status === "occupied",
             };
         },
 
-// Boots-Stil für die Ansicht im Wasser
-        getBoatStyle(boat) {
+        slotClass(slot) {
             return {
-                top: `${boat.top}px`,
-                left: `${boat.left}px`,
-                width: '40px',
-                height: '80px',
-                background: this.getBoatColor(boat.category),
-                position: 'absolute',
-                zIndex: 10,
-                transform: 'rotate(15deg)' // Leicht schräg im Wasser treibend
+                "is-free": slot.status === "available",
+                "is-booked": slot.status === "booked",
+                "is-occupied": slot.status === "occupied",
+                "is-selected": this.selectedSlotId === slot.id,
+                "is-dragover": this.dragOverId === slot.id,
             };
+        },
+
+        slotLabel(slot) {
+            // schöneres Label
+            const nr = slot.slot_number ?? slot.number ?? null;
+            const id = slot.id ?? "";
+            const base = nr ? `Platz ${nr}` : String(id);
+            return slot.pier ? `${base} (${slot.pier})` : base;
+        },
+
+        slotAriaLabel(slot) {
+            const parts = [
+                this.slotLabel(slot),
+                this.statusText(slot.status),
+            ];
+            if (slot.price_per_day) parts.push(`${this.formatPrice(slot.price_per_day)} pro Tag`);
+            return parts.join(", ");
+        },
+
+        boatAriaLabel(b) {
+            const parts = [b.name || "Boot"];
+            if (b.category) parts.push(b.category);
+            if (b.length_m) parts.push(`${b.length_m} Meter`);
+            return parts.join(", ");
+        },
+
+        formatPrice(v) {
+            const num = Number(v);
+            if (!Number.isFinite(num)) return "—";
+            return new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(num);
         },
 
         getBoatColor(category) {
-            const colors = {
-                premium: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
-                comfort: 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)',
-                standard: 'linear-gradient(135deg, #1abc9c 0%, #16a085 100%)',
-                economy: 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)'
-            };
-            return colors[category] || colors.standard;
+            const c = String(category || "").toLowerCase();
+            if (c.includes("sail")) return "#2e86c1";
+            if (c.includes("motor")) return "#1abc9c";
+            if (c.includes("yacht")) return "#9b59b6";
+            if (c.includes("small") || c.includes("klein")) return "#f39c12";
+            return "#34495e";
         },
 
-        // Drag & Drop
-        onDragStart(event, boat) {
+        // ---------- Selection ----------
+        selectSlot(slotId) {
+            const slot = this.gridSlots.find((s) => s.id === slotId);
+            if (!slot) return;
+
+            this.selectedSlotId = slotId;
+
+            if (slot.status !== "available") {
+                this.toast(`Hinweis: ${this.slotLabel(slot)} ist ${this.statusText(slot.status)}.`, "warning");
+            } else {
+                this.toast(`Platz gewählt: ${this.slotLabel(slot)}`, "info");
+            }
+
+            // Komfort: wenn Boot schon gewählt, direkt zur Buchung springen
+            if (this.selectedBoatId && slot.status === "available") {
+                this.activeTab = "booking";
+            }
+        },
+
+        selectBoat(boatId) {
+            const b = this.boatsList.find((x) => x.id === boatId);
+            this.selectedBoatId = boatId;
+
+            if (b) this.toast(`Boot gewählt: ${b.name || "Reservierung"}`, "info");
+
+            // Komfort: wenn Slot schon gewählt und frei, direkt zur Buchung
+            if (this.selectedSlot && this.selectedSlot.status === "available") {
+                this.activeTab = "booking";
+            }
+        },
+
+        resetSelection() {
+            this.draggedBoat = null;
+            this.dragOverId = null;
+            this.selectedSlotId = null;
+            this.selectedBoatId = null;
+
+            // Formular nicht komplett leeren (UX), nur Notizen
+            this.formData.notes = "";
+            this.toast("Auswahl zurückgesetzt.", "info");
+        },
+
+        // ---------- Drag & Drop ----------
+        onDragStart(boat) {
             this.draggedBoat = boat;
-            this.selectedBoatId = boat.id;
-            event.dataTransfer.setData('text/plain', boat.id);
-            event.dataTransfer.effectAllowed = 'move';
-            event.target.classList.add('dragging');
+            this.selectedBoatId = boat?.id || null;
+            this.toast("Boot ziehen: Lege es auf einem freien Platz ab.", "info", 2500);
         },
 
         onDragEnd() {
             this.draggedBoat = null;
-            document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+            this.dragOverId = null;
         },
 
         onDragOver(slotId) {
-            const slot = this.gridSlots.find(s => s.id === slotId);
-            if (slot && slot.status === 'available') {
-                this.dragOverId = slotId;
-                return true;
-            }
-            return false;
+            this.dragOverId = slotId;
         },
 
-        onDrop(slot) {
-            if (!this.draggedBoat || slot.status !== 'available') {
-                this.dragOverId = null;
+        onDragLeave(slotId) {
+            if (this.dragOverId === slotId) this.dragOverId = null;
+        },
+
+        onDrop(slotId) {
+            const slot = this.gridSlots.find((s) => s.id === slotId);
+            if (!slot) return;
+
+            this.selectedSlotId = slotId;
+
+            if (!this.selectedBoatId && this.draggedBoat?.id) {
+                this.selectedBoatId = this.draggedBoat.id;
+            }
+
+            if (slot.status !== "available") {
+                this.toast(`Nicht möglich: ${this.slotLabel(slot)} ist ${this.statusText(slot.status)}.`, "warning");
                 return;
             }
 
-            slot.status = 'booked';
-            slot.boatName = 'Reserviert';
-
-            this.selectedSlotId = slot.id;
-
-            this.dragOverId = null;
-
-            alert(`Platz ${slot.slot_number || slot.id} wurde reserviert.`);
-        }
-        ,
-
-        // Slot per Klick auswählen
-        selectSlot(slot) {
-            if (slot.status === 'available') {
-                this.selectedSlotId = slot.id;
-
-                // Automatisch ein Boot auswählen, falls keins ausgewählt ist
-                if (!this.selectedBoatId && this.boatsInWater.length > 0) {
-                    this.selectedBoatId = this.boatsInWater[0].id;
-                }
+            if (!this.selectedBoatId) {
+                this.toast("Bitte zuerst ein Bootssymbol wählen.", "warning");
+                return;
             }
+
+            this.toast(`Abgelegt auf ${this.slotLabel(slot)} – bitte Buchung ausfüllen.`, "success");
+            this.activeTab = "booking";
         },
 
-        // Boot für Verleih auswählen
-        selectBoatForRental(boat) {
-            this.selectedBoatId = boat.id;
-            this.activeTab = 'slots';
-            alert(`Boot "${boat.name}" wurde für die Buchung ausgewählt.`);
-        },
-
-        // Buchung an Server senden
+        // ---------- Submit ----------
         async submitBooking() {
             if (!this.canSubmitBooking) {
-                alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+                this.toast(this.validationHint || "Bitte Eingaben prüfen.", "warning");
                 return;
             }
 
-            const slot = this.gridSlots.find(s => s.id === this.selectedSlotId);
-            const boat = this.boatsInWater.find(b => b.id === this.selectedBoatId);
-
-            if (!slot || !boat) {
-                alert('Fehler: Slot oder Boot nicht gefunden.');
+            // Sicherheitscheck: Slot muss frei sein
+            const slot = this.selectedSlot;
+            if (!slot || slot.status !== "available") {
+                this.toast("Dieser Platz ist nicht (mehr) frei.", "warning");
                 return;
             }
 
-            const bookingData = {
-                slot_id: slot.id,
-                boat_id: boat.id,
-                boat_name: boat.name,
-                ...this.formData
+            const payload = {
+                slot_id: this.selectedSlotId,
+                boat_id: this.selectedBoatId,
+                customer: {
+                    name: this.formData.name.trim(),
+                    email: this.formData.email.trim(),
+                    phone: this.formData.customer_phone.trim(),
+                },
+                booking: {
+                    start_date: this.formData.start_date,
+                    end_date: this.formData.end_date,
+                    payment_method: this.formData.payment_method,
+                    notes: this.formData.notes.trim(),
+                },
+                meta: {
+                    price_preview: this.pricePreview,
+                },
             };
 
+            const url = window.APP_CONFIG?.saveBookingUrl || null;
+
             try {
-                const response = await fetch('/booking/bookSlot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(bookingData)
-                });
+                // Optional: echte API
+                if (url) {
+                    const res = await fetch(url, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
 
-                const result = await response.json();
+                    if (!res.ok) {
+                        const txt = await res.text().catch(() => "");
+                        throw new Error(`API Fehler (${res.status}): ${txt || "Unbekannt"}`);
+                    }
 
-                if (result.success) {
-                    alert('Buchung erfolgreich! ' + result.message);
-                    // Formular zurücksetzen
-                    this.resetForm();
-                } else {
-                    alert('Fehler: ' + (result.message || 'Unbekannter Fehler'));
+                    const json = await res.json().catch(() => ({}));
+                    if (!json?.success) {
+                        throw new Error(json?.message || "Buchung konnte nicht gespeichert werden.");
+                    }
                 }
-            } catch (error) {
-                alert('Netzwerkfehler: ' + error.message);
+
+                // Demo/Optimistisch: Slot auf booked setzen
+                slot.status = "booked";
+
+                this.toast("Buchung gespeichert!", "success");
+
+                // UX: Tab zurück + Auswahl behalten? -> sinnvoll: Boot/Slot zurücksetzen
+                this.resetSelection();
+                this.activeTab = "slots";
+            } catch (err) {
+                this.toast(`Fehler: ${err.message}`, "warning", 5000);
             }
         },
-
-        // Hilfsfunktionen
-        resetForm() {
-            this.formData = {
-                name: '',
-                email: '',
-                start_date: '',
-                end_date: '',
-                notes: '',
-                customer_phone: '',
-                payment_method: 'paypal'
-            };
-            this.selectedSlotId = null;
-            this.selectedBoatId = null;
-        },
-
-        async resetAllBookings() {
-            if (!confirm('Alle Buchungen zurücksetzen? Dies kann nicht rückgängig gemacht werden.')) {
-                return;
-            }
-
-            try {
-                const response = await fetch('/booking/resetBookings', {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const result = await response.json();
-                alert(result.message);
-                location.reload();
-            } catch (error) {
-                alert('Fehler: ' + error.message);
-            }
-        },
-
-        async showAllBookings() {
-            try {
-                const response = await fetch('/booking/getAllBookings', {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const result = await response.json();
-
-                if (result.success && result.bookings.length > 0) {
-                    const bookingList = result.bookings.map(b =>
-                        `• ${b.reservation_number}: ${b.customer_name} (${b.start_date} - ${b.end_date})`
-                    ).join('\n');
-
-                    alert(`Aktuelle Buchungen:\n\n${bookingList}`);
-                } else {
-                    alert('Keine Buchungen vorhanden.');
-                }
-            } catch (error) {
-                alert('Fehler beim Laden der Buchungen: ' + error.message);
-            }
-        }
     },
 
     mounted() {
-        // Heutiges Datum setzen
-        const today = new Date().toISOString().split('T')[0];
-        const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
-
-        this.formData.start_date = today;
-        this.formData.end_date = tomorrow;
-    }
-}).mount('#app');
+        // Kleine Start-UX:
+        if (!this.gridSlots.length) {
+            this.toast("Keine Slots vorhanden – APP_DATA prüfen.", "warning", 5000);
+        }
+    },
+}).mount("#app");

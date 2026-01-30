@@ -139,19 +139,9 @@
             border: 2px solid rgba(255,255,255,0.4);
             transition: all 0.2s ease;
         }
-
-        .anchor-token:hover {
-            transform: translateY(-2px) scale(1.03);
-        }
-
-        .anchor-token:active {
-            cursor: grabbing;
-        }
-
-        .anchor-token.dragging {
-            opacity: 0.85;
-            transform: scale(1.05);
-        }
+        .anchor-token:hover { transform: translateY(-2px) scale(1.03); }
+        .anchor-token:active { cursor: grabbing; }
+        .anchor-token.dragging { opacity: 0.85; transform: scale(1.05); }
 
         .marina-view {
             width: 100%;
@@ -182,6 +172,7 @@
 
         /* Docks (Hauptsteg + Fingerstege) */
         .dock {
+            pointer-events: none;
             position: absolute;
             background: linear-gradient(180deg, #8B4513 0%, #654321 100%);
             border-radius: 6px;
@@ -542,11 +533,13 @@
                      :class="[slot.status, { selected: selectedSlotId === slot.id, 'drag-over': dragOverId === slot.id }]"
                      :style="getSlotStyle(slot)"
                      @click="selectSlot(slot)"
+                     @dragenter.prevent="onDragOver(slot.id)"
                      @dragover.prevent="onDragOver(slot.id)"
                      @dragleave="dragOverId = null"
-                     @drop="onDrop(slot)">
+                     @drop.prevent="onDrop(slot)">
 
-                    <!-- Boot-Icon im Slot wenn gebucht -->
+
+                <!-- Boot-Icon im Slot wenn gebucht -->
                     <div v-if="slot.status === 'booked' && slot.boatName" class="boat-in-slot">
                         {{ slot.boatName }}
                     </div>
@@ -623,10 +616,10 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label><i class="fas fa-ship"></i> Ausgewähltes Boot</label>
-                        <input type="text" :value="selectedBoatInfo" readonly placeholder="Kein Boot ausgewählt">
-                    </div>
+<!--                    <div class="form-group">-->
+<!--                        <label><i class="fas fa-ship"></i> Ausgewähltes Boot</label>-->
+<!--                        <input type="text" :value="selectedBoatInfo" readonly placeholder="Kein Boot ausgewählt">-->
+<!--                    </div>-->
 
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Name</label>
@@ -760,7 +753,6 @@
                 dragOverId: null,
                 selectedSlotId: null,
                 selectedSlotIds: [],
-
                 // rein lokal (für UI-Liste)
                 localBookings: [],
 
@@ -1018,26 +1010,16 @@
                     return;
                 }
 
-                // Slot visuell reservieren
                 slot.status = 'booked';
                 slot.boatName = 'Reserviert';
 
-                // Multi-Select: zur Liste hinzufügen (wenn noch nicht drin)
                 if (!this.selectedSlotIds.includes(slot.id)) {
                     this.selectedSlotIds.push(slot.id);
                 }
 
-                // "aktuell ausgewählt" (optional)
                 this.selectedSlotId = slot.id;
-
                 this.dragOverId = null;
             },
-
-            selectSlot(slot) {
-                if (slot.status === 'occupied') return;
-                this.selectedSlotId = slot.id;
-            },
-
             addBoatToPalette(boat) {
                 // Wenn Boot schon da ist, nur auswählen
                 const exists = this.boatsInWater.some(b => b.id === boat.id);
