@@ -443,10 +443,6 @@
             // Demo: occupied (später aus DB)
             $occupiedSlots = ['A2', 'B3', 'C4', 'D2', 'E1'];
             ?>
-            <pre style="position:relative;z-index:9999;background:#fff;padding:10px;">
-slots count: <?= isset($slots) ? count($slots) : 'slots not set' ?>
-</pre>
-
 
             <div class="marina-view" id="marinaView">
                 <!-- Hauptsteg -->
@@ -846,7 +842,6 @@ slots count: <?= isset($slots) ? count($slots) : 'slots not set' ?>
         addSlotSelection(slot);
 
         document.getElementById('slotReservationForm')
-        .scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
     });
 
