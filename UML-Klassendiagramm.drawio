@@ -1,0 +1,359 @@
+<mxfile host="app.diagrams.net" modified="2026-02-03T00:00:00.000Z" agent="5.0" version="24.0.0">
+  <diagram name="Bootsverleih UML" id="c4acf3e9-155e-7222-9cf6-157b1a14988f">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- BaseController (Abstract) -->
+        <mxCell id="basecontroller" value="«abstract»&#xa;BaseController&#xa;&#xa;# request: RequestInterface&#xa;# helpers: list&lt;string&gt;&#xa;&#xa;+ initController(request: RequestInterface, response: ResponseInterface, logger: LoggerInterface): void" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=140;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="420" height="140" as="geometry" />
+        </mxCell>
+        
+        <!-- Booking Controller -->
+        <mxCell id="booking" value="Booking&#xa;&#xa;+ index(): string&#xa;+ processBooking(): RedirectResponse&#xa;+ processPayment(): RedirectResponse&#xa;+ myBookings(): string&#xa;+ allBookings(): string&#xa;+ updateSlot(): RedirectResponse&#xa;- getMarinaInfo(): array&#xa;- getPremiumSlots(): array&#xa;- getExclusiveBoats(): array&#xa;- generateReservationNumber(): string&#xa;- calculateAmount(): array" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=240;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="240" width="380" height="240" as="geometry" />
+        </mxCell>
+        
+        <!-- Login Controller -->
+        <mxCell id="login" value="Login&#xa;&#xa;+ index(): string&#xa;+ authenticate(): RedirectResponse&#xa;+ logout(): RedirectResponse" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=100;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="240" width="300" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Registration Controller -->
+        <mxCell id="registration" value="Registration&#xa;&#xa;+ index(): string&#xa;+ register(): RedirectResponse" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=80;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="840" y="240" width="280" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Home Controller -->
+        <mxCell id="home" value="Home&#xa;&#xa;+ index(): string" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=70;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="480" y="380" width="180" height="70" as="geometry" />
+        </mxCell>
+        
+        <!-- Model Base -->
+        <mxCell id="modelbase" value="«CodeIgniter Model»" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="600" width="200" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- UserModel -->
+        <mxCell id="usermodel" value="UserModel&#xa;&#xa;# table: string = 'users'&#xa;# primaryKey: string = 'id'&#xa;# allowedFields: array&#xa;# validationRules: array&#xa;# validationMessages: array&#xa;# beforeInsert: array&#xa;&#xa;# hashPassword(data: array): array" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=180;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="40" y="700" width="280" height="180" as="geometry" />
+        </mxCell>
+        
+        <!-- ItemModel -->
+        <mxCell id="itemmodel" value="ItemModel&#xa;&#xa;# table: string = 'items'&#xa;# primaryKey: string = 'id'&#xa;# allowedFields: array&#xa;# useTimestamps: bool = true&#xa;# validationRules: array&#xa;&#xa;+ getBoats(activeOnly: bool): array&#xa;+ getBerths(activeOnly: bool): array&#xa;+ getBoatsByCategory(category: string): array&#xa;+ getBerthBySlotNumber(slotNumber: string): array&#xa;+ checkAvailability(itemId: int, startDate: string, endDate: string): bool&#xa;# encodeFeatures(data: array): array&#xa;# decodeFeatures(data: array): array" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=270;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="380" y="700" width="450" height="270" as="geometry" />
+        </mxCell>
+        
+        <!-- ReservationModel -->
+        <mxCell id="reservationmodel" value="ReservationModel&#xa;&#xa;# table: string = 'reservations'&#xa;# primaryKey: string = 'id'&#xa;# allowedFields: array&#xa;# useTimestamps: bool = true&#xa;# validationRules: array&#xa;&#xa;+ generateReservationNumber(type: string): string&#xa;+ getCustomerReservations(email: string): array&#xa;+ getUserReservations(userId: int): array&#xa;+ updatePaymentStatus(reservationId: int, status: string): bool&#xa;+ getPendingPayments(): array&#xa;+ getReservationByNumber(number: string): array&#xa;+ cancelReservation(reservationId: int): bool" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=280;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="890" y="700" width="420" height="280" as="geometry" />
+        </mxCell>
+        
+        <!-- Weather Library -->
+        <mxCell id="weather" value="Weather&#xa;&#xa;# endpoint: string&#xa;# lat: float&#xa;# lon: float&#xa;# timezone: string&#xa;&#xa;+ __construct()&#xa;+ getCurrentWeather(): ?array&#xa;- mapWeatherCode(code: ?int): string" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=160;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1040" width="320" height="160" as="geometry" />
+        </mxCell>
+        
+        <!-- AdminFilter -->
+        <mxCell id="adminfilter" value="«interface»&#xa;FilterInterface&#xa;&#xa;+ before(request: RequestInterface, arguments: ?array): mixed&#xa;+ after(request: RequestInterface, response: ResponseInterface, arguments: ?array): mixed" style="swimlane;fontStyle=3;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=120;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1040" width="500" height="120" as="geometry" />
+        </mxCell>
+        
+        <!-- AdminFilter Implementation -->
+        <mxCell id="adminfilterimpl" value="AdminFilter&#xa;&#xa;+ before(request: RequestInterface, arguments: ?array): mixed&#xa;+ after(request: RequestInterface, response: ResponseInterface, arguments: ?array): mixed" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=100;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1240" width="500" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- WorkerFilter Implementation -->
+        <mxCell id="workerfilterimpl" value="WorkerFilter&#xa;&#xa;+ before(request: RequestInterface, arguments: ?array): mixed&#xa;+ after(request: RequestInterface, response: ResponseInterface, arguments: ?array): mixed" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=100;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="1240" width="500" height="100" as="geometry" />
+        </mxCell>
+        
+        <!-- Entity Classes -->
+        <!-- User Entity -->
+        <mxCell id="userentity" value="«entity»&#xa;User&#xa;&#xa;+ id: int&#xa;+ vorname: string&#xa;+ nachname: string&#xa;+ email: string&#xa;+ passwort: string&#xa;+ role: string" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=140;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="40" width="200" height="140" as="geometry" />
+        </mxCell>
+        
+        <!-- Item Entity -->
+        <mxCell id="itementity" value="«entity»&#xa;Item&#xa;&#xa;+ id: int&#xa;+ type: string&#xa;+ name: string&#xa;+ description: string&#xa;+ category: string&#xa;+ boat_type: string&#xa;+ length: float&#xa;+ year: int&#xa;+ capacity: int&#xa;+ slot_number: string&#xa;+ row: string&#xa;+ position: int&#xa;+ max_boat_length: float&#xa;+ price_per_day: decimal&#xa;+ features: json&#xa;+ image: string&#xa;+ is_active: bool&#xa;+ created_at: datetime&#xa;+ updated_at: datetime" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=380;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="220" width="240" height="380" as="geometry" />
+        </mxCell>
+        
+        <!-- Reservation Entity -->
+        <mxCell id="reservationentity" value="«entity»&#xa;Reservation&#xa;&#xa;+ id: int&#xa;+ user_id: int&#xa;+ reservation_number: string&#xa;+ reservation_type: string&#xa;+ item_id: int&#xa;+ customer_name: string&#xa;+ customer_email: string&#xa;+ customer_phone: string&#xa;+ boat_name: string&#xa;+ boat_type: string&#xa;+ start_date: date&#xa;+ end_date: date&#xa;+ days: int&#xa;+ price_per_day: decimal&#xa;+ boat_price: decimal&#xa;+ service_fee: decimal&#xa;+ insurance: decimal&#xa;+ total_amount: decimal&#xa;+ payment_method: string&#xa;+ payment_status: string&#xa;+ additional_equipment: json&#xa;+ experience_level: string&#xa;+ created_at: datetime&#xa;+ updated_at: datetime" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=480;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1400" y="640" width="250" height="480" as="geometry" />
+        </mxCell>
+        
+        <!-- Relationships -->
+        
+        <!-- BaseController to Controllers (Generalization) -->
+        <mxCell id="edge1" edge="1" parent="1" source="booking" target="basecontroller">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge1label" value="" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;fontStyle=0;labelBackgroundColor=none;" vertex="1" connectable="0" parent="edge1">
+          <mxGeometry x="-0.1" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge1arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="booking" target="basecontroller">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="230" y="240" as="sourcePoint" />
+            <mxPoint x="230" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge2arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="login" target="basecontroller">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="550" y="240" as="sourcePoint" />
+            <mxPoint x="350" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge3arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="registration" target="basecontroller">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="900" y="240" as="sourcePoint" />
+            <mxPoint x="460" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge4arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="home" target="basecontroller">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="570" y="380" as="sourcePoint" />
+            <mxPoint x="350" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Models extending CI Model -->
+        <mxCell id="edge5arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="usermodel" target="modelbase">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="140" y="700" as="sourcePoint" />
+            <mxPoint x="140" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge6arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="itemmodel" target="modelbase">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="400" y="700" as="sourcePoint" />
+            <mxPoint x="240" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge7arrow" value="" style="endArrow=block;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="reservationmodel" target="modelbase">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="900" y="700" as="sourcePoint" />
+            <mxPoint x="240" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Controller Dependencies to Models -->
+        <mxCell id="edge8" value="" style="endArrow=open;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="booking" target="reservationmodel">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="230" y="480" as="sourcePoint" />
+            <mxPoint x="900" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8label" value="«uses»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge8">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="120" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge9" value="" style="endArrow=open;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="booking" target="itemmodel">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="350" y="480" as="sourcePoint" />
+            <mxPoint x="550" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9label" value="«uses»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge9">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="30" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge10" value="" style="endArrow=open;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="login" target="usermodel">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="550" y="340" as="sourcePoint" />
+            <mxPoint x="200" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10label" value="«uses»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge10">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="-80" y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge11" value="" style="endArrow=open;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="registration" target="usermodel">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="840" y="320" as="sourcePoint" />
+            <mxPoint x="250" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11label" value="«uses»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge11">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="-120" y="-30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Filter Interface Implementation -->
+        <mxCell id="edge12arrow" value="" style="endArrow=block;endFill=0;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="adminfilterimpl" target="adminfilter">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="730" y="1240" as="sourcePoint" />
+            <mxPoint x="730" y="1160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12label" value="«implements»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge12arrow">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="40" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge13arrow" value="" style="endArrow=block;endFill=0;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="workerfilterimpl" target="adminfilter">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1200" y="1240" as="sourcePoint" />
+            <mxPoint x="900" y="1160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13label" value="«implements»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge13arrow">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="-50" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Model to Entity Associations -->
+        <mxCell id="edge14" value="" style="endArrow=open;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="usermodel" target="userentity">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="320" y="750" as="sourcePoint" />
+            <mxPoint x="1400" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14label" value="manages" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge14">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="280" y="-220" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14mult1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge14">
+          <mxGeometry x="-0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="-10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14mult2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge14">
+          <mxGeometry x="0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge15" value="" style="endArrow=open;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="itemmodel" target="itementity">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="830" y="800" as="sourcePoint" />
+            <mxPoint x="1400" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15label" value="manages" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge15">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="160" y="-50" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15mult1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge15">
+          <mxGeometry x="-0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="-10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15mult2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge15">
+          <mxGeometry x="0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge16" value="" style="endArrow=open;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="reservationmodel" target="reservationentity">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1310" y="850" as="sourcePoint" />
+            <mxPoint x="1400" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16label" value="manages" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge16">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="20" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16mult1" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge16">
+          <mxGeometry x="-0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="-10" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16mult2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge16">
+          <mxGeometry x="0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Entity Associations -->
+        <mxCell id="edge17" value="" style="endArrow=open;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="reservationentity" target="userentity">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1525" y="640" as="sourcePoint" />
+            <mxPoint x="1525" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge17label" value="belongs to" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge17">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="35" y="150" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge17mult1" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge17">
+          <mxGeometry x="-0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge17mult2" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge17">
+          <mxGeometry x="0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="edge18" value="" style="endArrow=open;endFill=0;endSize=12;html=1;" edge="1" parent="1" source="reservationentity" target="itementity">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="1400" y="850" as="sourcePoint" />
+            <mxPoint x="1640" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge18label" value="references" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge18">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="35" y="20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge18mult1" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge18">
+          <mxGeometry x="-0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge18mult2" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;" vertex="1" connectable="0" parent="edge18">
+          <mxGeometry x="0.9" y="1" relative="1" as="geometry">
+            <mxPoint x="15" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Weather Library Usage -->
+        <mxCell id="edge19" value="" style="endArrow=open;endSize=12;dashed=1;html=1;dashPattern=3 3;" edge="1" parent="1" source="booking" target="weather">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="200" y="480" as="sourcePoint" />
+            <mxPoint x="200" y="1040" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge19label" value="«uses»" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontStyle=2;" vertex="1" connectable="0" parent="edge19">
+          <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+            <mxPoint x="-30" y="130" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend" value="Legende:&#xa;&#xa;Controller (blau)&#xa;Models (gelb)&#xa;Entities (violett)&#xa;Libraries (grün)&#xa;Filters/Interfaces (rot/orange)&#xa;&#xa;→ Vererbung (durchgezogen, leere Pfeilspitze)&#xa;- -> Abhängigkeit «uses» (gestrichelt)&#xa;- - -> Interface Implementierung (gestrichelt)&#xa;→ Assoziation (durchgezogen, offene Pfeilspitze)" style="swimlane;fontStyle=2;align=left;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=240;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="1720" y="40" width="360" height="240" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

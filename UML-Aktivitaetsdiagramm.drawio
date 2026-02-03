@@ -1,0 +1,547 @@
+<mxfile host="app.diagrams.net" modified="2026-02-03T00:00:00.000Z" agent="5.0" version="22.0.0" etag="UML-Activity-Diagram" type="device">
+  <diagram name="Bootsverleih - Vollständiges Aktivitätsdiagramm" id="bootsverleih-activity">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="1654" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Swimlanes -->
+        <mxCell id="lane-user" value="Benutzer" style="swimlane;html=1;startSize=40;horizontal=0;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="1080" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-system" value="System" style="swimlane;html=1;startSize=40;horizontal=0;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="340" width="1080" height="420" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-database" value="Datenbank" style="swimlane;html=1;startSize=40;horizontal=0;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="760" width="1080" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="lane-payment" value="Zahlungssystem" style="swimlane;html=1;startSize=40;horizontal=0;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="40" y="980" width="1080" height="200" as="geometry" />
+        </mxCell>
+        
+        <!-- START - Registrierung/Login -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" parent="lane-user" vertex="1">
+          <mxGeometry x="50" y="120" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-registered" value="Bereits&lt;br&gt;registriert?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-user" vertex="1">
+          <mxGeometry x="110" y="95" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="start" target="decision-registered" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="action-register" value="Registrierung&lt;br&gt;ausfüllen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="240" y="30" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-2" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="decision-registered" target="action-register" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="action-login" value="Login&lt;br&gt;Formular" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="240" y="160" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-3" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="decision-registered" target="action-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- System verarbeitet Registrierung -->
+        <mxCell id="process-validate-register" value="Validierung&lt;br&gt;Registrierungsdaten" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="240" y="30" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-register" target="process-validate-register" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-register-valid" value="Daten&lt;br&gt;valide?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-system" vertex="1">
+          <mxGeometry x="370" y="30" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-system" source="process-validate-register" target="decision-register-valid" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- DB speichert User -->
+        <mxCell id="db-save-user" value="Benutzer&lt;br&gt;speichern" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="500" y="30" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-6" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-register-valid" target="db-save-user" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-7" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="decision-register-valid" target="action-register" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="410" as="sourcePoint" />
+            <mxPoint x="340" y="95" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="390" y="410" />
+              <mxPoint x="360" y="410" />
+              <mxPoint x="360" y="95" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- System verarbeitet Login -->
+        <mxCell id="process-validate-login" value="Validierung&lt;br&gt;Login-Daten" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="240" y="150" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-login" target="process-validate-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-check-credentials" value="Benutzer&lt;br&gt;prüfen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="250" y="140" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-validate-login" target="db-check-credentials" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-login-valid" value="Login&lt;br&gt;erfolgreich?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-system" vertex="1">
+          <mxGeometry x="370" y="140" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-check-credentials" target="decision-login-valid" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-11" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="decision-login-valid" target="action-login" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="520" />
+              <mxPoint x="360" y="225" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="process-create-session" value="Session&lt;br&gt;erstellen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="500" y="150" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-12" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-system" source="decision-login-valid" target="process-create-session" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-12b" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-save-user" target="process-create-session" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="830" />
+              <mxPoint x="580" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- User wählt Buchung -->
+        <mxCell id="action-view-homepage" value="Startseite&lt;br&gt;anzeigen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="640" y="110" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-create-session" target="action-view-homepage" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="action-booking-page" value="Buchungsseite&lt;br&gt;öffnen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="770" y="110" width="100" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="action-view-homepage" target="action-booking-page" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-booking-type" value="Buchungs-&lt;br&gt;typ?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-user" vertex="1">
+          <mxGeometry x="900" y="95" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="action-booking-page" target="decision-booking-type" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- System lädt Daten -->
+        <mxCell id="process-load-boats" value="Verfügbare&lt;br&gt;Boote laden" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="770" y="30" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-16" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-booking-page" target="process-load-boats" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-get-items" value="Items&lt;br&gt;abfragen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="780" y="30" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-17" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-load-boats" target="db-get-items" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- BOOTSBUCHUNG BRANCH -->
+        <mxCell id="action-fill-boat-form" value="Boot&lt;br&gt;auswählen&lt;br&gt;&amp; Formular&lt;br&gt;ausfüllen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="1030" y="30" width="80" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-18" value="Boot" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="decision-booking-type" target="action-fill-boat-form" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- LIEGEPLATZ BRANCH -->
+        <mxCell id="action-fill-slot-form" value="Liegeplatz&lt;br&gt;auswählen&lt;br&gt;&amp; Formular&lt;br&gt;ausfüllen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="1030" y="180" width="80" height="70" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-19" value="Liegeplatz" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="decision-booking-type" target="action-fill-slot-form" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- System verarbeitet Boot-Buchung -->
+        <mxCell id="process-validate-boat" value="Bootsreservierung&lt;br&gt;validieren" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="1030" y="30" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-20" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-fill-boat-form" target="process-validate-boat" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-check-boat-availability" value="Verfügbarkeit&lt;br&gt;prüfen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="1030" y="30" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-validate-boat" target="db-check-boat-availability" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-boat-available" value="Boot&lt;br&gt;verfügbar?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-system" vertex="1">
+          <mxGeometry x="1020" y="120" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-22" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-check-boat-availability" target="decision-boat-available" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-23" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="decision-boat-available" target="action-fill-boat-form" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1000" y="500" />
+              <mxPoint x="1000" y="105" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="db-save-boat-reservation" value="Reservierung&lt;br&gt;speichern&lt;br&gt;(pending)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="1030" y="140" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-24" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-boat-available" target="db-save-boat-reservation" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- System verarbeitet Liegeplatz-Buchung -->
+        <mxCell id="process-validate-slot" value="Liegeplatz-&lt;br&gt;reservierung&lt;br&gt;validieren" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="1030" y="180" width="80" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-25" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-fill-slot-form" target="process-validate-slot" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-check-slot-availability" value="Verfügbarkeit&lt;br&gt;prüfen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="1030" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-26" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-validate-slot" target="db-check-slot-availability" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-slot-available" value="Liegeplatz&lt;br&gt;verfügbar?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-system" vertex="1">
+          <mxGeometry x="920" y="260" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-27" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-check-slot-availability" target="decision-slot-available" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-28" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="decision-slot-available" target="action-fill-slot-form" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1010" y="640" />
+              <mxPoint x="1010" y="255" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="db-save-slot-reservation" value="Reservierung&lt;br&gt;speichern&lt;br&gt;(pending)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="780" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-29" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-slot-available" target="db-save-slot-reservation" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- MERGE zurück zum Payment -->
+        <mxCell id="merge-to-payment" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" parent="lane-system" vertex="1">
+          <mxGeometry x="810" y="290" width="20" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-30" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-save-boat-reservation" target="merge-to-payment" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="820" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="arrow-31" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-save-slot-reservation" target="merge-to-payment" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-redirect-payment" value="Weiterleitung&lt;br&gt;zur Payment-&lt;br&gt;View" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="770" y="330" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-32" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-system" source="merge-to-payment" target="process-redirect-payment" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- PAYMENT VIEW -->
+        <mxCell id="action-payment-page" value="Zahlungs-&lt;br&gt;methode&lt;br&gt;wählen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="640" y="210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-redirect-payment" target="action-payment-page" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-load-reservation" value="Reservierung&lt;br&gt;laden" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="650" y="260" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-redirect-payment" target="db-load-reservation" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-payment-method" value="Zahlungs-&lt;br&gt;methode?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-user" vertex="1">
+          <mxGeometry x="500" y="200" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-user" source="action-payment-page" target="decision-payment-method" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- PAYMENT PROCESSING -->
+        <mxCell id="process-payment" value="Zahlung&lt;br&gt;verarbeiten" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-payment" vertex="1">
+          <mxGeometry x="500" y="60" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-36" value="PayPal/&lt;br&gt;Kreditkarte" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-payment-method" target="process-payment" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="decision-payment-success" value="Zahlung&lt;br&gt;erfolgreich?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="lane-payment" vertex="1">
+          <mxGeometry x="370" y="50" width="100" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="lane-payment" source="process-payment" target="decision-payment-success" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-38" value="Nein" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="decision-payment-success" target="action-payment-page" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="460" y="1170" />
+              <mxPoint x="460" y="310" />
+              <mxPoint x="730" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="db-update-payment-status" value="Status auf&lt;br&gt;'paid'&lt;br&gt;aktualisieren" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="lane-database" vertex="1">
+          <mxGeometry x="250" y="50" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-39" value="Ja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-payment-success" target="db-update-payment-status" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- CASH Payment -->
+        <mxCell id="process-cash-booking" value="Barzahlung&lt;br&gt;vormerken" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="lane-system" vertex="1">
+          <mxGeometry x="500" y="330" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-40" value="Bar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="decision-payment-method" target="process-cash-booking" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-41" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-cash-booking" target="db-update-payment-status" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="710" />
+              <mxPoint x="330" y="870" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Bestätigung -->
+        <mxCell id="action-confirmation" value="Buchungs-&lt;br&gt;bestätigung&lt;br&gt;anzeigen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="lane-user" vertex="1">
+          <mxGeometry x="110" y="210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-update-payment-status" target="action-confirmation" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="870" />
+              <mxPoint x="200" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <!-- Admin Area -->
+        <mxCell id="note-admin" value="&lt;b&gt;ADMIN BEREICH&lt;/b&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#f8cecc;strokeColor=#b85450;size=10;" parent="1" vertex="1">
+          <mxGeometry x="80" y="1220" width="120" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="action-admin-view" value="Alle&lt;br&gt;Buchungen&lt;br&gt;anzeigen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="230" y="1210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-admin-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="note-admin" target="action-admin-view" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-admin-filter" value="Filter&lt;br&gt;Worker/Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="230" y="1300" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-admin-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-admin-view" target="process-admin-filter" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="db-admin-query" value="Buchungen&lt;br&gt;abfragen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="360" y="1290" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-admin-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-admin-filter" target="db-admin-query" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="action-cancel-booking" value="Buchung&lt;br&gt;stornieren" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="480" y="1210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-admin-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="db-admin-query" target="action-cancel-booking" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="1330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="db-update-status-cancelled" value="Status auf&lt;br&gt;'cancelled'&lt;br&gt;setzen" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="490" y="1300" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-admin-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-cancel-booking" target="db-update-status-cancelled" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- User My Bookings -->
+        <mxCell id="action-my-bookings" value="Meine&lt;br&gt;Buchungen&lt;br&gt;anzeigen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="650" y="1210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-user-bookings" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-confirmation" target="action-my-bookings" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="160" y="1240" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        
+        <mxCell id="db-user-bookings" value="Buchungen&lt;br&gt;des Users&lt;br&gt;laden" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="660" y="1300" width="80" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-user-bookings-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-my-bookings" target="db-user-bookings" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Logout -->
+        <mxCell id="action-logout" value="Logout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="820" y="1210" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-logout-1" value="Optional" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" parent="1" source="action-my-bookings" target="action-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="process-destroy-session" value="Session&lt;br&gt;zerstören" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="820" y="1300" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-logout-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="action-logout" target="process-destroy-session" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- END -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" parent="1" vertex="1">
+          <mxGeometry x="950" y="1225" width="30" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-end-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="process-destroy-session" target="end" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Weather Service (optional) -->
+        <mxCell id="note-weather" value="&lt;b&gt;Optional:&lt;/b&gt;&lt;br&gt;Weather Library&lt;br&gt;(Open-Meteo API)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffe6cc;strokeColor=#d79b00;size=10;" parent="1" vertex="1">
+          <mxGeometry x="640" y="40" width="100" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow-weather" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" parent="1" source="note-weather" target="action-view-homepage" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <!-- Titel -->
+        <mxCell id="title" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;UML Aktivitätsdiagramm - Bootsverleih System&lt;/b&gt;&lt;/font&gt;&lt;br&gt;Vollständiger Workflow: Registrierung, Login, Buchung (Boot/Liegeplatz), Zahlung, Administration" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="0" width="1080" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Legende -->
+        <mxCell id="legend" value="&lt;b&gt;LEGENDE&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;align=left;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="40" y="1400" width="300" height="200" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-user" value="Benutzer-Aktion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="60" y="1430" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-system" value="System-Prozess" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="180" y="1430" width="100" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-db" value="Datenbank" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="60" y="1480" width="70" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-decision" value="Entscheidung" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="155" y="1480" width="70" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-payment" value="Zahlung" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="245" y="1485" width="70" height="40" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-admin" value="Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="60" y="1550" width="70" height="30" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="legend-start-end" value="Start/Ende" style="ellipse;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="150" y="1545" width="80" height="40" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
