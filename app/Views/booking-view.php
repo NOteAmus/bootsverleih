@@ -609,6 +609,19 @@
                 </div>
             </div>
 
+            <div class="legend" style="padding: 16px; margin-top: 16px; border-top: 1px solid var(--light-gray);">
+                <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:18px;height:18px;border-radius:6px;background: linear-gradient(135deg, rgba(46, 134, 193, 0.92), rgba(52, 152, 219, 0.92)); border:2px solid rgba(255,255,255,0.65);"></span>
+                        <span>Frei</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:18px;height:18px;border-radius:6px;background: linear-gradient(135deg, rgba(220, 53, 69, 0.92), rgba(192, 57, 43, 0.92)); border:2px solid rgba(220, 53, 69, 1);"></span>
+                        <span>Belegt</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="text-center mt-3">
                 <p style="color: var(--text-light); font-style: italic;">
                     <i class="fas fa-info-circle"></i>
