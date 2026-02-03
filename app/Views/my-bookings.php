@@ -392,7 +392,15 @@
                                 <div class="detail-content">
                                     <div class="detail-label">Zahlungsmethode</div>
                                     <div class="detail-value">
-                                        <?= ucfirst(esc($booking['payment_method'])) ?>
+                                        <?php
+                                            $pm = $booking['payment_method'] ?? '';
+                                            $labels = [
+                                                'cash' => 'Bargeld',
+                                                'paypal' => 'PayPal',
+                                                'card' => 'Kreditkarte',
+                                            ];
+                                            echo esc($labels[$pm] ?? ucfirst($pm));
+                                        ?>
                                     </div>
                                 </div>
                             </div>

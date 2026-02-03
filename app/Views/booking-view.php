@@ -321,6 +321,28 @@
 
         .form-actions { grid-column: 1 / -1; text-align: center; margin-top: 1rem; }
 
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.35rem;
+        }
+        .payment-option {
+            border: 2px solid var(--light-gray);
+            border-radius: 10px;
+            padding: 0.9rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--white);
+        }
+        .payment-option:hover { border-color: var(--primary-light); box-shadow: 0 6px 12px var(--shadow); }
+        .payment-option input { width: auto; accent-color: var(--primary); }
+        .payment-option .title { font-weight: 700; color: var(--text-dark); }
+        .payment-option .subtitle { display: block; font-size: 0.9rem; color: var(--text-light); }
+
         /* Chip input */
         .chip-input {
             min-height: 48px;
@@ -654,6 +676,33 @@
                         <label for="specialRequests"><i class="fas fa-comments"></i> Besondere Wünsche</label>
                         <textarea id="specialRequests" name="special_requests" v-model.trim="slotForm.special_requests" rows="3" placeholder="Stromanschluss benötigt, besondere Manövrierhilfen, etc..."></textarea>
                     </div>
+
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-credit-card"></i> Zahlungsmethode</label>
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="slot_payment" value="cash" v-model="slotForm.payment_method" />
+                                <div>
+                                    <span class="title">Barzahlung</span>
+                                    <span class="subtitle">Bezahlen Sie bequem vor Ort</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="slot_payment" value="paypal" v-model="slotForm.payment_method" />
+                                <div>
+                                    <span class="title">PayPal</span>
+                                    <span class="subtitle">Schnell & Käuferschutz</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="slot_payment" value="card" v-model="slotForm.payment_method" />
+                                <div>
+                                    <span class="title">Kreditkarte</span>
+                                    <span class="subtitle">Visa, Mastercard, Amex</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -736,6 +785,33 @@
                     <div class="form-group full-width">
                         <label for="boatRequests"><i class="fas fa-tools"></i> Zusätzliche Ausrüstung</label>
                         <textarea id="boatRequests" name="additional_equipment" v-model.trim="boatForm.additional_equipment" rows="3" placeholder="z.B. Sonnendach, Grill, Wasserski, zusätzliche Schwimmwesten..."></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-credit-card"></i> Zahlungsmethode</label>
+                        <div class="payment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="boat_payment" value="cash" v-model="boatForm.payment_method" />
+                                <div>
+                                    <span class="title">Barzahlung</span>
+                                    <span class="subtitle">Bezahlen Sie bei Übergabe vor Ort</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="boat_payment" value="paypal" v-model="boatForm.payment_method" />
+                                <div>
+                                    <span class="title">PayPal</span>
+                                    <span class="subtitle">Schnell & Käuferschutz</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="boat_payment" value="card" v-model="boatForm.payment_method" />
+                                <div>
+                                    <span class="title">Kreditkarte</span>
+                                    <span class="subtitle">Visa, Mastercard, Amex</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
@@ -1119,7 +1195,7 @@
                     start_date: state.slotForm.start_date,
                     end_date: state.slotForm.end_date,
                     special_requests: state.slotForm.special_requests,
-                    payment_method: "paypal",
+                    payment_method: state.slotForm.payment_method || "paypal",
                 };
 
                 console.log('Sending payload:', payload);
@@ -1192,7 +1268,7 @@
                     end_date: state.boatForm.end_date,
                     experience_level: state.boatForm.experience_level,
                     additional_equipment: state.boatForm.additional_equipment,
-                    payment_method: "paypal",
+                    payment_method: state.boatForm.payment_method || "paypal",
                 };
 
                 console.log('Sending payload:', payload);

@@ -310,14 +310,15 @@
         </div>
     </header>
 
+    <?php $defaultMethod = $reservation['payment_method'] ?? 'paypal'; ?>
     <div class="container">
         <div class="payment-layout">
             <div class="payment-main">
                 <h2 class="section-title">Zahlungsmethode wählen</h2>
 
                 <div class="payment-methods">
-                    <label class="payment-method active">
-                        <input type="radio" name="payment_method" value="paypal" checked>
+                    <label class="payment-method <?= ($defaultMethod === 'paypal') ? 'active' : '' ?>">
+                        <input type="radio" name="payment_method" value="paypal" <?= ($defaultMethod === 'paypal') ? 'checked' : '' ?> >
                         <div class="payment-icon">
                             <i class="fab fa-paypal" style="color: #0070ba;"></i>
                         </div>
@@ -327,8 +328,8 @@
                         </div>
                     </label>
 
-                    <label class="payment-method">
-                        <input type="radio" name="payment_method" value="card">
+                    <label class="payment-method <?= ($defaultMethod === 'card') ? 'active' : '' ?>">
+                        <input type="radio" name="payment_method" value="card" <?= ($defaultMethod === 'card') ? 'checked' : '' ?> >
                         <div class="payment-icon">
                             <i class="fas fa-credit-card" style="color: #333;"></i>
                         </div>
@@ -340,7 +341,7 @@
                 </div>
 
                 <form id="paymentForm">
-                    <div id="cardFields" style="display: none;">
+                    <div id="cardFields" style="<?= ($defaultMethod === 'card') ? '' : 'display: none;' ?>">
                         <div class="form-group">
                             <label>Karteninhaber</label>
                             <input type="text" id="cardHolder" placeholder="Max Mustermann">
@@ -368,15 +369,15 @@
                         </div>
                     </div>
 
-                    <div id="paypalFields">
+                    <div id="paypalFields" style="<?= ($defaultMethod === 'card') ? 'display: none;' : '' ?>">
                         <div class="form-group">
                             <label>PayPal E-Mail</label>
-                            <input type="email" id="paypalEmail" placeholder="ihre-email@beispiel.de" required>
+                            <input type="email" id="paypalEmail" name="paypal_email" placeholder="ihre-email@beispiel.de">
                         </div>
 
                         <div class="form-group">
                             <label>PayPal Passwort</label>
-                            <input type="password" id="paypalPassword" placeholder="••••••••" required>
+                            <input type="password" id="paypalPassword" name="paypal_password" placeholder="••••••••">
                         </div>
                     </div>
 
@@ -496,6 +497,15 @@
                 }
             });
         });
+
+        const defaultMethod = reservation.payment_method || 'paypal';
+        const preset = document.querySelector(`input[name="payment_method"][value="${defaultMethod}"]`);
+        if (preset) {
+            preset.checked = true;
+            preset.dispatchEvent(new Event('change'));
+        } else {
+            document.querySelector('input[name="payment_method"]:checked')?.dispatchEvent(new Event('change'));
+        }
 
         // Kartennummer formatieren
         document.getElementById('cardNumber')?.addEventListener('input', function(e) {

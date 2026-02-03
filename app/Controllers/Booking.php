@@ -214,6 +214,12 @@ class Booking extends Controller
         // Convert item_id to integer
         $itemId = (int) $data['item_id'];
 
+        $paymentMethod = $data['payment_method'] ?? 'paypal';
+        $allowedPaymentMethods = ['paypal', 'card', 'cash'];
+        if (!in_array($paymentMethod, $allowedPaymentMethods, true)) {
+            $paymentMethod = 'paypal';
+        }
+
         // Check availability
         if (!$reservationModel->isItemAvailable($itemId, $data['start_date'], $data['end_date'])) {
             return $this->response->setJSON([
@@ -282,7 +288,7 @@ class Booking extends Controller
             'service_fee' => $serviceFee,
             'insurance' => $insurance,
             'total_amount' => $totalAmount,
-            'payment_method' => $data['payment_method'] ?? 'paypal',
+            'payment_method' => $paymentMethod,
             'payment_status' => 'pending',
             'additional_equipment' => $data['additional_equipment'] ?? null,
             'experience_level' => $data['experience_level'] ?? null,
@@ -291,12 +297,16 @@ class Booking extends Controller
         $reservationId = $reservationModel->insert($reservationData);
         
         if ($reservationId) {
+            $redirectUrl = $paymentMethod === 'cash'
+                ? base_url('my-bookings?payment=cash&reservation=' . $reservationData['reservation_number'])
+                : base_url('payment/' . $reservationId);
+
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Reservierung erstellt. Weiterleitung zur Zahlung...',
                 'reservation_id' => $reservationId,
                 'reservation_number' => $reservationData['reservation_number'],
-                'redirect_url' => base_url('payment/' . $reservationId)
+                'redirect_url' => $redirectUrl
             ]);
         }
 
@@ -332,6 +342,12 @@ class Booking extends Controller
                 'success' => false,
                 'message' => 'Bitte wählen Sie mindestens einen Liegeplatz aus'
             ]);
+        }
+
+        $paymentMethod = $data['payment_method'] ?? 'paypal';
+        $allowedPaymentMethods = ['paypal', 'card', 'cash'];
+        if (!in_array($paymentMethod, $allowedPaymentMethods, true)) {
+            $paymentMethod = 'paypal';
         }
 
         // Get first slot for calculation (could be enhanced to support multiple prices)
@@ -386,7 +402,7 @@ class Booking extends Controller
             'service_fee' => $serviceFee,
             'insurance' => 0.00, // No insurance for berths
             'total_amount' => $totalAmount,
-            'payment_method' => $data['payment_method'] ?? 'paypal',
+            'payment_method' => $paymentMethod,
             'payment_status' => 'pending',
             'special_requests' => $data['special_requests'] ?? null,
         ];
@@ -399,12 +415,16 @@ class Booking extends Controller
                 // Could add to a reservation_slots table here
             }
             
+            $redirectUrl = $paymentMethod === 'cash'
+                ? base_url('my-bookings?payment=cash&reservation=' . $reservationData['reservation_number'])
+                : base_url('payment/' . $reservationId);
+
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Reservierung erstellt. Weiterleitung zur Zahlung...',
                 'reservation_id' => $reservationId,
                 'reservation_number' => $reservationData['reservation_number'],
-                'redirect_url' => base_url('payment/' . $reservationId)
+                'redirect_url' => $redirectUrl
             ]);
         }
 
