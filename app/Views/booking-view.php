@@ -465,18 +465,18 @@
 <body>
 <?= view('header', ['weather' => $weather ?? null]) ?>
 
-<div class="container">
+<div id="app" class="container">
     <!-- Liegeplätze -->
-    <div class="tab-content active" id="slots-tab">
+    <div class="tab-content" :class="{ active: activeTab === 'slots' }" id="slots-tab">
         <div class="marina-map-container">
             <h2 class="section-title">Marina Übersicht - Plauer See</h2>
 
             <div class="container">
                 <div class="nav-tabs">
-                    <button class="nav-tab active" data-tab="slots">
+                    <button class="nav-tab" :class="{ active: activeTab === 'slots' }" type="button" @click="setActiveTab('slots')">
                         <i class="fas fa-anchor"></i>Liegeplätze & Marina
                     </button>
-                    <button class="nav-tab" data-tab="boats">
+                    <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
                 </div>
@@ -530,7 +530,7 @@
                     <div class="dock pier" style="left: <?= $cfg['left'] ?>;"></div>
                 <?php endforeach; ?>
 
-                <!-- Stellplätze am Fingersteg (abwechselnd links/rechts) -->
+                <!-- Stellplätze am Fingersteg -->
                 <?php foreach ($slotsByRow as $row => $rowSlots):
                     if (!isset($rows[$row])) continue;
                     $pierLeft = $rows[$row]['left'];
@@ -546,20 +546,42 @@
                         ?>
                         <div
                                 class="slot <?= $sideClass ?><?= $occupiedClass ?>"
+                                :class="slotDynamicClasses(<?= (int)$slot['id'] ?>)"
                                 style="top: <?= (int)$topPos ?>px; left: <?= $pierLeft ?>;"
                                 data-slot-id="<?= (int)$slot['id'] ?>"
                                 data-slot="<?= esc($slot['slot_number']) ?>"
                                 data-accepts-boat="1"
                                 title="<?= esc($slot['slot_number']) ?>"
+                                @click="onSlotClick(<?= (int)$slot['id'] ?>)"
+                                @dblclick="removeSlotSelectionById(<?= (int)$slot['id'] ?>)"
+                                @dragover.prevent="onSlotDragOver(<?= (int)$slot['id'] ?>, $event)"
+                                @dragleave="onSlotDragLeave(<?= (int)$slot['id'] ?>)"
+                                @drop.prevent="onSlotDrop(<?= (int)$slot['id'] ?>, $event)"
                         >
-                            <?= esc($slot['slot_number']) ?>
+                            <template v-if="pendingSlots[<?= (int)$slot['id'] ?>]">
+                                <div class="boat-in-slot">
+                                    <i class="fas fa-ship"></i>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <?= esc($slot['slot_number']) ?>
+                            </template>
                         </div>
                     <?php endforeach; endforeach; ?>
             </div>
 
             <!-- Boot-Token Palette -->
             <div class="boat-palette" aria-label="Boote ziehen">
-                <div class="boat-token" draggable="true" data-boat-token="1" title="Drag & Drop auf einen Stellplatz">
+                <div
+                        class="boat-token"
+                        draggable="true"
+                        :style="{ outline: touchSelectedToken ? '3px solid rgba(244,208,63,.9)' : '' }"
+                        data-boat-token="1"
+                        title="Drag & Drop auf einen Stellplatz"
+                        @dragstart="onBoatDragStart('1', $event)"
+                        @dragend="onBoatDragEnd"
+                        @click="touchSelectTokenFn('1')"
+                >
                     <i class="fas fa-ship"></i>
                     <span class="label">Boot</span>
                 </div>
@@ -576,61 +598,72 @@
         <!-- Liegeplatz Buchungsformular -->
         <div class="booking-form">
             <h2 class="section-title">Liegeplatz Reservierung</h2>
-            <form id="slotReservationForm">
+            <form id="slotReservationForm" @submit.prevent="submitSlotReservation">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="slotCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
-                        <input type="text" id="slotCustomerName" name="customer_name" required placeholder="Max Mustermann" />
+                        <input type="text" id="slotCustomerName" name="customer_name" v-model.trim="slotForm.customer_name" required placeholder="Max Mustermann" />
                     </div>
 
                     <div class="form-group">
                         <label for="slotCustomerEmail"><i class="fas fa-envelope"></i> E-Mail Adresse</label>
-                        <input type="email" id="slotCustomerEmail" name="customer_email" required placeholder="max@mustermann.de" />
+                        <input type="email" id="slotCustomerEmail" name="customer_email" v-model.trim="slotForm.customer_email" required placeholder="max@mustermann.de" />
                     </div>
 
                     <div class="form-group">
                         <label for="slotCustomerPhone"><i class="fas fa-phone"></i> Telefonnummer</label>
-                        <input type="tel" id="slotCustomerPhone" name="customer_phone" required placeholder="+49 123 456789" />
+                        <input type="tel" id="slotCustomerPhone" name="customer_phone" v-model.trim="slotForm.customer_phone" required placeholder="+49 123 456789" />
                     </div>
 
                     <div class="form-group">
                         <label for="boatLength"><i class="fas fa-ruler"></i> Bootslänge (in Metern)</label>
-                        <input type="number" id="boatLength" name="boat_length" min="4" max="25" step="0.1" required placeholder="z.B. 8.5" />
+                        <input type="number" id="boatLength" name="boat_length" v-model.trim="slotForm.boat_length" min="4" max="25" step="0.1" required placeholder="z.B. 8.5" />
                     </div>
 
                     <div class="form-group">
                         <label for="slotStartDate"><i class="fas fa-calendar-day"></i> Ankunftsdatum</label>
-                        <input type="date" id="slotStartDate" name="start_date" required />
+                        <input type="date" id="slotStartDate" name="start_date" v-model="slotForm.start_date" :min="todayStr" required />
                     </div>
 
                     <div class="form-group">
                         <label for="slotEndDate"><i class="fas fa-calendar-day"></i> Abreisedatum</label>
-                        <input type="date" id="slotEndDate" name="end_date" required />
+                        <input type="date" id="slotEndDate" name="end_date" v-model="slotForm.end_date" :min="todayStr" required />
                     </div>
 
                     <div class="form-group full-width">
                         <label><i class="fas fa-anchor"></i> Ausgewählte Liegeplätze</label>
 
-                        <!-- Chip-Input Container -->
-                        <div id="selectedSlotsContainer" class="chip-input" tabindex="0">
-                <span class="placeholder">
-                  Klicken oder ziehen Sie Boote auf Liegeplätze – mehrere möglich
-                </span>
+                        <div class="chip-input" tabindex="0">
+              <span v-if="selectedSlotsList.length === 0" class="placeholder">
+                Klicken oder ziehen Sie Boote auf Liegeplätze – mehrere möglich
+              </span>
+
+                            <div v-else class="chips">
+                                <div class="chip" v-for="s in selectedSlotsList" :key="s.id">
+                                    <span>{{ s.number }}</span>
+                                    <button type="button" aria-label="Entfernen" @click="removeSlotSelectionById(s.id)">&times;</button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Hidden Field für Submit -->
-                        <input type="hidden" id="selectedSlotIds" name="slot_ids" value="" />
+                        <input type="hidden" id="selectedSlotIds" name="slot_ids" :value="selectedSlotIdsCsv" />
                     </div>
 
                     <div class="form-group full-width">
                         <label for="specialRequests"><i class="fas fa-comments"></i> Besondere Wünsche</label>
-                        <textarea id="specialRequests" name="special_requests" rows="3" placeholder="Stromanschluss benötigt, besondere Manövrierhilfen, etc..."></textarea>
+                        <textarea id="specialRequests" name="special_requests" v-model.trim="slotForm.special_requests" rows="3" placeholder="Stromanschluss benötigt, besondere Manövrierhilfen, etc..."></textarea>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-check-circle"></i> Liegeplatz jetzt reservieren
+                    <button type="submit" class="btn btn-primary" :disabled="slotSubmitting">
+                        <template v-if="slotSubmitting">
+                            <i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...
+                        </template>
+                        <template v-else>
+                            <i class="fas fa-check-circle"></i> Liegeplatz jetzt reservieren
+                        </template>
                     </button>
                 </div>
             </form>
@@ -638,41 +671,41 @@
     </div>
 
     <!-- Bootsverleih -->
-    <div class="tab-content" id="boats-tab">
+    <div class="tab-content" :class="{ active: activeTab === 'boats' }" id="boats-tab">
         <div class="booking-form">
             <h2 class="section-title">Boot Reservierung</h2>
 
             <div class="container">
                 <div class="nav-tabs">
-                    <button class="nav-tab" data-tab="slots">
+                    <button class="nav-tab" :class="{ active: activeTab === 'slots' }" type="button" @click="setActiveTab('slots')">
                         <i class="fas fa-anchor"></i>Liegeplätze & Marina
                     </button>
-                    <button class="nav-tab active" data-tab="boats">
+                    <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
                 </div>
             </div>
 
-            <form id="boatReservationForm">
+            <form id="boatReservationForm" @submit.prevent="submitBoatReservation">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="boatCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
-                        <input type="text" id="boatCustomerName" name="customer_name" required placeholder="Max Mustermann" />
+                        <input type="text" id="boatCustomerName" name="customer_name" v-model.trim="boatForm.customer_name" required placeholder="Max Mustermann" />
                     </div>
 
                     <div class="form-group">
                         <label for="boatCustomerEmail"><i class="fas fa-envelope"></i> E-Mail Adresse</label>
-                        <input type="email" id="boatCustomerEmail" name="customer_email" required placeholder="max@mustermann.de" />
+                        <input type="email" id="boatCustomerEmail" name="customer_email" v-model.trim="boatForm.customer_email" required placeholder="max@mustermann.de" />
                     </div>
 
                     <div class="form-group">
                         <label for="boatCustomerPhone"><i class="fas fa-phone"></i> Telefonnummer</label>
-                        <input type="tel" id="boatCustomerPhone" name="customer_phone" required placeholder="+49 123 456789" />
+                        <input type="tel" id="boatCustomerPhone" name="customer_phone" v-model.trim="boatForm.customer_phone" required placeholder="+49 123 456789" />
                     </div>
 
                     <div class="form-group">
                         <label for="boatExperience"><i class="fas fa-ship"></i> Segel-/Bootserfahrung</label>
-                        <select id="boatExperience" name="experience" required>
+                        <select id="boatExperience" name="experience" v-model="boatForm.experience_level" required>
                             <option value="">Bitte auswählen</option>
                             <option value="beginner">Anfänger</option>
                             <option value="intermediate">Erfahren</option>
@@ -682,17 +715,17 @@
 
                     <div class="form-group">
                         <label for="boatStartDate"><i class="fas fa-calendar-day"></i> Abholdatum</label>
-                        <input type="date" id="boatStartDate" name="start_date" required />
+                        <input type="date" id="boatStartDate" name="start_date" v-model="boatForm.start_date" :min="todayStr" required />
                     </div>
 
                     <div class="form-group">
                         <label for="boatEndDate"><i class="fas fa-calendar-day"></i> Rückgabedatum</label>
-                        <input type="date" id="boatEndDate" name="end_date" required />
+                        <input type="date" id="boatEndDate" name="end_date" v-model="boatForm.end_date" :min="todayStr" required />
                     </div>
 
                     <div class="form-group full-width">
                         <label for="selectedBoat"><i class="fas fa-ship"></i> Gewünschtes Boot auswählen</label>
-                        <select id="selectedBoat" name="boat_id" required>
+                        <select id="selectedBoat" name="boat_id" v-model="boatForm.item_id" required>
                             <option value="">Bitte ein Boot auswählen...</option>
                             <?php foreach ($boats as $boat): ?>
                                 <option value="<?= (int)$boat['id'] ?>" data-price="<?= esc($boat['price_per_day']) ?>">
@@ -704,13 +737,18 @@
 
                     <div class="form-group full-width">
                         <label for="boatRequests"><i class="fas fa-tools"></i> Zusätzliche Ausrüstung</label>
-                        <textarea id="boatRequests" name="additional_equipment" rows="3" placeholder="z.B. Sonnendach, Grill, Wasserski, zusätzliche Schwimmwesten..."></textarea>
+                        <textarea id="boatRequests" name="additional_equipment" v-model.trim="boatForm.additional_equipment" rows="3" placeholder="z.B. Sonnendach, Grill, Wasserski, zusätzliche Schwimmwesten..."></textarea>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-ship"></i> Boot jetzt reservieren
+                    <button type="submit" class="btn btn-primary" :disabled="boatSubmitting">
+                        <template v-if="boatSubmitting">
+                            <i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...
+                        </template>
+                        <template v-else>
+                            <i class="fas fa-ship"></i> Boot jetzt reservieren
+                        </template>
                     </button>
                 </div>
             </form>
@@ -721,7 +759,38 @@
             <p class="text-center mb-2" style="color: var(--text-light);">
                 Wählen Sie aus unserer modernen und gut ausgestatteten Flotte
             </p>
-            <div class="boats-grid" id="boatsGrid"></div>
+
+            <div class="boats-grid" id="boatsGrid">
+                <div class="boat-card" v-for="boat in boatsData" :key="boat.id" :data-boat-id="boat.id">
+                    <div class="boat-image" :style="{ backgroundImage: `url('${boat.image}')` }">
+                        <div class="boat-category">{{ boat.type }}</div>
+                    </div>
+
+                    <div class="boat-content">
+                        <div class="boat-header">
+                            <div>
+                                <div class="boat-name">{{ boat.name }}</div>
+                                <div class="boat-type">{{ boat.type }} • {{ boat.year }}</div>
+                            </div>
+                            <div class="boat-price">€{{ boat.price_per_day }}<span>/Tag</span></div>
+                        </div>
+
+                        <div class="boat-details">
+                            <div class="detail-item"><i class="fas fa-ruler"></i><span>{{ boat.length }}m</span></div>
+                            <div class="detail-item"><i class="fas fa-users"></i><span>{{ boat.capacity }} Pers.</span></div>
+                            <div class="detail-item"><i class="fas fa-calendar"></i><span>{{ boat.year }}</span></div>
+                        </div>
+
+                        <div class="boat-features">
+                            <span class="feature-tag" v-for="f in boat.features" :key="f">{{ f }}</span>
+                        </div>
+
+                        <button class="btn btn-primary" type="button" style="width:100%;margin-top:1rem;" @click="selectBoatFromCard(boat.id)">
+                            <i class="fas fa-check"></i> Boot auswählen
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -754,435 +823,381 @@
     </div>
 </footer>
 
+<!-- Vue 3 (CDN) -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
 <script>
-    // =========================
-    // Tabs (synchronisiert alle nav-tabs)
-    // =========================
-    function setActiveTab(tabId) {
-        document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-        const target = document.getElementById(tabId + "-tab");
-        if (target) target.classList.add("active");
+    const { createApp, reactive, computed, watch } = Vue;
 
-        document.querySelectorAll(".nav-tab").forEach(btn => {
-            btn.classList.toggle("active", btn.getAttribute("data-tab") === tabId);
-        });
-    }
+    createApp({
+        setup() {
+            // ---------- state ----------
+            const state = reactive({
+                activeTab: "slots",
 
-    document.querySelectorAll(".nav-tab").forEach(tab => {
-        tab.addEventListener("click", () => setActiveTab(tab.getAttribute("data-tab")));
-    });
+                // Slots selection + states
+                selectedSlots: {},         // { [slotId]: { id, number } }
+                pendingSlots: {},          // { [slotId]: true }
+                dropHoverSlots: {},        // { [slotId]: true }
 
-    // =========================
-    // Multi-Select Slots (Chips + Hidden)
-    // =========================
-    const selectedSlots = new Map(); // key = slotId (string), value = { id, number }
+                // Dragging + mobile token
+                draggingBoatTokenId: null,
+                touchSelectedToken: null,
 
-    function refreshSelectedSlotsUI() {
-        const container = document.getElementById("selectedSlotsContainer");
-        const hiddenIds = document.getElementById("selectedSlotIds");
-        const arr = Array.from(selectedSlots.values());
+                // Submitting flags
+                slotSubmitting: false,
+                boatSubmitting: false,
 
-        hiddenIds.value = arr.map(x => x.id).join(",");
-        container.innerHTML = "";
+                // Forms
+                slotForm: {
+                    customer_name: "",
+                    customer_email: "",
+                    customer_phone: "",
+                    boat_length: "",
+                    start_date: "",
+                    end_date: "",
+                    special_requests: "",
+                    payment_method: "paypal",
+                },
+                boatForm: {
+                    item_id: "",
+                    customer_name: "",
+                    customer_email: "",
+                    customer_phone: "",
+                    start_date: "",
+                    end_date: "",
+                    experience_level: "",
+                    additional_equipment: "",
+                    payment_method: "paypal",
+                },
 
-        if (arr.length === 0) {
-            container.innerHTML = `<span class="placeholder">Klicken oder ziehen Sie Boote auf Liegeplätze – mehrere möglich</span>`;
-            return;
-        }
-
-        arr.forEach(slot => {
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            chip.innerHTML = `<span>${slot.number}</span><button type="button" aria-label="Entfernen">&times;</button>`;
-            chip.querySelector("button").addEventListener("click", () => removeSlotSelectionById(slot.id));
-            container.appendChild(chip);
-        });
-    }
-
-    function addSlotSelection(slotEl) {
-        if (!slotEl || slotEl.classList.contains("occupied")) return;
-
-        const slotId = slotEl.getAttribute("data-slot-id");
-        const slotNumber = slotEl.getAttribute("data-slot");
-        if (!slotId || !slotNumber) return;
-
-        const key = String(slotId);
-        if (selectedSlots.has(key)) return;
-
-        selectedSlots.set(key, { id: slotId, number: slotNumber });
-        slotEl.classList.add("selected");
-        refreshSelectedSlotsUI();
-    }
-
-    function removeSlotSelectionById(slotId) {
-        const key = String(slotId);
-        if (!selectedSlots.has(key)) return;
-
-        selectedSlots.delete(key);
-
-        const el = document.querySelector(`.slot[data-slot-id="${slotId}"]`);
-        if (el) {
-            el.classList.remove("selected");
-
-            // Wenn pending -> Boot entfernen + Slotnummer wieder anzeigen
-            if (el.classList.contains("pending")) {
-                el.classList.remove("pending");
-                el.removeAttribute("data-boat-token");
-                el.innerHTML = el.getAttribute("data-slot") || "";
-                el.removeAttribute("title");
-                el.setAttribute("title", el.getAttribute("data-slot") || "");
-            }
-        }
-
-        refreshSelectedSlotsUI();
-    }
-
-    function toggleSlotSelection(slotEl) {
-        if (!slotEl || slotEl.classList.contains("occupied")) return;
-
-        const slotId = slotEl.getAttribute("data-slot-id");
-        if (!slotId) return;
-
-        const key = String(slotId);
-
-        if (selectedSlots.has(key)) {
-            removeSlotSelectionById(slotId);
-        } else {
-            addSlotSelection(slotEl);
-            document.getElementById("slotReservationForm")
-                .scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-    }
-
-    // =========================
-    // Drag & Drop: Boot -> Slot
-    // =========================
-    const boatTokens = document.querySelectorAll('.boat-token[draggable="true"]');
-    const droppableSlots = document.querySelectorAll('.slot[data-accepts-boat="1"]');
-    let draggingBoatTokenId = null;
-
-    function placeBoatIntoSlot(slot, tokenId) {
-        if (slot.classList.contains("occupied")) return;
-        if (slot.classList.contains("pending")) return;
-
-        const originalNumber = slot.getAttribute("data-slot") || "";
-
-        slot.classList.add("pending");
-        slot.setAttribute("data-boat-token", tokenId);
-
-        // Nur das Schiff-Icon anzeigen
-        slot.innerHTML = `
-        <div class="boat-in-slot">
-          <i class="fas fa-ship"></i>
-        </div>
-      `;
-
-        // Tooltip mit Slot-Nummer behalten
-        slot.setAttribute("title", originalNumber);
-    }
-
-    boatTokens.forEach(token => {
-        token.addEventListener("dragstart", (e) => {
-            draggingBoatTokenId = token.getAttribute("data-boat-token");
-            e.dataTransfer.setData("text/plain", draggingBoatTokenId);
-            e.dataTransfer.effectAllowed = "copy";
-
-            // Custom Drag Image: nur Schiff
-            const icon = document.createElement("i");
-            icon.className = "fas fa-ship";
-            icon.style.fontSize = "32px";
-            icon.style.color = "#f4d03f";
-            icon.style.position = "absolute";
-            icon.style.top = "-1000px";
-            document.body.appendChild(icon);
-
-            e.dataTransfer.setDragImage(icon, 16, 16);
-
-            setTimeout(() => document.body.removeChild(icon), 0);
-        });
-
-        token.addEventListener("dragend", () => {
-            draggingBoatTokenId = null;
-        });
-    });
-
-    droppableSlots.forEach(slot => {
-        slot.addEventListener("dragover", (e) => {
-            if (slot.classList.contains("occupied")) return;
-            e.preventDefault();
-            e.dataTransfer.dropEffect = "copy";
-            slot.classList.add("drop-hover");
-        });
-
-        slot.addEventListener("dragleave", () => {
-            slot.classList.remove("drop-hover");
-        });
-
-        slot.addEventListener("drop", (e) => {
-            e.preventDefault();
-            slot.classList.remove("drop-hover");
-            if (slot.classList.contains("occupied")) return;
-
-            const tokenId = e.dataTransfer.getData("text/plain") || draggingBoatTokenId;
-            if (!tokenId) return;
-
-            placeBoatIntoSlot(slot, tokenId);
-            addSlotSelection(slot);
-
-            document.getElementById("slotReservationForm")
-                .scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-    });
-
-    // =========================
-    // Mobile Fallback: Boot antippen -> Slot antippen
-    // =========================
-    let touchSelectedToken = null;
-
-    boatTokens.forEach(token => {
-        token.addEventListener("click", () => {
-            touchSelectedToken = token.getAttribute("data-boat-token");
-            boatTokens.forEach(t => t.style.outline = "");
-            token.style.outline = "3px solid rgba(244,208,63,.9)";
-        });
-    });
-
-    // Slot Click: wenn Mobile-Token aktiv -> Boot setzen, sonst normal togglen
-    document.querySelectorAll(".slot[data-slot-id]").forEach(slot => {
-        slot.addEventListener("click", () => {
-            if (touchSelectedToken) {
-                if (slot.classList.contains("occupied")) return;
-
-                placeBoatIntoSlot(slot, touchSelectedToken);
-                addSlotSelection(slot);
-
-                touchSelectedToken = null;
-                boatTokens.forEach(t => t.style.outline = "");
-
-                document.getElementById("slotReservationForm")
-                    .scrollIntoView({ behavior: "smooth", block: "start" });
-                return;
-            }
-
-            toggleSlotSelection(slot);
-        });
-
-        // Doppelklick entfernt pending + Auswahl
-        slot.addEventListener("dblclick", () => {
-            const slotId = slot.getAttribute("data-slot-id");
-            if (!slotId) return;
-            removeSlotSelectionById(slotId);
-        });
-    });
-
-    // Initial UI
-    refreshSelectedSlotsUI();
-
-    // =========================
-    // Liegeplatz Reservierung (submit)
-    // =========================
-    document.getElementById("slotReservationForm").addEventListener("submit", function (e) {
-        e.preventDefault();
-
-        const slotIdsCsv = document.getElementById("selectedSlotIds").value.trim();
-        const slotIds = slotIdsCsv
-            ? slotIdsCsv.split(",").map(x => parseInt(x, 10)).filter(n => Number.isFinite(n))
-            : [];
-
-        if (slotIds.length === 0) {
-            alert("Bitte wählen Sie zuerst einen oder mehrere Liegeplätze aus der Marina-Ansicht aus.");
-            return;
-        }
-
-        const formData = {
-            slot_ids: slotIds, // <-- MULTI
-            customer_name: document.getElementById("slotCustomerName").value,
-            customer_email: document.getElementById("slotCustomerEmail").value,
-            customer_phone: document.getElementById("slotCustomerPhone").value,
-            boat_length: document.getElementById("boatLength").value,
-            start_date: document.getElementById("slotStartDate").value,
-            end_date: document.getElementById("slotEndDate").value,
-            payment_method: "paypal",
-        };
-
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
-
-        fetch("/booking/makeSlotReservation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
+                // Boats cards demo data
+                boatsData: [
+                    {id:1,name:"Bavaria Cruiser 37",type:"Segelyacht",category:"premium",length:11.3,year:2023,capacity:8,price_per_day:350,features:["2 Kabinen","Vollküche","WC mit Dusche","GPS","Autopilot"],image:"https://res.cloudinary.com/dk-wassersport/image/upload/v1740666784/yacht/yacht_20250219_202505_new-img_75_4_img-Z6Q0P0Qy.jpg"},
+                    {id:2,name:"Hanse 388",type:"Segelyacht",category:"premium",length:11.4,year:2022,capacity:6,price_per_day:320,features:["3 Kabinen","Kombüse","Elektrowinde","Badeplattform","Sonnenliege"],image:"https://res.cloudinary.com/dk-wassersport/image/upload/v1687436145/yacht/hanse-388-segeln-lavagna-2018-mst-7553_ef16a87fb0075501318c20c50a281a6a.jpg"},
+                    {id:3,name:"Jeanneau Sun Odyssey 349",type:"Segelyacht",category:"comfort",length:10.3,year:2021,capacity:6,price_per_day:280,features:["Großraum","Kühlschrank","Heizung","Badeleiter","Stereoanlage"],image:"https://www.pitter-yachting.com/images/yacht/sun-odyssey-349/23971630-nala/23971630-main.jpg"},
+                    {id:4,name:"Quicksilver Activ 675",type:"Motorboot",category:"comfort",length:6.75,year:2023,capacity:8,price_per_day:220,features:["115 PS","Sonnendeck","Badeplattform","Kühlbox","USB-Anschluss"],image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlymDneY3tolTqia68b61rdHnxxw9NZzakxQ&s"},
+                    {id:5,name:"Bayliner VR6",type:"Motorboot",category:"standard",length:6.1,year:2022,capacity:6,price_per_day:180,features:["Mercury 150 PS","Ski-Torpedo","Badeleiter","Sportlenkung","Bluetooth"],image:"https://www.bootscenter-keser.de/wp-content/uploads/2024/03/Bayliner-VR6-Cuddy-7.webp"},
+                    {id:6,name:"Zodiac Cadet 310",type:"Schlauchboot",category:"economy",length:3.1,year:2023,capacity:4,price_per_day:90,features:["20 PS Motor","Leicht & wendig","Einfache Bedienung","Schnell abpumpbar"],image:"https://www.marinawassersport.de/cdn/shop/files/2015_Zodiac_310Alu_01_6edc392e-22e9-469e-a766-9d8670794f46.jpg?v=1740217353&width=1445"}
+                ],
             });
-    });
 
-    // =========================
-    // Boot Reservierung (submit)
-    // =========================
-    document.getElementById("boatReservationForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+            // ---------- dates ----------
+            const formatDate = (date) => date.toISOString().split("T")[0];
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
 
-        const boatSelect = document.getElementById("selectedBoat");
-        if (!boatSelect.value) {
-            alert("Bitte wählen Sie zuerst ein Boot aus.");
-            return;
-        }
+            const todayStr = computed(() => formatDate(today));
 
-        const formData = {
-            item_id: parseInt(boatSelect.value, 10),
-            customer_name: document.getElementById("boatCustomerName").value,
-            customer_email: document.getElementById("boatCustomerEmail").value,
-            customer_phone: document.getElementById("boatCustomerPhone").value,
-            start_date: document.getElementById("boatStartDate").value,
-            end_date: document.getElementById("boatEndDate").value,
-            experience_level: document.getElementById("boatExperience").value,
-            additional_equipment: document.getElementById("boatRequests").value,
-            payment_method: "paypal",
-        };
+            state.slotForm.start_date = formatDate(today);
+            state.slotForm.end_date = formatDate(tomorrow);
+            state.boatForm.start_date = formatDate(today);
+            state.boatForm.end_date = formatDate(tomorrow);
 
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalBtnText = submitBtn.innerHTML;
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Reservierung wird erstellt...';
-
-        fetch("/booking/makeBoatReservation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.redirect_url;
-                } else {
-                    alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalBtnText;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnText;
-            });
-    });
-
-    // =========================
-    // Datumseingaben vorbelegen
-    // =========================
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const formatDate = (date) => date.toISOString().split("T")[0];
-
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.value = formatDate(today);
-        input.min = formatDate(today);
-    });
-
-    const slotEnd = document.getElementById("slotEndDate");
-    if (slotEnd) slotEnd.value = formatDate(tomorrow);
-
-    document.querySelectorAll('input[type="date"]').forEach(input => {
-        input.addEventListener("change", function () {
-            const startId = this.id.includes("End") ? this.id.replace("End", "Start") : this.id;
-            const endId = this.id.includes("Start") ? this.id.replace("Start", "End") : this.id;
-
-            const startDate = document.getElementById(startId);
-            const endDate = document.getElementById(endId);
-
-            if (startDate && endDate) {
-                if (new Date(endDate.value) <= new Date(startDate.value)) {
-                    const nextDay = new Date(startDate.value);
+            function ensureEndAfterStart(formObj) {
+                if (!formObj.start_date || !formObj.end_date) return;
+                const s = new Date(formObj.start_date);
+                const e = new Date(formObj.end_date);
+                if (e <= s) {
+                    const nextDay = new Date(s);
                     nextDay.setDate(nextDay.getDate() + 1);
-                    endDate.value = formatDate(nextDay);
+                    formObj.end_date = formatDate(nextDay);
                 }
             }
-        });
-    });
 
-    // =========================
-    // Boots-Daten (Demo für Karten)
-    // =========================
-    const boatsData = [
-        {id:1,name:"Bavaria Cruiser 37",type:"Segelyacht",category:"premium",length:11.3,year:2023,capacity:8,price_per_day:350,features:["2 Kabinen","Vollküche","WC mit Dusche","GPS","Autopilot"],image:"https://res.cloudinary.com/dk-wassersport/image/upload/v1740666784/yacht/yacht_20250219_202505_new-img_75_4_img-Z6Q0P0Qy.jpg"},
-        {id:2,name:"Hanse 388",type:"Segelyacht",category:"premium",length:11.4,year:2022,capacity:6,price_per_day:320,features:["3 Kabinen","Kombüse","Elektrowinde","Badeplattform","Sonnenliege"],image:"https://res.cloudinary.com/dk-wassersport/image/upload/v1687436145/yacht/hanse-388-segeln-lavagna-2018-mst-7553_ef16a87fb0075501318c20c50a281a6a.jpg"},
-        {id:3,name:"Jeanneau Sun Odyssey 349",type:"Segelyacht",category:"comfort",length:10.3,year:2021,capacity:6,price_per_day:280,features:["Großraum","Kühlschrank","Heizung","Badeleiter","Stereoanlage"],image:"https://www.pitter-yachting.com/images/yacht/sun-odyssey-349/23971630-nala/23971630-main.jpg"},
-        {id:4,name:"Quicksilver Activ 675",type:"Motorboot",category:"comfort",length:6.75,year:2023,capacity:8,price_per_day:220,features:["115 PS","Sonnendeck","Badeplattform","Kühlbox","USB-Anschluss"],image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTlymDneY3tolTqia68b61rdHnxxw9NZzakxQ&s"},
-        {id:5,name:"Bayliner VR6",type:"Motorboot",category:"standard",length:6.1,year:2022,capacity:6,price_per_day:180,features:["Mercury 150 PS","Ski-Torpedo","Badeleiter","Sportlenkung","Bluetooth"],image:"https://www.bootscenter-keser.de/wp-content/uploads/2024/03/Bayliner-VR6-Cuddy-7.webp"},
-        {id:6,name:"Zodiac Cadet 310",type:"Schlauchboot",category:"economy",length:3.1,year:2023,capacity:4,price_per_day:90,features:["20 PS Motor","Leicht & wendig","Einfache Bedienung","Schnell abpumpbar"],image:"https://www.marinawassersport.de/cdn/shop/files/2015_Zodiac_310Alu_01_6edc392e-22e9-469e-a766-9d8670794f46.jpg?v=1740217353&width=1445"}
-    ];
+            watch(() => state.slotForm.start_date, () => ensureEndAfterStart(state.slotForm));
+            watch(() => state.slotForm.end_date,   () => ensureEndAfterStart(state.slotForm));
+            watch(() => state.boatForm.start_date, () => ensureEndAfterStart(state.boatForm));
+            watch(() => state.boatForm.end_date,   () => ensureEndAfterStart(state.boatForm));
 
-    const boatsGrid = document.getElementById("boatsGrid");
-    if (boatsGrid) {
-        boatsData.forEach(boat => {
-            const boatCard = document.createElement("div");
-            boatCard.className = "boat-card";
-            boatCard.setAttribute("data-boat-id", boat.id);
+            // ---------- computed ----------
+            const selectedSlotsList = computed(() => Object.values(state.selectedSlots));
+            const selectedSlotIdsCsv = computed(() => selectedSlotsList.value.map(x => x.id).join(","));
 
-            boatCard.innerHTML = `
-          <div class="boat-image" style="background-image:url('${boat.image}');">
-            <div class="boat-category">${boat.type}</div>
-          </div>
-          <div class="boat-content">
-            <div class="boat-header">
-              <div>
-                <div class="boat-name">${boat.name}</div>
-                <div class="boat-type">${boat.type} • ${boat.year}</div>
-              </div>
-              <div class="boat-price">€${boat.price_per_day}<span>/Tag</span></div>
-            </div>
-            <div class="boat-details">
-              <div class="detail-item"><i class="fas fa-ruler"></i><span>${boat.length}m</span></div>
-              <div class="detail-item"><i class="fas fa-users"></i><span>${boat.capacity} Pers.</span></div>
-              <div class="detail-item"><i class="fas fa-calendar"></i><span>${boat.year}</span></div>
-            </div>
-            <div class="boat-features">
-              ${boat.features.map(f => `<span class="feature-tag">${f}</span>`).join("")}
-            </div>
-            <button class="btn btn-primary select-boat-btn" data-boat-id="${boat.id}" style="width:100%;margin-top:1rem;">
-              <i class="fas fa-check"></i> Boot auswählen
-            </button>
-          </div>
-        `;
+            // ---------- tabs ----------
+            function setActiveTab(tabId) {
+                state.activeTab = tabId;
+            }
 
-            boatsGrid.appendChild(boatCard);
-        });
-    }
+            // ---------- slot helpers (DOM lookup, weil Slots serverseitig generiert werden) ----------
+            function getSlotEl(slotId) {
+                return document.querySelector(`.slot[data-slot-id="${slotId}"]`);
+            }
+            function getSlotNumber(slotId) {
+                const el = getSlotEl(slotId);
+                return el ? (el.getAttribute("data-slot") || "") : "";
+            }
+            function isSlotOccupied(slotId) {
+                const el = getSlotEl(slotId);
+                return !!(el && el.classList.contains("occupied"));
+            }
 
-    // Boot auswählen -> Tab + Select setzen
-    document.addEventListener("click", function (e) {
-        const btn = e.target.closest(".select-boat-btn");
-        if (!btn) return;
+            // ---------- slot selection ----------
+            function addSlotSelectionById(slotId) {
+                if (isSlotOccupied(slotId)) return;
 
-        const boatId = btn.getAttribute("data-boat-id");
-        setActiveTab("boats");
+                const key = String(slotId);
+                if (state.selectedSlots[key]) return;
 
-        const sel = document.getElementById("selectedBoat");
-        if (sel) sel.value = boatId;
+                const slotNumber = getSlotNumber(slotId);
+                if (!slotNumber) return;
 
-        document.getElementById("boatReservationForm")
-            .scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+                state.selectedSlots[key] = { id: slotId, number: slotNumber };
+
+                // keep CSS in sync even though this particular slot element is server-rendered
+                const el = getSlotEl(slotId);
+                if (el) el.classList.add("selected");
+            }
+
+            function removeSlotSelectionById(slotId) {
+                const key = String(slotId);
+                if (!state.selectedSlots[key]) return;
+
+                delete state.selectedSlots[key];
+
+                const el = getSlotEl(slotId);
+                if (el) el.classList.remove("selected");
+
+                // if pending -> clear
+                if (state.pendingSlots[slotId]) {
+                    delete state.pendingSlots[slotId];
+
+                    const el2 = getSlotEl(slotId);
+                    if (el2) {
+                        el2.classList.remove("pending");
+                        el2.removeAttribute("data-boat-token");
+                    }
+                }
+            }
+
+            function toggleSlotSelectionById(slotId) {
+                if (isSlotOccupied(slotId)) return;
+
+                const key = String(slotId);
+                if (state.selectedSlots[key]) {
+                    removeSlotSelectionById(slotId);
+                } else {
+                    addSlotSelectionById(slotId);
+                    document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+
+            // ---------- place boat ----------
+            function placeBoatIntoSlotById(slotId, tokenId) {
+                if (isSlotOccupied(slotId)) return;
+                if (state.pendingSlots[slotId]) return;
+
+                state.pendingSlots[slotId] = true;
+
+                const el = getSlotEl(slotId);
+                if (el) {
+                    el.classList.add("pending");
+                    el.setAttribute("data-boat-token", tokenId);
+                }
+            }
+
+            // ---------- drag handlers ----------
+            function onBoatDragStart(tokenId, e) {
+                state.draggingBoatTokenId = tokenId;
+                e.dataTransfer.setData("text/plain", tokenId);
+                e.dataTransfer.effectAllowed = "copy";
+
+                // Custom Drag Image: nur Schiff
+                const icon = document.createElement("i");
+                icon.className = "fas fa-ship";
+                icon.style.fontSize = "32px";
+                icon.style.color = "#f4d03f";
+                icon.style.position = "absolute";
+                icon.style.top = "-1000px";
+                document.body.appendChild(icon);
+                e.dataTransfer.setDragImage(icon, 16, 16);
+                setTimeout(() => document.body.removeChild(icon), 0);
+            }
+
+            function onBoatDragEnd() {
+                state.draggingBoatTokenId = null;
+            }
+
+            function onSlotDragOver(slotId) {
+                if (isSlotOccupied(slotId)) return;
+                state.dropHoverSlots[slotId] = true;
+                const el = getSlotEl(slotId);
+                if (el) el.classList.add("drop-hover");
+            }
+
+            function onSlotDragLeave(slotId) {
+                delete state.dropHoverSlots[slotId];
+                const el = getSlotEl(slotId);
+                if (el) el.classList.remove("drop-hover");
+            }
+
+            function onSlotDrop(slotId, e) {
+                onSlotDragLeave(slotId);
+                if (isSlotOccupied(slotId)) return;
+
+                const tokenId = e.dataTransfer.getData("text/plain") || state.draggingBoatTokenId;
+                if (!tokenId) return;
+
+                placeBoatIntoSlotById(slotId, tokenId);
+                addSlotSelectionById(slotId);
+
+                document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+
+            // ---------- mobile fallback ----------
+            function touchSelectTokenFn(tokenId) {
+                state.touchSelectedToken = tokenId;
+            }
+
+            function onSlotClick(slotId) {
+                if (state.touchSelectedToken) {
+                    if (isSlotOccupied(slotId)) return;
+
+                    placeBoatIntoSlotById(slotId, state.touchSelectedToken);
+                    addSlotSelectionById(slotId);
+                    state.touchSelectedToken = null;
+
+                    document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    return;
+                }
+
+                toggleSlotSelectionById(slotId);
+            }
+
+            // ---------- classes for slots (adds Vue-managed classes on top of server classes) ----------
+            function slotDynamicClasses(slotId) {
+                return {
+                    pending: !!state.pendingSlots[slotId],
+                    "drop-hover": !!state.dropHoverSlots[slotId],
+                };
+            }
+
+            // ---------- submit handlers ----------
+            async function submitSlotReservation() {
+                const slotIds = selectedSlotsList.value
+                    .map(x => parseInt(x.id, 10))
+                    .filter(n => Number.isFinite(n));
+
+                if (slotIds.length === 0) {
+                    alert("Bitte wählen Sie zuerst einen oder mehrere Liegeplätze aus der Marina-Ansicht aus.");
+                    return;
+                }
+
+                const payload = {
+                    slot_ids: slotIds,
+                    customer_name: state.slotForm.customer_name,
+                    customer_email: state.slotForm.customer_email,
+                    customer_phone: state.slotForm.customer_phone,
+                    boat_length: state.slotForm.boat_length,
+                    start_date: state.slotForm.start_date,
+                    end_date: state.slotForm.end_date,
+                    special_requests: state.slotForm.special_requests,
+                    payment_method: "paypal",
+                };
+
+                state.slotSubmitting = true;
+                try {
+                    const r = await fetch("/booking/makeSlotReservation", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+                    const data = await r.json();
+
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
+                } finally {
+                    state.slotSubmitting = false;
+                }
+            }
+
+            async function submitBoatReservation() {
+                if (!state.boatForm.item_id) {
+                    alert("Bitte wählen Sie zuerst ein Boot aus.");
+                    return;
+                }
+
+                const payload = {
+                    item_id: parseInt(state.boatForm.item_id, 10),
+                    customer_name: state.boatForm.customer_name,
+                    customer_email: state.boatForm.customer_email,
+                    customer_phone: state.boatForm.customer_phone,
+                    start_date: state.boatForm.start_date,
+                    end_date: state.boatForm.end_date,
+                    experience_level: state.boatForm.experience_level,
+                    additional_equipment: state.boatForm.additional_equipment,
+                    payment_method: "paypal",
+                };
+
+                state.boatSubmitting = true;
+                try {
+                    const r = await fetch("/booking/makeBoatReservation", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload),
+                    });
+                    const data = await r.json();
+
+                    if (data.success) {
+                        window.location.href = data.redirect_url;
+                    } else {
+                        alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
+                } finally {
+                    state.boatSubmitting = false;
+                }
+            }
+
+            // ---------- boat card select ----------
+            function selectBoatFromCard(boatId) {
+                setActiveTab("boats");
+                state.boatForm.item_id = String(boatId);
+                document.getElementById("boatReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+
+            return {
+                // state
+                activeTab: computed(() => state.activeTab),
+                pendingSlots: state.pendingSlots,
+                boatsData: computed(() => state.boatsData),
+                slotForm: state.slotForm,
+                boatForm: state.boatForm,
+                slotSubmitting: computed(() => state.slotSubmitting),
+                boatSubmitting: computed(() => state.boatSubmitting),
+                todayStr,
+
+                // selection
+                selectedSlotsList,
+                selectedSlotIdsCsv,
+
+                // methods
+                setActiveTab,
+                onSlotClick,
+                removeSlotSelectionById,
+                onBoatDragStart,
+                onBoatDragEnd,
+                onSlotDragOver,
+                onSlotDragLeave,
+                onSlotDrop,
+                touchSelectTokenFn,
+                slotDynamicClasses,
+                submitSlotReservation,
+                submitBoatReservation,
+                selectBoatFromCard,
+                touchSelectedToken: computed(() => state.touchSelectedToken),
+            };
+        },
+    }).mount("#app");
 </script>
 </body>
 </html>
