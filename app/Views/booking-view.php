@@ -727,11 +727,9 @@
                         <label for="selectedBoat"><i class="fas fa-ship"></i> Gewünschtes Boot auswählen</label>
                         <select id="selectedBoat" name="boat_id" v-model="boatForm.item_id" required>
                             <option value="">Bitte ein Boot auswählen...</option>
-                            <?php foreach ($boats as $boat): ?>
-                                <option value="<?= (int)$boat['id'] ?>" data-price="<?= esc($boat['price_per_day']) ?>">
-                                    <?= esc($boat['name']) ?> (<?= esc($boat['boat_type']) ?> - €<?= number_format($boat['price_per_day'], 0) ?>/Tag)
-                                </option>
-                            <?php endforeach; ?>
+                            <option v-for="boat in boatsData" :key="boat.id" :value="boat.id">
+                                {{ boat.name }} ({{ boat.type }} - €{{ boat.price_per_day }}/Tag)
+                            </option>
                         </select>
                     </div>
 
@@ -1227,9 +1225,60 @@
 
             // ---------- boat card select ----------
             function selectBoatFromCard(boatId) {
-                setActiveTab("boats");
-                state.boatForm.item_id = String(boatId);
-                document.getElementById("boatReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                console.log('selectBoatFromCard called with:', boatId);
+                
+                // Switch to boats tab first
+                state.activeTab = "boats";
+                
+                // Wait for Vue to render the tab content
+                setTimeout(() => {
+                    // Set the boat ID in the form (use nextTick equivalent)
+                    state.boatForm.item_id = String(boatId);
+                    console.log('Set boatForm.item_id to:', state.boatForm.item_id);
+                    
+                    // Wait for Vue to update the DOM
+                    setTimeout(() => {
+                        const selectElement = document.getElementById("selectedBoat");
+                        console.log('Select element:', selectElement);
+                        
+                        // Log all available options
+                        if (selectElement) {
+                            console.log('Available options:');
+                            Array.from(selectElement.options).forEach(opt => {
+                                console.log(`  value: "${opt.value}", text: "${opt.text}"`);
+                            });
+                        }
+                        
+                        console.log('Select element value:', selectElement?.value);
+                        console.log('boatForm.item_id:', state.boatForm.item_id);
+                        
+                        // Manually set the select value if Vue binding didn't work
+                        if (selectElement) {
+                            const targetValue = String(boatId);
+                            console.log('Manually setting select value to:', targetValue);
+                            selectElement.value = targetValue;
+                            console.log('After manual set, select value is:', selectElement.value);
+                            
+                            // Trigger Vue's change event
+                            selectElement.dispatchEvent(new Event('input', { bubbles: true }));
+                            selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                            
+                            // Update the Vue state to match
+                            state.boatForm.item_id = selectElement.value;
+                        }
+                        
+                        // Scroll to form
+                        const formElement = document.getElementById("boatReservationForm");
+                        if (formElement) {
+                            formElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }
+                        
+                        // Focus on select
+                        if (selectElement) {
+                            selectElement.focus();
+                        }
+                    }, 100);
+                }, 50);
             }
 
             return {

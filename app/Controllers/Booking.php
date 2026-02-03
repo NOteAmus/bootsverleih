@@ -222,13 +222,36 @@ class Booking extends Controller
             ]);
         }
 
-        // Get boat details
+        // Get boat details (DB first, otherwise demo list for the showcase)
         $boat = $itemModel->find($itemId);
-        if (!$boat || $boat['type'] !== 'boot') {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Boot nicht gefunden'
-            ]);
+
+        if (!$boat || ($boat['type'] ?? '') !== 'boot') {
+            // fallback: demo boats for non-DB showcase
+            $demoBoat = null;
+            foreach ($this->getPremiumBoats() as $b) {
+                if ((int)($b['id'] ?? 0) === $itemId) {
+                    $demoBoat = $b;
+                    break;
+                }
+            }
+
+            if ($demoBoat) {
+                // normalize demo boat to expected fields
+                $boat = [
+                    'id' => $demoBoat['id'] ?? $itemId,
+                    'name' => $demoBoat['name'] ?? 'Demo Boot',
+                    'boat_type' => $demoBoat['type'] ?? 'Demo',
+                    'type' => 'boot',
+                    'price_per_day' => $demoBoat['price_per_day'] ?? 0,
+                    'length' => $demoBoat['length'] ?? null,
+                    'capacity' => $demoBoat['capacity'] ?? null,
+                ];
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Boot nicht gefunden'
+                ]);
+            }
         }
 
         // Calculate days and price
