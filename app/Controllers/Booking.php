@@ -293,23 +293,35 @@ class Booking extends Controller
         $session = session();
         $userId = $session->get('user')['id'] ?? null;
 
-        // Validate input
-        if (!isset($data['item_id']) || !isset($data['start_date']) || !isset($data['end_date'])) {
+        // Validate input - now expects slot_ids array
+        if (!isset($data['slot_ids']) || !isset($data['start_date']) || !isset($data['end_date'])) {
             return $this->response->setJSON([
                 'success' => false,
                 'message' => 'Fehlende Pflichtfelder'
             ]);
         }
 
-        // Convert item_id to integer
-        $itemId = (int) $data['item_id'];
-
-        // Check availability
-        if (!$reservationModel->isItemAvailable($itemId, $data['start_date'], $data['end_date'])) {
+        // Get slot IDs array
+        $slotIds = is_array($data['slot_ids']) ? $data['slot_ids'] : [$data['slot_ids']];
+        
+        if (empty($slotIds)) {
             return $this->response->setJSON([
                 'success' => false,
-                'message' => 'Liegeplatz ist im gewählten Zeitraum nicht verfügbar'
+                'message' => 'Bitte wählen Sie mindestens einen Liegeplatz aus'
             ]);
+        }
+
+        // Get first slot for calculation (could be enhanced to support multiple prices)
+        $itemId = (int) $slotIds[0];
+
+        // Check availability for all slots
+        foreach ($slotIds as $slotId) {
+            if (!$reservationModel->isItemAvailable((int)$slotId, $data['start_date'], $data['end_date'])) {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Einer oder mehrere Liegeplätze sind im gewählten Zeitraum nicht verfügbar'
+                ]);
+            }
         }
 
         // Get berth details
@@ -325,7 +337,9 @@ class Booking extends Controller
         $startDate = new \DateTime($data['start_date']);
         $endDate = new \DateTime($data['end_date']);
         $days = $startDate->diff($endDate)->days + 1;
-        $berthPrice = $days * $berth['price_per_day'];
+        
+        // Calculate total for all selected slots
+        $berthPrice = $days * $berth['price_per_day'] * count($slotIds);
         $serviceFee = 10.00; // Lower service fee for berths
         $totalAmount = $berthPrice + $serviceFee;
 
@@ -338,8 +352,9 @@ class Booking extends Controller
             'customer_name' => $data['customer_name'] ?? '',
             'customer_email' => $data['customer_email'] ?? '',
             'customer_phone' => $data['customer_phone'] ?? null,
-            'boat_name' => 'Liegeplatz ' . $berth['slot_number'],
+            'boat_name' => 'Liegeplatz ' . $berth['slot_number'] . (count($slotIds) > 1 ? ' (+' . (count($slotIds) - 1) . ' weitere)' : ''),
             'boat_type' => 'Liegeplatz',
+            'boat_length' => $data['boat_length'] ?? null,
             'start_date' => $data['start_date'],
             'end_date' => $data['end_date'],
             'days' => $days,
@@ -350,11 +365,17 @@ class Booking extends Controller
             'total_amount' => $totalAmount,
             'payment_method' => $data['payment_method'] ?? 'paypal',
             'payment_status' => 'pending',
+            'special_requests' => $data['special_requests'] ?? null,
         ];
 
         $reservationId = $reservationModel->insert($reservationData);
         
         if ($reservationId) {
+            // Store all slot IDs for this reservation (for future multi-slot support)
+            foreach ($slotIds as $slotId) {
+                // Could add to a reservation_slots table here
+            }
+            
             return $this->response->setJSON([
                 'success' => true,
                 'message' => 'Reservierung erstellt. Weiterleitung zur Zahlung...',

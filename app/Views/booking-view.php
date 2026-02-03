@@ -598,7 +598,7 @@
         <!-- Liegeplatz Buchungsformular -->
         <div class="booking-form">
             <h2 class="section-title">Liegeplatz Reservierung</h2>
-            <form id="slotReservationForm" @submit.prevent="submitSlotReservation">
+            <form id="slotReservationForm" @submit.prevent="submitSlotReservation" novalidate>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="slotCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
@@ -686,7 +686,7 @@
                 </div>
             </div>
 
-            <form id="boatReservationForm" @submit.prevent="submitBoatReservation">
+            <form id="boatReservationForm" @submit.prevent="submitBoatReservation" novalidate>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="boatCustomerName"><i class="fas fa-user"></i> Vor- und Nachname</label>
@@ -1075,6 +1075,34 @@
 
             // ---------- submit handlers ----------
             async function submitSlotReservation() {
+                console.log('submitSlotReservation called');
+                
+                // Manuelle Validierung
+                if (!state.slotForm.customer_name) {
+                    alert("Bitte geben Sie Ihren Namen ein.");
+                    return;
+                }
+                if (!state.slotForm.customer_email) {
+                    alert("Bitte geben Sie Ihre E-Mail-Adresse ein.");
+                    return;
+                }
+                if (!state.slotForm.customer_phone) {
+                    alert("Bitte geben Sie Ihre Telefonnummer ein.");
+                    return;
+                }
+                if (!state.slotForm.boat_length) {
+                    alert("Bitte geben Sie die Bootslänge ein.");
+                    return;
+                }
+                if (!state.slotForm.start_date) {
+                    alert("Bitte wählen Sie ein Ankunftsdatum.");
+                    return;
+                }
+                if (!state.slotForm.end_date) {
+                    alert("Bitte wählen Sie ein Abreisedatum.");
+                    return;
+                }
+
                 const slotIds = selectedSlotsList.value
                     .map(x => parseInt(x.id, 10))
                     .filter(n => Number.isFinite(n));
@@ -1096,22 +1124,28 @@
                     payment_method: "paypal",
                 };
 
+                console.log('Sending payload:', payload);
                 state.slotSubmitting = true;
+                
                 try {
                     const r = await fetch("/booking/makeSlotReservation", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload),
                     });
+                    
+                    console.log('Response status:', r.status);
                     const data = await r.json();
+                    console.log('Response data:', data);
 
                     if (data.success) {
+                        console.log('Redirecting to:', data.redirect_url);
                         window.location.href = data.redirect_url;
                     } else {
                         alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
                     }
                 } catch (err) {
-                    console.error(err);
+                    console.error('Error:', err);
                     alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
                 } finally {
                     state.slotSubmitting = false;
@@ -1119,6 +1153,33 @@
             }
 
             async function submitBoatReservation() {
+                console.log('submitBoatReservation called');
+                
+                // Manuelle Validierung
+                if (!state.boatForm.customer_name) {
+                    alert("Bitte geben Sie Ihren Namen ein.");
+                    return;
+                }
+                if (!state.boatForm.customer_email) {
+                    alert("Bitte geben Sie Ihre E-Mail-Adresse ein.");
+                    return;
+                }
+                if (!state.boatForm.customer_phone) {
+                    alert("Bitte geben Sie Ihre Telefonnummer ein.");
+                    return;
+                }
+                if (!state.boatForm.experience_level) {
+                    alert("Bitte wählen Sie Ihre Bootserfahrung aus.");
+                    return;
+                }
+                if (!state.boatForm.start_date) {
+                    alert("Bitte wählen Sie ein Abholdatum.");
+                    return;
+                }
+                if (!state.boatForm.end_date) {
+                    alert("Bitte wählen Sie ein Rückgabedatum.");
+                    return;
+                }
                 if (!state.boatForm.item_id) {
                     alert("Bitte wählen Sie zuerst ein Boot aus.");
                     return;
@@ -1136,22 +1197,28 @@
                     payment_method: "paypal",
                 };
 
+                console.log('Sending payload:', payload);
                 state.boatSubmitting = true;
+                
                 try {
                     const r = await fetch("/booking/makeBoatReservation", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload),
                     });
+                    
+                    console.log('Response status:', r.status);
                     const data = await r.json();
+                    console.log('Response data:', data);
 
                     if (data.success) {
+                        console.log('Redirecting to:', data.redirect_url);
                         window.location.href = data.redirect_url;
                     } else {
                         alert("Fehler: " + (data.message || "Reservierung konnte nicht erstellt werden"));
                     }
                 } catch (err) {
-                    console.error(err);
+                    console.error('Error:', err);
                     alert("Fehler bei der Reservierung. Bitte versuchen Sie es erneut.");
                 } finally {
                     state.boatSubmitting = false;
