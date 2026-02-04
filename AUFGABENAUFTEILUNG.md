@@ -8,21 +8,21 @@
 
 ---
 
-## Person 1: Bootsvermietung & Inventarverwaltung
+## Person 1: Liegeplatzverwaltung & Inventarverwaltung
 
 ### Verantwortungsbereich
-Entwicklung des Bootsbuchungssystems, Inventarverwaltung und Produktverwaltung
+Entwicklung des Liegeplatz-Buchungssystems, Inventarverwaltung und Produktverwaltung
 
 ### Implementierte Features
 
-#### 1. **BookingController - Boot-Funktionen**
+#### 1. **BookingController - Liegeplatz-Funktionen**
 📁 `app/Controllers/Booking.php`
 - ✅ `index()` - Buchungsübersicht laden
-- ✅ `makeBoatReservation()` - Bootsbuchung erstellen
-- ✅ `getAvailability()` - Verfügbarkeit von Booten prüfen
+- ✅ `makeSlotReservation()` - Liegeplatzbuchung erstellen
+- ✅ `getAvailability()` - Verfügbarkeit von Liegeplätzen prüfen
 - ✅ `getAvailableItems()` - Verfügbare Items abrufen
-- ✅ Integration der Boot-Preisberechnung (Preis pro Tag × Tage + Gebühren)
-- ✅ Validierung der Bootsbuchungsdaten
+- ✅ Integration der Liegeplatz-Preisberechnung (Preis pro Tag × Tage + Gebühren)
+- ✅ Validierung der Liegeplatzbuchungsdaten
 - ✅ Verfügbarkeitsprüfung vor Reservierung
 
 #### 2. **ItemModel - Inventarverwaltung**
@@ -30,45 +30,46 @@ Entwicklung des Bootsbuchungssystems, Inventarverwaltung und Produktverwaltung
 - ✅ Komplett entwickelt
 - ✅ `getBoats()` - Alle aktiven Boote abrufen
 - ✅ `getBerths()` - Alle Liegeplätze abrufen
-- ✅ `getBoatsByCategory()` - Boote nach Kategorie filtern
-- ✅ `getAvailableBoats()` - Verfügbare Boote im Zeitraum
+- ✅ `getBerthsByCategory()` - Liegeplätze nach Kategorie filtern
+- ✅ `getAvailableBerths()` - Verfügbare Liegeplätze im Zeitraum
 - ✅ Datenbankschema für Items-Tabelle
-- ✅ Verwaltung von Boot-Attributen (Typ, Länge, Kapazität, Preis)
+- ✅ Verwaltung von Liegeplatz-Attributen (Typ, Reihe, Position, Größe, Preis)
 
-#### 3. **Views - Liegeplätze buchung**
+#### 3. **Views - Liegeplatz-Buchung**
 📁 `app/Views/booking-view.php`
-- ✅ Boot-Auswahl-Interface (linke Seite der Buchungsseite)
-- ✅ Boot-Katalog mit Kategorien (Classic Comfort, Premium Performance, Luxury)
-- ✅ Dynamische Boot-Karten mit Bildern und Details
-- ✅ Boot-Reservierungsformular
-- ✅ JavaScript für Boot-Buchungslogik
-- ✅ Fetch-Request zu `/booking/makeBoatReservation`
-- ✅ Frontend-Validierung für Liegeplätze buchung
+- ✅ Liegeplatz-Interface (rechte Seite der Buchungsseite)
+- ✅ Interaktive Hafenplan-Visualisierung
+- ✅ Liegeplatz-Auswahl mit Kategorien (Premium, Standard, Compact)
+- ✅ Dynamische Liegeplatz-Karten mit Details
+- ✅ Liegeplatz-Reservierungsformular
+- ✅ JavaScript für Liegeplatz-Buchungslogik
+- ✅ Fetch-Request zu `/booking/makeSlotReservation`
+- ✅ Frontend-Validierung für Liegeplatzbuchungen
 
 #### 4. **Datenbank - Items-Tabelle**
 📁 `app/Database/Migrations/`
 - ✅ Tabelle: `items`
-- ✅ Felder: type, name, boat_type, length, capacity, price_per_day, features, etc.
-- ✅ Sample-Daten für verschiedene Bootstypen
+- ✅ Felder: type, name, slot_number, row, position, max_boat_length, price_per_day, features, etc.
+- ✅ Sample-Daten für verschiedene Liegeplatz-Kategorien
 
-#### 5. **Routing - Boot-Endpunkte**
+#### 5. **Routing - Liegeplatz-Endpunkte**
 📁 `app/Config/Routes.php`
 - ✅ `GET /booking` → Booking::index
-- ✅ `POST /booking/makeBoatReservation` → Booking::makeBoatReservation
+- ✅ `POST /booking/makeSlotReservation` → Booking::makeSlotReservation
 - ✅ `GET /booking/getAvailableItems` → Booking::getAvailableItems
 
 #### 6. **Weather Library Integration**
 📁 `app/Libraries/Weather.php`
-- ✅ Wetterinformationen für Bootsvermietung
+- ✅ Wetterinformationen für Hafenbereich
 - ✅ Integration mit Open-Meteo API
-- ✅ Anzeige relevanter Wetterdaten für Bootsfahrten
+- ✅ Anzeige relevanter Wetterdaten für Marina-Betrieb
 
 ---
 
 ## Person 2: Benutzer- & Buchungsverwaltung + Zahlungssystem
 
 ### Verantwortungsbereich
-Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklung und Admin-Funktionen
+Entwicklung des Authentifizierungssystems, Boots-Buchung, Zahlungsabwicklung und Admin-Funktionen
 
 ### Implementierte Features
 
@@ -107,18 +108,18 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 - ✅ Kreditkarten-Eingabeformular
 - ✅ Kartenvalidierung
 
-#### 3. **Boot-Buchungssystem**
+#### 3. **Boots-Buchungssystem**
 📁 `app/Controllers/Booking.php`
-- ✅ `makeSlotReservation()` - Bootbuchung erstellen
+- ✅ `makeBoatReservation()` - Bootsbuchung erstellen
 - ✅ Preisberechnung für Boote
 - ✅ Unterscheidung zwischen Boot- und Liegeplatz-Reservierungen
 
 📁 `app/Views/booking-view.php`
-- ✅ Liegeplatz-Interface (rechte Seite der Buchungsseite)
-- ✅ Interaktive Hafenplan-Visualisierung
-- ✅ Liegeplatz-Auswahl mit Kategorien (Premium, Standard, Compact)
-- ✅ JavaScript für Bootplatz-Buchungslogik
-- ✅ Fetch-Request zu `/booking/makeSlotReservation`
+- ✅ Boot-Auswahl-Interface (linke Seite der Buchungsseite)
+- ✅ Boot-Katalog mit Kategorien (Classic Comfort, Premium Performance, Luxury)
+- ✅ Dynamische Boot-Karten mit Bildern und Details
+- ✅ JavaScript für Boots-Buchungslogik
+- ✅ Fetch-Request zu `/booking/makeBoatReservation`
 
 #### 4. **Buchungsverwaltung**
 📁 `app/Controllers/Home.php`
@@ -172,7 +173,7 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 - ✅ `GET/POST /login` - Login-Routen
 - ✅ `GET/POST /register` - Registrierungs-Routen
 - ✅ `GET /logout` - Logout
-- ✅ `POST /booking/makeSlotReservation` - Liegeplatz-Buchung
+- ✅ `POST /booking/makeBoatReservation` - Boots-Buchung
 - ✅ `GET /payment/(:num)` - Zahlungsseite
 - ✅ `POST /payment/process` - Zahlung verarbeiten
 - ✅ `GET /my-bookings` - Eigene Buchungen
@@ -191,12 +192,12 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 ### Beide Personen haben beigetragen zu:
 
 #### 1. **BookingController**
-- **Person 1:** Boot-spezifische Methoden
-- **Person 2:** Liegeplatz-spezifische Methoden
+- **Person 1:** Liegeplatz-spezifische Methoden
+- **Person 2:** Boot-spezifische Methoden
 
 #### 2. **booking-view.php**
-- **Person 1:** Linke Seite (Boot-Auswahl)
-- **Person 2:** Rechte Seite (Liegeplatz-Auswahl)
+- **Person 1:** Rechte Seite (Liegeplatz-Auswahl)
+- **Person 2:** Linke Seite (Boot-Auswahl)
 
 #### 3. **ReservationModel & ItemModel Integration**
 - Beide Models arbeiten zusammen für Verfügbarkeitsabfragen
@@ -227,11 +228,11 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 
 | Aspekt | Person 1 | Person 2 |
 |--------|----------|----------|
-| **Hauptfokus** | Bootsvermietung & Inventar | Benutzer, Liegeplätze & Zahlungen |
-| **Controllers** | Booking (Boote) | Login, Registration, Home, Booking (Liegeplätze) |
+| **Hauptfokus** | Liegeplatzverwaltung & Inventar | Benutzer, Boote & Zahlungen |
+| **Controllers** | Booking (Liegeplätze) | Login, Registration, Home, Booking (Boote) |
 | **Models** | ItemModel | UserModel, ReservationModel |
-| **Views** | booking-view (Boot-Teil) | login, register, payment, my-bookings, all-bookings, booking-view (Liegeplatz-Teil) |
-| **Features** | Boot-Katalog, Verfügbarkeit, Weather | Auth, Zahlung, Liegeplätze, Admin-Panel |
+| **Views** | booking-view (Liegeplatz-Teil) | login, register, payment, my-bookings, all-bookings, booking-view (Boot-Teil) |
+| **Features** | Liegeplatz-Hafenplan, Verfügbarkeit, Weather | Auth, Zahlung, Boot-Katalog, Admin-Panel |
 | **Sicherheit** | - | Filter (Auth, Admin, Worker) |
 | **Zeilen Code (ca.)** | ~800-1000 | ~1200-1500 |
 
@@ -242,15 +243,15 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 ### Person 1: Bottom-Up Ansatz
 1. Datenbank-Design (Items-Tabelle)
 2. Model-Entwicklung (ItemModel)
-3. Controller-Logik (Boot-Buchungen)
-4. Frontend-Integration (Boot-Interface)
+3. Controller-Logik (Liegeplatz-Buchungen)
+4. Frontend-Integration (Hafenplan-Interface)
 
 ### Person 2: Top-Down Ansatz
 1. Benutzer-Story definiert (Login/Register)
 2. Authentifizierung implementiert
 3. Zahlungssystem entwickelt
 4. Admin-Funktionen hinzugefügt
-5. Liegeplatz-System parallel entwickelt
+5. Boots-Vermietungssystem parallel entwickelt
 
 ---
 
