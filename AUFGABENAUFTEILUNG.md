@@ -35,7 +35,7 @@ Entwicklung des Bootsbuchungssystems, Inventarverwaltung und Produktverwaltung
 - ✅ Datenbankschema für Items-Tabelle
 - ✅ Verwaltung von Boot-Attributen (Typ, Länge, Kapazität, Preis)
 
-#### 3. **Views - Bootsbuchung**
+#### 3. **Views - Liegeplätze buchung**
 📁 `app/Views/booking-view.php`
 - ✅ Boot-Auswahl-Interface (linke Seite der Buchungsseite)
 - ✅ Boot-Katalog mit Kategorien (Classic Comfort, Premium Performance, Luxury)
@@ -43,7 +43,7 @@ Entwicklung des Bootsbuchungssystems, Inventarverwaltung und Produktverwaltung
 - ✅ Boot-Reservierungsformular
 - ✅ JavaScript für Boot-Buchungslogik
 - ✅ Fetch-Request zu `/booking/makeBoatReservation`
-- ✅ Frontend-Validierung für Bootsbuchungen
+- ✅ Frontend-Validierung für Liegeplätze buchung
 
 #### 4. **Datenbank - Items-Tabelle**
 📁 `app/Database/Migrations/`
@@ -107,17 +107,17 @@ Entwicklung des Authentifizierungssystems, Liegeplatz-Buchung, Zahlungsabwicklun
 - ✅ Kreditkarten-Eingabeformular
 - ✅ Kartenvalidierung
 
-#### 3. **Liegeplatz-Buchungssystem**
+#### 3. **Boot-Buchungssystem**
 📁 `app/Controllers/Booking.php`
-- ✅ `makeSlotReservation()` - Liegeplatzbuchung erstellen
-- ✅ Preisberechnung für Liegeplätze
+- ✅ `makeSlotReservation()` - Bootbuchung erstellen
+- ✅ Preisberechnung für Boote
 - ✅ Unterscheidung zwischen Boot- und Liegeplatz-Reservierungen
 
 📁 `app/Views/booking-view.php`
 - ✅ Liegeplatz-Interface (rechte Seite der Buchungsseite)
 - ✅ Interaktive Hafenplan-Visualisierung
 - ✅ Liegeplatz-Auswahl mit Kategorien (Premium, Standard, Compact)
-- ✅ JavaScript für Liegeplatz-Buchungslogik
+- ✅ JavaScript für Bootplatz-Buchungslogik
 - ✅ Fetch-Request zu `/booking/makeSlotReservation`
 
 #### 4. **Buchungsverwaltung**
