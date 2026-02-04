@@ -1248,7 +1248,7 @@
                     <p>Planen Sie Ihren Bootsausflug mit unseren detaillierten Wetterinformationen. Wir bieten Echtzeit-Daten und Vorhersagen für die nächsten Tage.</p>
                     <p>Die Wassertemperatur, Windgeschwindigkeit und UV-Index helfen Ihnen, den perfekten Tag für Ihre Bootstour zu finden.</p>
                     <a href="#" class="btn">
-                        <i class="fas fa-wind" href="https://www.wetter.com/"></i>
+                        <i class="fas fa-wind" href="https://www.wetter.com/wetter_aktuell/wettervorhersage/3_tagesvorhersage/deutschland/plau-am-see/DE0008294.html"></i>
                     </a>
                 </div>
                 <div class="weather-info fade-in">
