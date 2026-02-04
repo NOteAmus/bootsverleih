@@ -1,0 +1,172 @@
+<mxfile host="app.diagrams.net" modified="2026-02-04T12:00:00.000Z" agent="5.0" version="21.6.5" etag="draw-io-state-diagram" type="device">
+  <diagram name="Zustandsdiagramm - Bootsverleih" id="zustandsdiagramm-bootsverleih">
+    <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Titel -->
+        <mxCell id="title" value="Zustandsdiagramm - Bootsverleih System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Startzustand -->
+        <mxCell id="start" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="575" y="80" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Formular ausfüllen -->
+        <mxCell id="state-formular" value="Formular ausfüllen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="485" y="140" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Pending -->
+        <mxCell id="state-pending" value="&lt;b&gt;Pending&lt;/b&gt;&lt;br&gt;(Reservierung erstellt,&lt;br&gt;wartet auf Zahlung)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="485" y="250" width="200" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Zahlungsauswahl -->
+        <mxCell id="state-payment-view" value="Zahlungsmethode&lt;br&gt;auswählen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="485" y="380" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Zahlung verarbeiten -->
+        <mxCell id="state-processing" value="Zahlung wird&lt;br&gt;verarbeitet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="485" y="490" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Paid/Completed -->
+        <mxCell id="state-paid" value="&lt;b&gt;Paid&lt;/b&gt;&lt;br&gt;(Bezahlt/Abgeschlossen)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="485" y="600" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Cancelled -->
+        <mxCell id="state-cancelled" value="&lt;b&gt;Cancelled&lt;/b&gt;&lt;br&gt;(Storniert)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="380" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Zustand: Failed -->
+        <mxCell id="state-failed" value="&lt;b&gt;Failed&lt;/b&gt;&lt;br&gt;(Zahlung fehlgeschlagen)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="790" y="490" width="180" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Endzustand -->
+        <mxCell id="end" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="575" y="710" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="end-inner" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=none;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="570" y="705" width="30" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Pfeile/Übergänge -->
+        
+        <!-- Start -> Formular -->
+        <mxCell id="trans-start-formular" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;" edge="1" parent="1" source="start" target="state-formular">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Formular -> Pending -->
+        <mxCell id="trans-formular-pending" value="Buchung absenden&lt;br&gt;(POST /booking/make*Reservation)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="state-formular" target="state-pending">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Pending -> Payment View -->
+        <mxCell id="trans-pending-payment" value="Weiterleitung zur&lt;br&gt;Zahlungsseite" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="state-pending" target="state-payment-view">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Payment View -> Processing -->
+        <mxCell id="trans-payment-processing" value="Zahlungsmethode&lt;br&gt;bestätigen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="state-payment-view" target="state-processing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Processing -> Paid -->
+        <mxCell id="trans-processing-paid" value="Zahlung erfolgreich&lt;br&gt;(Status = 'paid')" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#82b366;" edge="1" parent="1" source="state-processing" target="state-paid">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Processing -> Failed -->
+        <mxCell id="trans-processing-failed" value="Zahlung abgelehnt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#b85450;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-processing" target="state-failed">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Failed -> Payment View (retry) -->
+        <mxCell id="trans-failed-payment" value="Erneut versuchen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#666666;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-failed" target="state-payment-view">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="880" y="410" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Pending -> Cancelled -->
+        <mxCell id="trans-pending-cancelled" value="Benutzer bricht ab&lt;br&gt;oder Timeout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#b85450;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-pending" target="state-cancelled">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="290" />
+              <mxPoint x="420" y="410" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Payment View -> Cancelled -->
+        <mxCell id="trans-payment-cancelled" value="Abbrechen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#b85450;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-payment-view" target="state-cancelled">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Paid -> End -->
+        <mxCell id="trans-paid-end" value="Buchung abgeschlossen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;" edge="1" parent="1" source="state-paid" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cancelled -> End -->
+        <mxCell id="trans-cancelled-end" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-cancelled" target="end">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="290" y="720" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Failed -> Cancelled -->
+        <mxCell id="trans-failed-cancelled" value="Endgültig abbrechen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=classic;endFill=1;strokeWidth=2;fontSize=10;strokeColor=#b85450;dashed=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="state-failed" target="state-cancelled">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="790" y="620" />
+              <mxPoint x="420" y="620" />
+              <mxPoint x="420" y="380" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Legende -->
+        <mxCell id="legend-title" value="Legende" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="100" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-pending" value="Pending: Wartet auf Zahlung" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="140" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-paid" value="Paid: Erfolgreich bezahlt" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="180" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-cancelled" value="Cancelled/Failed: Fehlgeschlagen" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="220" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-process" value="Prozess-Zustände" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;align=left;" vertex="1" parent="1">
+          <mxGeometry x="50" y="260" width="200" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Zusätzliche Notizen -->
+        <mxCell id="note-box" value="&lt;b&gt;Hinweise:&lt;/b&gt;&lt;br&gt;• payment_status in DB: 'pending', 'paid', 'cancelled', 'failed'&lt;br&gt;• Reservierung wird sofort mit Status 'pending' gespeichert&lt;br&gt;• Gestrichelte Linien = optionale/wiederholbare Aktionen&lt;br&gt;• Reservation kann später bezahlt werden (flexible Zahlung)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;align=left;verticalAlign=top;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="780" y="100" width="340" height="120" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
