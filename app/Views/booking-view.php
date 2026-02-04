@@ -48,9 +48,165 @@
             color: var(--text-dark);
             line-height: 1.6;
             min-height: 100vh;
+            padding-top: 80px;
         }
 
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(10, 46, 92, 0.98);
+            color: white;
+            padding: 0.5rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 0 1 auto;
+        }
+
+        .logo-icon {
+            font-size: 1.6rem;
+            color: var(--secondary);
+        }
+
+        .logo-text h1 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            width: 220px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        /* Temperaturanzeige neben Logo */
+        .temp-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 25px;
+            font-size: 1.1rem;
+            color: white;
+        }
+
+        .temp-display i {
+            display: none;
+        }
+
+        .temp-display span {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 10px;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+        }
+
+        .mobile-nav {
+            display: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 4px 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        nav a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--secondary);
+        }
+
+        nav a:hover:after {
+            width: 100%;
+        }
+
+        .weather-header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 30px;
+            margin-left: 0;
+            padding-left: 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            flex-wrap: nowrap;
+            font-size: 1rem;
+        }
+
+        .weather-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            white-space: nowrap;
+            padding: 0 6px;
+        }
 
         .btn {
             padding: 1rem 2rem;
@@ -77,7 +233,7 @@
             background: var(--white);
             border-radius: var(--border-radius);
             padding: 1rem;
-            margin: -3rem auto 4rem;
+            margin: 2rem auto 4rem;
             max-width: 900px;
             box-shadow: 0 10px 30px var(--shadow);
             display: flex;
@@ -469,8 +625,95 @@
         @media (max-width: 992px) {
             .form-grid { grid-template-columns: 1fr; }
             .nav-tabs { flex-direction: column; }
+            .weather-header {
+                display: none;
+            }
         }
         @media (max-width: 768px) {
+            /* Mobile Header Layout */
+            header {
+                padding: 0.5rem 0;
+            }
+
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            /* Hide logo text on mobile, keep only icon */
+            .logo-text {
+                display: none;
+            }
+
+            .logo {
+                flex: 0 0 auto;
+                gap: 0;
+            }
+
+            .logo-icon {
+                font-size: 1.8rem;
+            }
+
+            /* Temperatur neben Logo auch auf Mobile */
+            .temp-display {
+                margin-left: 5px;
+                font-size: 1rem;
+            }
+
+            .temp-display i {
+                display: none;
+            }
+
+            .temp-display span {
+                font-size: 1.1rem;
+            }
+
+            /* Show hamburger menu and profile on mobile */
+            .hamburger {
+                display: flex;
+                order: 2;
+                margin-left: auto;
+            }
+
+            /* Hide desktop navigation on mobile */
+            nav {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: rgba(10, 46, 92, 0.98);
+                padding: 20px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 1001;
+            }
+
+            nav.mobile-nav-open {
+                display: block;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 0;
+                align-items: stretch;
+            }
+
+            nav ul li {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            nav ul li:last-child {
+                border-bottom: none;
+            }
+
+            nav a {
+                display: block;
+                padding: 15px 0;
+                font-size: 1rem;
+            }
+
             .section-title { font-size: 1.8rem; }
             .marina-section, .booking-form { padding: 2rem; }
             .boats-grid { grid-template-columns: 1fr; }
@@ -1403,6 +1646,30 @@
             };
         },
     }).mount("#app");
+</script>
+
+<!-- Hamburger Menu Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.querySelector('nav');
+        
+        if (hamburger && nav) {
+            hamburger.addEventListener('click', function() {
+                this.classList.toggle('active');
+                nav.classList.toggle('mobile-nav-open');
+            });
+
+            // Close menu when clicking on a nav link
+            const navLinks = nav.querySelectorAll('a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    hamburger.classList.remove('active');
+                    nav.classList.remove('mobile-nav-open');
+                });
+            });
+        }
+    });
 </script>
 </body>
 </html>
