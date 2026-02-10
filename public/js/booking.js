@@ -447,7 +447,6 @@ function initBookingApp(initialData = {}) {
                 placeBoatIntoSlotById(slotId, tokenId);
                 addSlotSelectionById(slotId);
 
-                document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
             }
 
             // ==========================================
@@ -466,7 +465,6 @@ function initBookingApp(initialData = {}) {
                     addSlotSelectionById(slotId);
                     state.touchSelectedToken = null;
 
-                    document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
                     return;
                 }
 
