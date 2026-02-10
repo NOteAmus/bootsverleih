@@ -244,6 +244,3 @@ Entwicklung des Authentifizierungssystems, Boots-Buchung, Zahlungsabwicklung und
 4. Admin-Funktionen hinzugefügt
 5. Boots-Vermietungssystem parallel entwickelt
 
----
-
-**Hinweis:** Diese Aufteilung zeigt eine realistische Arbeitsteilung in einem 2-Personen-Team, wobei beide Entwickler in verschiedenen Bereichen des Systems gearbeitet haben, aber eng zusammengearbeitet haben, um eine nahtlose Integration zu gewährleisten.
