@@ -208,12 +208,12 @@
 }
 
 .gridstack-container {
-    min-height: 800px;
+    min-height: 640px;
 }
 
-/* GridStack Area - Large (700px) */
+/* GridStack Area - Reduced 20% (700px → 560px) */
 .gridstack-area {
-    height: 700px;
+    height: 560px;
     border: 2px solid var(--primary);
 }
 
@@ -304,12 +304,12 @@
     }
 
     .gridstack-area {
-        height: 500px;
+        height: 448px;
     }
 
     .gridstack-container {
         padding: 1rem;
-        min-height: 600px;
+        min-height: 528px;
     }
 
     .slot {
@@ -328,7 +328,7 @@
     }
 
     .gridstack-area {
-        height: 400px;
+        height: 360px;
     }
 
     .slot {

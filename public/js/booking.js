@@ -174,9 +174,9 @@ function initBookingApp(initialData = {}) {
 
                 state.shipsGrid.removeAll(false);
 
-                // Extend rows
+                // Set grid rows (8 rows × 70px cellHeight = 560px, 20% smaller than original 700px)
                 state.shipsGrid.engine.maxRow = 30;
-                state.shipsGrid.opts.minRow = 30;
+                state.shipsGrid.opts.minRow = 8;
                 state.shipsGrid._updateStyles?.();
                 state.shipsGrid._triggerChangeEvent?.();
 
