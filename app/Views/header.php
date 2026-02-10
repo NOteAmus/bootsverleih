@@ -1,4 +1,4 @@
-<!-- Header mit dynamischem Profil-Icon -->
+<!-- Header mit dynamischem Profil-Icon und Wetter -->
 <header>
     <div class="container">
         <div class="header-content">
@@ -12,6 +12,15 @@
                 </div>
             </div>
 
+            <!-- Temperaturanzeige direkt neben Logo -->
+            <div class="temp-display">
+                <?php
+                    $tc = isset($weather['temperature_c']) ? $weather['temperature_c'] : null;
+                ?>
+                <i class="fas fa-thermometer-half"></i>
+                <span><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></span>
+            </div>
+
             <!-- Hamburger Menu Button -->
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -19,14 +28,94 @@
                 <span></span>
             </div>
 
+            <div class="weather-header">
+                <div class="weather-item">
+                    <?php
+                        $tc = isset($weather['temperature_c']) ? $weather['temperature_c'] : null;
+                        $tf = isset($weather['temperature_f']) ? $weather['temperature_f'] : null;
+                        $prec = isset($weather['precipitation_probability']) ? $weather['precipitation_probability'] : null;
+                        $hum = isset($weather['humidity']) ? $weather['humidity'] : null;
+                        $wind = isset($weather['windspeed']) ? $weather['windspeed'] : null;
+                    ?>
+                    <i class="fas fa-thermometer-half"></i>
+                    <span style="font-weight:700"><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></span>
+                </div>
+                <div class="weather-item" style="margin-left:12px;">
+                    <i class="fas fa-cloud-showers-heavy"></i>
+                    <span><?= $prec !== null ? 'Niederschlag: ' . $prec . '%' : 'Niederschlag: n.v.' ?></span>
+                </div>
+                <div class="weather-item" style="margin-left:12px;">
+                    <i class="fas fa-tint"></i>
+                    <span><?= $hum !== null ? 'Luftfeuchte: ' . $hum . '%' : 'Luftfeuchte: n.v.' ?></span>
+                </div>
+                <div class="weather-item" style="margin-left:12px;">
+                    <i class="fas fa-wind"></i>
+                    <span><?= $wind !== null ? 'Wind: ' . $wind . ' km/h' : 'Wind: n.v.' ?></span>
+                </div>
+            </div>
+
             <nav>
                 <ul>
-                    <li><a href="#">Startseite</a></li>
-                    <li><a href="#booking">Buchen</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#features">Features</a></li>
+                    <li><a href="/">Startseite</a></li>
+                    <li><a href="/booking">Buchen</a></li>
+                    <li><a href="/#services">Services</a></li>
+                    <li><a href="/#features">Features</a></li>
                 </ul>
             </nav>
+
+            <!-- Dynamisches Profil-Icon (außerhalb nav für mobile Sichtbarkeit) -->
+            <div class="profile-section" id="profileSection">
+                <?php
+                    $session = service('session');
+                    $user = $session ? $session->get('user') : null;
+
+                    if ($user) {
+                        $initials = '';
+                        if (!empty($user['initials'])) {
+                            $initials = $user['initials'];
+                        } else {
+                            $fn = isset($user['firstName']) ? $user['firstName'] : '';
+                            $ln = isset($user['lastName']) ? $user['lastName'] : '';
+                            $initials = strtoupper(substr($fn, 0, 1) . substr($ln, 0, 1));
+                        }
+
+                        ?>
+                        <div class="profile-dropdown">
+                            <div class="profile-icon" id="profileInitials"><?= esc($initials) ?></div>
+                            <div class="dropdown-menu">
+                                <div class="user-info">
+                                    <div class="user-name"><?= esc($user['firstName'] ?? '') ?> <?= esc($user['lastName'] ?? '') ?></div>
+                                    <div class="user-email"><?= esc($user['email'] ?? '') ?></div>
+                                </div>
+                                <a href="<?= site_url('profile') ?>">
+                                    <i class="fas fa-user"></i> Mein Profil
+                                </a>
+                                <a href="<?= site_url('my-bookings') ?>">
+                                    <i class="fas fa-calendar-alt"></i> Meine Buchungen
+                                </a>
+                                <?php if (in_array($user['role'] ?? 'user', ['admin', 'worker'])): ?>
+                                <a href="<?= site_url('admin/bookings') ?>">
+                                    <i class="fas fa-tasks"></i> Verwaltung
+                                </a>
+                                <?php endif; ?>
+                                <a href="<?= site_url('settings') ?>">
+                                    <i class="fas fa-cog"></i> Einstellungen
+                                </a>
+                                <a href="<?= site_url('logout') ?>">
+                                    <i class="fas fa-sign-out-alt"></i> Abmelden
+                                </a>
+                            </div>
+                        </div>
+                        <?php
+                    } else {
+                        ?>
+                        <a href="<?= site_url('login') ?>" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Anmelden
+                        </a>
+                        <?php
+                    }
+                ?>
+            </div>
         </div>
     </div>
 </header>

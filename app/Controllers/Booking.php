@@ -34,6 +34,15 @@ class Booking extends Controller
         $data['user_role'] = $user['role'] ?? 'guest';
         $data['is_admin'] = ($data['user_role'] === 'admin');
 
+        // Wetterdaten laden (wie in Home Controller)
+        try {
+            $weatherService = new \App\Libraries\Weather();
+            $data['weather'] = $weatherService->getCurrentWeather();
+        } catch (\Throwable $e) {
+            // Bei Fehler null verwenden (View zeigt Fallback-Werte)
+            $data['weather'] = null;
+        }
+
         return view('booking-view', $data);
     }
 
