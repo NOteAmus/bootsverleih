@@ -21,3 +21,10 @@ $routes->post('/payment/process', 'Home::processPayment');
 $routes->get('/my-bookings', 'Home::myBookings');
 $routes->get('/admin/bookings', 'Home::allBookings', ['filter' => 'worker']);
 $routes->post('/admin/bookings/cancel', 'Home::cancelBooking', ['filter' => 'worker']);
+
+// Boot-Verschieben Routes
+$routes->get('/boat-moving', 'Booking::boatMoving');
+$routes->get('/booking/get-boat-positions', 'Booking::getBoatPositions');
+$routes->post('/booking/save-boat-positions', 'Booking::saveBoatPositions');
+$routes->post('/booking/move-boat-to-slot', 'Booking::moveBoatToSlot');
+$routes->post('/booking/move-boat-to-water', 'Booking::moveBoatToWater');

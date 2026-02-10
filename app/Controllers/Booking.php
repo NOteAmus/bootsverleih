@@ -463,4 +463,184 @@ class Booking extends Controller
             'items' => $items
         ]);
     }
+    /**
+     * Boot-Verschieben Reiter
+     */
+    public function boatMoving()
+    {
+        $itemModel = new ItemModel();
+        $boatPositionModel = new BoatPositionModel();
+
+        $data['boats'] = $itemModel->getBoats();
+        $data['slots'] = $itemModel->getBerths();
+        $data['boatPositions'] = $boatPositionModel->getMarinaBoatPositions();
+
+        return view('boat-moving-view', $data);
+    }
+
+    /**
+     * Save boat positions via API
+     */
+    public function saveBoatPositions()
+    {
+        if (!$this->request->is('post')) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
+
+        $positions = $this->request->getJSON(true);
+
+        if (!is_array($positions)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Invalid data format'
+            ]);
+        }
+
+        $boatPositionModel = new BoatPositionModel();
+
+        try {
+            $success = $boatPositionModel->saveBoatPositions($positions);
+
+            if ($success) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Boot-Positionen gespeichert',
+                    'saved_count' => count($positions)
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Fehler beim Speichern'
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Save boat positions failed: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Internal server error'
+            ]);
+        }
+    }
+
+    /**
+     * Move boat to slot
+     */
+    public function moveBoatToSlot()
+    {
+        if (!$this->request->is('post')) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
+
+        $data = $this->request->getJSON(true);
+        $boatPositionId = $data['boat_position_id'] ?? null;
+        $slotId = $data['slot_id'] ?? null;
+
+        if (!$boatPositionId || !$slotId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Missing required parameters'
+            ]);
+        }
+
+        $boatPositionModel = new BoatPositionModel();
+
+        try {
+            $success = $boatPositionModel->moveToSlot($boatPositionId, $slotId);
+
+            if ($success) {
+                // Get updated position
+                $position = $boatPositionModel->find($boatPositionId);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Boot wurde auf Liegeplatz verschoben',
+                    'position' => $position
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Konnte Boot nicht verschieben'
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Move boat to slot failed: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Internal server error'
+            ]);
+        }
+    }
+
+    /**
+     * Move boat to water
+     */
+    public function moveBoatToWater()
+    {
+        if (!$this->request->is('post')) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
+
+        $data = $this->request->getJSON(true);
+        $boatPositionId = $data['boat_position_id'] ?? null;
+
+        if (!$boatPositionId) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Missing boat position ID'
+            ]);
+        }
+
+        $boatPositionModel = new BoatPositionModel();
+
+        try {
+            $success = $boatPositionModel->moveToWater($boatPositionId);
+
+            if ($success) {
+                $position = $boatPositionModel->find($boatPositionId);
+
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => 'Boot wurde ins Wasser verschoben',
+                    'position' => $position
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Konnte Boot nicht verschieben'
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Move boat to water failed: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Internal server error'
+            ]);
+        }
+    }
+
+    /**
+     * Get boat positions for marina
+     */
+    public function getBoatPositions()
+    {
+        $boatPositionModel = new BoatPositionModel();
+        $positions = $boatPositionModel->getMarinaBoatPositions();
+
+        return $this->response->setJSON([
+            'success' => true,
+            'positions' => $positions
+        ]);
+    }
 }

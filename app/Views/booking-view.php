@@ -7,6 +7,8 @@
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
+    <!-- GridStack CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.3.0/dist/gridstack.min.css">
     <title>Yachthafen Plau am See - Liegeplätze & Bootsverleih</title>
 
     <style>
@@ -330,6 +332,26 @@
             z-index: 1;
         }
 
+        /* VERGRÖSSERTE Marina View für Schiffe verschieben */
+        .marina-view-large {
+            width: 100%;
+            height: 800px; /* Vergrößert auf 800px statt 600px */
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            background: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
+            background-size: cover;
+            background-position: center;
+            border: 3px solid var(--primary);
+        }
+        .marina-view-large::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            z-index: 1;
+        }
+
         .dock {
             position: absolute;
             background: linear-gradient(180deg, #8b4513 0%, #654321 100%);
@@ -394,6 +416,17 @@
             border-color: rgba(220, 53, 69, 1);
         }
 
+        .slot.with-ship {
+            background: linear-gradient(135deg, rgba(106, 176, 76, 0.92), rgba(46, 204, 113, 0.92));
+            border-color: rgba(46, 204, 113, 0.9);
+            cursor: move;
+        }
+
+        .slot.with-ship:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
         .slot.pending {
             background: linear-gradient(135deg, rgba(212, 172, 13, 0.95), rgba(244, 208, 63, 0.95));
             border-color: rgba(255, 255, 255, 0.85);
@@ -436,6 +469,92 @@
 
         .slot .boat-in-slot { display: flex; align-items: center; gap: 8px; }
         .slot .boat-in-slot i { color: #fff; opacity: 0.95; }
+
+        /* GridStack Container */
+        .gridstack-container {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px var(--shadow);
+            border: 1px solid var(--light-gray);
+            min-height: 800px; /* Größere Höhe */
+        }
+
+        .gridstack-area {
+            width: 100%;
+            height: 700px; /* Vergrößertes Grid */
+            background: linear-gradient(135deg, rgba(26, 82, 118, 0.05), rgba(46, 134, 193, 0.05));
+            border: 2px dashed var(--primary-light);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        /* GridStack Item Styles */
+        .grid-stack-item {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+        }
+
+        .grid-stack-item:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .grid-stack-item-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background: linear-gradient(135deg, rgba(46, 134, 193, 0.95), rgba(52, 152, 219, 0.95));
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+            cursor: move;
+            user-select: none;
+        }
+
+        .grid-stack-item-content.with-ship {
+            background: linear-gradient(135deg, rgba(106, 176, 76, 0.95), rgba(46, 204, 113, 0.95));
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .ship-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--secondary-light);
+        }
+
+        .ship-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .ship-slot {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+
+        /* Controls */
+        .ships-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
 
         /* Forms */
         .booking-form {
@@ -621,7 +740,11 @@
         }
 
         /* Responsive */
-        @media (max-width: 1200px) { .marina-view { height: 500px; } }
+        @media (max-width: 1200px) {
+            .marina-view { height: 500px; }
+            .marina-view-large { height: 700px; }
+            .gridstack-area { height: 600px; }
+        }
         @media (max-width: 992px) {
             .form-grid { grid-template-columns: 1fr; }
             .nav-tabs { flex-direction: column; }
@@ -718,6 +841,8 @@
             .marina-section, .booking-form { padding: 2rem; }
             .boats-grid { grid-template-columns: 1fr; }
             .marina-view { height: 420px; }
+            .marina-view-large { height: 550px; }
+            .gridstack-area { height: 500px; }
             :root { --slot-width: 78px; --slot-height: 30px; --slot-gap: 8px; }
         }
 
@@ -743,6 +868,9 @@
                     </button>
                     <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
+                    </button>
+                    <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
+                        <i class="fas fa-ship"></i>Schiffe verschieben
                     </button>
                 </div>
             </div>
@@ -988,6 +1116,9 @@
                     <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
+                    <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
+                        <i class="fas fa-ship"></i>Schiffe verschieben
+                    </button>
                 </div>
             </div>
 
@@ -1123,6 +1254,60 @@
             </div>
         </div>
     </div>
+
+    <!-- Schiffe verschieben -->
+    <div class="tab-content" :class="{ active: activeTab === 'ships' }" id="ships-tab">
+        <div class="marina-map-container">
+            <h2 class="section-title">Schiffe verschieben - Marina Plauer See</h2>
+
+            <div class="container">
+                <div class="nav-tabs">
+                    <button class="nav-tab" :class="{ active: activeTab === 'slots' }" type="button" @click="setActiveTab('slots')">
+                        <i class="fas fa-anchor"></i>Liegeplätze & Marina
+                    </button>
+                    <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
+                        <i class="fas fa-ship"></i>Bootsverleih
+                    </button>
+                    <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
+                        <i class="fas fa-ship"></i>Schiffe verschieben
+                    </button>
+                </div>
+            </div>
+
+            <p class="text-center mb-2" style="color: var(--text-light); max-width: 800px; margin: 0 auto 2rem;">
+                Ziehen Sie die Schiffe im Grid an neue Positionen. Klicken Sie "Verschieben bestätigen", um die Änderungen zu speichern.
+            </p>
+
+            <!-- GridStack Container -->
+            <div class="gridstack-container">
+                <div class="gridstack-area grid-stack" id="shipsGrid"></div>
+            </div>
+
+            <!-- Controls für Schiffe verschieben -->
+            <div class="ships-controls">
+                <button class="btn btn-primary" type="button" @click="confirmShipMovements">
+                    <i class="fas fa-exchange-alt"></i> Verschieben bestätigen
+                </button>
+                <button class="btn" type="button" style="background: var(--light-gray);" @click="resetShipMovements">
+                    <i class="fas fa-undo"></i> Zurücksetzen
+                </button>
+                <button class="btn" type="button" style="background: var(--light-gray);" @click="setActiveTab('slots')">
+                    <i class="fas fa-times"></i> Abbrechen
+                </button>
+            </div>
+
+            <!-- Statusanzeige -->
+            <div class="text-center mt-3">
+                <div v-if="shipMoveStatus.message" :class="['status-message', shipMoveStatus.type]">
+                    <i :class="shipMoveStatus.icon"></i> {{ shipMoveStatus.message }}
+                </div>
+                <p style="color: var(--text-light); font-style: italic;">
+                    <i class="fas fa-info-circle"></i>
+                    Ziehen Sie die Schiffe im Grid an neue Positionen. Die Änderungen werden erst nach Bestätigung gespeichert.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <footer class="footer" id="contact">
@@ -1155,6 +1340,11 @@
 
 <!-- Vue 3 (CDN) -->
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<!-- Lodash (wird von GridStack benötigt) -->
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+<!-- GridStack JS -->
+<script src="https://cdn.jsdelivr.net/npm/gridstack@8.3.0/dist/gridstack-all.js"></script>
+
 
 <script>
     const { createApp, reactive, computed, watch } = Vue;
@@ -1177,6 +1367,25 @@
                 // Submitting flags
                 slotSubmitting: false,
                 boatSubmitting: false,
+
+                // Ship moving state
+                shipsGrid: null,
+                shipMovements: [], // Speichert Bewegungen
+                shipMoveStatus: {
+                    message: "",
+                    type: "",
+                    icon: ""
+                },
+
+                // Demo-Daten für besetzte Schiffe
+                occupiedShips: [
+                    { id: 1, name: "Bavaria 37", slot: "A2", x: 0, y: 0, w: 2, h: 2 },
+                    { id: 2, name: "Hanse 388", slot: "B3", x: 3, y: 0, w: 2, h: 2 },
+                    { id: 3, name: "Jeanneau 349", slot: "C4", x: 0, y: 3, w: 2, h: 2 },
+                    { id: 4, name: "Quicksilver 675", slot: "D2", x: 3, y: 3, w: 2, h: 2 },
+                    { id: 5, name: "Bayliner VR6", slot: "E1", x: 6, y: 0, w: 2, h: 2 },
+                    { id: 6, name: "Zodiac 310", slot: "A5", x: 6, y: 3, w: 2, h: 1 }
+                ],
 
                 // Forms
                 slotForm: {
@@ -1248,6 +1457,138 @@
             // ---------- tabs ----------
             function setActiveTab(tabId) {
                 state.activeTab = tabId;
+
+                // Wenn Schiffe verschieben Tab aktiviert wird, Grid initialisieren
+                if (tabId === "ships") {
+                    setTimeout(initializeShipsGrid, 100);
+                }
+            }
+
+            // ---------- GridStack für Schiffe ----------
+            function initializeShipsGrid() {
+                const gridElement = document.getElementById('shipsGrid');
+                if (!gridElement) return;
+
+                if (state.shipsGrid) state.shipsGrid.destroy(false);
+
+                state.shipsGrid = GridStack.init({
+                    column: 12,
+                    cellHeight: 70,
+                    margin: 10,
+
+                    // wichtig: frei bewegen, aber NICHT überlappen
+                    float: true,            // Items dürfen "schweben", keine automatische Verdichtung nach oben
+                    disableResize: true,
+                    draggable: { handle: '.grid-stack-item-content' },
+
+                    // Kollisionen / nicht in die Quere kommen
+                    // GridStack verhindert Overlap standardmäßig.
+                    // Wir verstärken das Verhalten:
+                    animate: true,
+                    // (optional) besseres Verhalten beim Schieben anderer:
+                    // disableOneColumnMode: true, // falls du kein OneColumn auf klein willst
+                }, gridElement);
+
+                // ganz leer machen
+                state.shipsGrid.removeAll(false);
+
+                // *** WICHTIG: Höhe / Anzahl Reihen "erweitern"
+                // GridStack arbeitet mit rows. Default wächst es mit Inhalt.
+                // Wir setzen bewusst viele rows, damit du unten Platz hast:
+                state.shipsGrid.engine.maxRow = 30;   // mehr vertikaler Platz
+                state.shipsGrid.opts.minRow = 30;
+                state.shipsGrid._updateStyles?.();    // falls vorhanden (je nach Version)
+                state.shipsGrid._triggerChangeEvent?.();
+
+                // Widgets hinzufügen
+                state.occupiedShips.forEach(ship => {
+                    state.shipsGrid.addWidget({
+                        id: ship.id,
+                        x: ship.x, y: ship.y, w: ship.w, h: ship.h,
+                        content: `
+        <div class="grid-stack-item-content with-ship">
+          <div class="ship-icon"><i class="fas fa-ship"></i></div>
+          <div class="ship-name">${ship.name}</div>
+          <div class="ship-slot">Slot: ${ship.slot}</div>
+        </div>
+      `
+                    });
+                });
+
+                // Kollisionsschutz: falls jemand irgendwo dropt, erzwinge "kein overlap"
+                // (eigentlich Standard, aber sicher ist sicher)
+                state.shipsGrid.on('dragstop', (event, el) => {
+                    const n = el?.gridstackNode;
+                    if (!n) return;
+                    // optional: hier könntest du zusätzlich "clampen" oder validieren
+                });
+
+                state.shipsGrid.on('change', (event, items) => {
+                    if (items?.length) updateShipMovements(items);
+                });
+            }
+
+
+            function calculateSlotFromPosition(x, y) {
+                // Einfache Zuordnung von Grid-Position zu Slot-Nummer
+                const rowLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                const row = rowLetters[Math.min(y, rowLetters.length - 1)] || 'A';
+                const position = Math.min(x + 1, 8);
+                return `${row}${position}`;
+            }
+
+            function confirmShipMovements() {
+                if (state.shipMovements.length === 0) {
+                    showStatus("Es wurden keine Schiffe verschoben.", "warning", "fas fa-exclamation-triangle");
+                    return;
+                }
+
+                showStatus("Schiffe werden verschoben...", "info", "fas fa-spinner fa-spin");
+
+                // Simuliere API-Call
+                setTimeout(() => {
+                    console.log("Schiff-Bewegungen:", state.shipMovements);
+
+                    // Hier würde der API-Call stattfinden
+                    // fetch("/api/moveShips", {
+                    //     method: "POST",
+                    //     headers: { "Content-Type": "application/json" },
+                    //     body: JSON.stringify({ movements: state.shipMovements })
+                    // })
+
+                    showStatus(`${state.shipMovements.length} Schiffe erfolgreich verschoben!`, "success", "fas fa-check-circle");
+
+                    // Bewegungen zurücksetzen
+                    state.shipMovements = [];
+
+                    // Erfolg für 3 Sekunden anzeigen
+                    setTimeout(() => {
+                        state.shipMoveStatus.message = "";
+                    }, 3000);
+
+                }, 1500);
+            }
+
+            function resetShipMovements() {
+                // Grid zurücksetzen auf Original-Positionen
+                if (state.shipsGrid) {
+                    state.shipsGrid.load(state.occupiedShips);
+                    state.shipMovements = [];
+                    showStatus("Alle Bewegungen wurden zurückgesetzt.", "info", "fas fa-undo");
+
+                    // Nachricht nach 2 Sekunden entfernen
+                    setTimeout(() => {
+                        state.shipMoveStatus.message = "";
+                    }, 2000);
+                }
+            }
+
+            function showStatus(message, type, icon) {
+                state.shipMoveStatus = {
+                    message: message,
+                    type: type,
+                    icon: icon
+                };
             }
 
             // ---------- slot helpers (DOM lookup, weil Slots serverseitig generiert werden) ----------
@@ -1406,7 +1747,7 @@
             // ---------- submit handlers ----------
             async function submitSlotReservation() {
                 console.log('submitSlotReservation called');
-                
+
                 // Manuelle Validierung
                 if (!state.slotForm.customer_name) {
                     alert("Bitte geben Sie Ihren Namen ein.");
@@ -1456,14 +1797,14 @@
 
                 console.log('Sending payload:', payload);
                 state.slotSubmitting = true;
-                
+
                 try {
                     const r = await fetch("/booking/makeSlotReservation", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload),
                     });
-                    
+
                     console.log('Response status:', r.status);
                     const data = await r.json();
                     console.log('Response data:', data);
@@ -1484,7 +1825,7 @@
 
             async function submitBoatReservation() {
                 console.log('submitBoatReservation called');
-                
+
                 // Manuelle Validierung
                 if (!state.boatForm.customer_name) {
                     alert("Bitte geben Sie Ihren Namen ein.");
@@ -1529,14 +1870,14 @@
 
                 console.log('Sending payload:', payload);
                 state.boatSubmitting = true;
-                
+
                 try {
                     const r = await fetch("/booking/makeBoatReservation", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(payload),
                     });
-                    
+
                     console.log('Response status:', r.status);
                     const data = await r.json();
                     console.log('Response data:', data);
@@ -1558,21 +1899,21 @@
             // ---------- boat card select ----------
             function selectBoatFromCard(boatId) {
                 console.log('selectBoatFromCard called with:', boatId);
-                
+
                 // Switch to boats tab first
                 state.activeTab = "boats";
-                
+
                 // Wait for Vue to render the tab content
                 setTimeout(() => {
                     // Set the boat ID in the form (use nextTick equivalent)
                     state.boatForm.item_id = String(boatId);
                     console.log('Set boatForm.item_id to:', state.boatForm.item_id);
-                    
+
                     // Wait for Vue to update the DOM
                     setTimeout(() => {
                         const selectElement = document.getElementById("selectedBoat");
                         console.log('Select element:', selectElement);
-                        
+
                         // Log all available options
                         if (selectElement) {
                             console.log('Available options:');
@@ -1580,31 +1921,31 @@
                                 console.log(`  value: "${opt.value}", text: "${opt.text}"`);
                             });
                         }
-                        
+
                         console.log('Select element value:', selectElement?.value);
                         console.log('boatForm.item_id:', state.boatForm.item_id);
-                        
+
                         // Manually set the select value if Vue binding didn't work
                         if (selectElement) {
                             const targetValue = String(boatId);
                             console.log('Manually setting select value to:', targetValue);
                             selectElement.value = targetValue;
                             console.log('After manual set, select value is:', selectElement.value);
-                            
+
                             // Trigger Vue's change event
                             selectElement.dispatchEvent(new Event('input', { bubbles: true }));
                             selectElement.dispatchEvent(new Event('change', { bubbles: true }));
-                            
+
                             // Update the Vue state to match
                             state.boatForm.item_id = selectElement.value;
                         }
-                        
+
                         // Scroll to form
                         const formElement = document.getElementById("boatReservationForm");
                         if (formElement) {
                             formElement.scrollIntoView({ behavior: "smooth", block: "start" });
                         }
-                        
+
                         // Focus on select
                         if (selectElement) {
                             selectElement.focus();
@@ -1622,6 +1963,7 @@
                 boatForm: state.boatForm,
                 slotSubmitting: computed(() => state.slotSubmitting),
                 boatSubmitting: computed(() => state.boatSubmitting),
+                shipMoveStatus: computed(() => state.shipMoveStatus),
                 todayStr,
 
                 // selection
@@ -1642,18 +1984,66 @@
                 submitSlotReservation,
                 submitBoatReservation,
                 selectBoatFromCard,
+                confirmShipMovements,
+                resetShipMovements,
                 touchSelectedToken: computed(() => state.touchSelectedToken),
             };
         },
+
+        mounted() {
+            // GridStack nach Mount initialisieren falls Schiffe-Tab aktiv ist
+            if (this.activeTab === "ships") {
+                setTimeout(() => this.$options.setup().initializeShipsGrid, 300);
+            }
+        }
     }).mount("#app");
 </script>
+
+<style>
+    /* Status Message Styles */
+    .status-message {
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        margin: 20px auto;
+        max-width: 600px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .status-message.success {
+        background: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .status-message.info {
+        background: rgba(52, 152, 219, 0.15);
+        color: #2980b9;
+        border: 1px solid rgba(52, 152, 219, 0.3);
+    }
+
+    .status-message.warning {
+        background: rgba(241, 196, 15, 0.15);
+        color: #f39c12;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+    }
+
+    .status-message.error {
+        background: rgba(231, 76, 60, 0.15);
+        color: #c0392b;
+        border: 1px solid rgba(231, 76, 60, 0.3);
+    }
+</style>
 
 <!-- Hamburger Menu Script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const hamburger = document.getElementById('hamburger');
         const nav = document.querySelector('nav');
-        
+
         if (hamburger && nav) {
             hamburger.addEventListener('click', function() {
                 this.classList.toggle('active');
