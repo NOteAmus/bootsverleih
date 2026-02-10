@@ -832,18 +832,9 @@
                 font-size: 1.8rem;
             }
 
-            /* Temperatur neben Logo auch auf Mobile */
+            /* Temperaturanzeige im mobilen Header ausblenden */
             .temp-display {
-                margin-left: 5px;
-                font-size: 1rem;
-            }
-
-            .temp-display i {
                 display: none;
-            }
-
-            .temp-display span {
-                font-size: 1.1rem;
             }
 
             /* Show hamburger menu and profile on mobile */
@@ -964,22 +955,6 @@
                         <h1>Yachthafen Plau am See</h1>
                         <p>Premium Liegeplatzverwaltung & Bootsverleih</p>
                     </div>
-                </div>
-
-                <!-- Temperaturanzeige direkt neben Logo -->
-                <div class="temp-display">
-                    <?php
-                        $tc = isset($weather['temperature_c']) ? $weather['temperature_c'] : null;
-                    ?>
-                    <i class="fas fa-thermometer-half"></i>
-                    <span><?= $tc !== null ? round($tc) . '°C' : 'n.v.' ?></span>
-                </div>
-
-                <!-- Hamburger Menu Button -->
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
                 </div>
 
                 <div class="weather-header">

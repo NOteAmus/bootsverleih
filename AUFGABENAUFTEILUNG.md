@@ -215,15 +215,6 @@ Entwicklung des Authentifizierungssystems, Boots-Buchung, Zahlungsabwicklung und
 - **Session-Management:** CodeIgniter Session Library
 
 ---
-
-## Workflow-Dokumentation (Person 2)
-
-📁 `PAYMENT_WORKFLOW.md`
-- Dokumentation des Zahlungsworkflows
-- Von "pending" zu "paid" Status-Änderung
-
----
-
 ## Zusammenfassung
 
 | Aspekt | Person 1 | Person 2 |
@@ -253,6 +244,3 @@ Entwicklung des Authentifizierungssystems, Boots-Buchung, Zahlungsabwicklung und
 4. Admin-Funktionen hinzugefügt
 5. Boots-Vermietungssystem parallel entwickelt
 
----
-
-**Hinweis:** Diese Aufteilung zeigt eine realistische Arbeitsteilung in einem 2-Personen-Team, wobei beide Entwickler in verschiedenen Bereichen des Systems gearbeitet haben, aber eng zusammengearbeitet haben, um eine nahtlose Integration zu gewährleisten.
