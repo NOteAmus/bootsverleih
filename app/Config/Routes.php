@@ -22,9 +22,10 @@ $routes->get('/my-bookings', 'Home::myBookings');
 $routes->get('/admin/bookings', 'Home::allBookings', ['filter' => 'worker']);
 $routes->post('/admin/bookings/cancel', 'Home::cancelBooking', ['filter' => 'worker']);
 
-// Boot-Verschieben Routes
-$routes->get('/boat-moving', 'Booking::boatMoving');
-$routes->get('/booking/get-boat-positions', 'Booking::getBoatPositions');
-$routes->post('/booking/save-boat-positions', 'Booking::saveBoatPositions');
-$routes->post('/booking/move-boat-to-slot', 'Booking::moveBoatToSlot');
-$routes->post('/booking/move-boat-to-water', 'Booking::moveBoatToWater');
+// Boot-Verschieben Routes (nur für Admins)
+$routes->get('/boat-moving', 'Booking::boatMoving', ['filter' => 'admin']);
+$routes->get('/booking/get-boat-positions', 'Booking::getBoatPositions', ['filter' => 'admin']);
+$routes->post('/booking/save-boat-positions', 'Booking::saveBoatPositions', ['filter' => 'admin']);
+$routes->post('/booking/move-boat-to-slot', 'Booking::moveBoatToSlot', ['filter' => 'admin']);
+$routes->post('/booking/move-boat-to-water', 'Booking::moveBoatToWater', ['filter' => 'admin']);
+$routes->post('/booking/moveShips', 'Booking::moveShips', ['filter' => 'admin']);

@@ -484,10 +484,22 @@
         .gridstack-area {
             width: 100%;
             height: 700px; /* Vergrößertes Grid */
-            background: linear-gradient(135deg, rgba(26, 82, 118, 0.05), rgba(46, 134, 193, 0.05));
-            border: 2px dashed var(--primary-light);
+            background: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--primary);
             border-radius: var(--border-radius);
             overflow: hidden;
+            position: relative;
+        }
+
+        .gridstack-area::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+            z-index: 0;
+            pointer-events: none;
         }
 
         /* GridStack Item Styles */
@@ -869,9 +881,11 @@
                     <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
+                    <?php if ($is_admin ?? false): ?>
                     <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
                         <i class="fas fa-ship"></i>Schiffe verschieben
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1116,9 +1130,11 @@
                     <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
+                    <?php if ($is_admin ?? false): ?>
                     <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
                         <i class="fas fa-ship"></i>Schiffe verschieben
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1255,7 +1271,8 @@
         </div>
     </div>
 
-    <!-- Schiffe verschieben -->
+    <!-- Schiffe verschieben (nur für Admins) -->
+    <?php if ($is_admin ?? false): ?>
     <div class="tab-content" :class="{ active: activeTab === 'ships' }" id="ships-tab">
         <div class="marina-map-container">
             <h2 class="section-title">Schiffe verschieben - Marina Plauer See</h2>
@@ -1268,9 +1285,11 @@
                     <button class="nav-tab" :class="{ active: activeTab === 'boats' }" type="button" @click="setActiveTab('boats')">
                         <i class="fas fa-ship"></i>Bootsverleih
                     </button>
+                    <?php if ($is_admin ?? false): ?>
                     <button class="nav-tab" :class="{ active: activeTab === 'ships' }" type="button" @click="setActiveTab('ships')">
                         <i class="fas fa-ship"></i>Schiffe verschieben
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -1308,6 +1327,7 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <footer class="footer" id="contact">
@@ -1370,6 +1390,7 @@
 
                 // Ship moving state
                 shipsGrid: null,
+                shipsGridInitialized: false, // Flag um zu prüfen ob Grid bereits initialisiert wurde
                 shipMovements: [], // Speichert Bewegungen
                 shipMoveStatus: {
                     message: "",
@@ -1377,15 +1398,18 @@
                     icon: ""
                 },
 
-                // Demo-Daten für besetzte Schiffe
-                occupiedShips: [
-                    { id: 1, name: "Bavaria 37", slot: "A2", x: 0, y: 0, w: 2, h: 2 },
-                    { id: 2, name: "Hanse 388", slot: "B3", x: 3, y: 0, w: 2, h: 2 },
-                    { id: 3, name: "Jeanneau 349", slot: "C4", x: 0, y: 3, w: 2, h: 2 },
-                    { id: 4, name: "Quicksilver 675", slot: "D2", x: 3, y: 3, w: 2, h: 2 },
-                    { id: 5, name: "Bayliner VR6", slot: "E1", x: 6, y: 0, w: 2, h: 2 },
-                    { id: 6, name: "Zodiac 310", slot: "A5", x: 6, y: 3, w: 2, h: 1 }
-                ],
+                // Schiffspositionen aus der Datenbank (vom Server übergeben)
+                occupiedShips: <?= json_encode(array_map(function($pos) {
+                    return [
+                        'id' => (int)$pos['id'],
+                        'name' => $pos['ship_name'],
+                        'slot' => $pos['slot_number'],
+                        'x' => (int)$pos['grid_x'],
+                        'y' => (int)$pos['grid_y'],
+                        'w' => (int)$pos['grid_width'],
+                        'h' => (int)$pos['grid_height']
+                    ];
+                }, $boat_positions ?? [])) ?>,
 
                 // Forms
                 slotForm: {
@@ -1466,10 +1490,13 @@
 
             // ---------- GridStack für Schiffe ----------
             function initializeShipsGrid() {
+                // Prüfen ob Grid bereits initialisiert wurde
+                if (state.shipsGridInitialized) {
+                    return; // Grid ist bereits initialisiert, nichts tun
+                }
+
                 const gridElement = document.getElementById('shipsGrid');
                 if (!gridElement) return;
-
-                if (state.shipsGrid) state.shipsGrid.destroy(false);
 
                 state.shipsGrid = GridStack.init({
                     column: 12,
@@ -1526,8 +1553,32 @@
                 state.shipsGrid.on('change', (event, items) => {
                     if (items?.length) updateShipMovements(items);
                 });
+
+                // Flag setzen dass Grid initialisiert wurde
+                state.shipsGridInitialized = true;
             }
 
+
+            function updateShipMovements(items) {
+                // Aktualisiere die shipMovements basierend auf den neuen Positionen
+                items.forEach(item => {
+                    const shipId = item.id;
+                    const existingIndex = state.shipMovements.findIndex(m => m.id === shipId);
+
+                    const movement = {
+                        id: shipId,
+                        x: item.x,
+                        y: item.y,
+                        newSlot: calculateSlotFromPosition(item.x, item.y)
+                    };
+
+                    if (existingIndex >= 0) {
+                        state.shipMovements[existingIndex] = movement;
+                    } else {
+                        state.shipMovements.push(movement);
+                    }
+                });
+            }
 
             function calculateSlotFromPosition(x, y) {
                 // Einfache Zuordnung von Grid-Position zu Slot-Nummer
@@ -1537,7 +1588,7 @@
                 return `${row}${position}`;
             }
 
-            function confirmShipMovements() {
+            async function confirmShipMovements() {
                 if (state.shipMovements.length === 0) {
                     showStatus("Es wurden keine Schiffe verschoben.", "warning", "fas fa-exclamation-triangle");
                     return;
@@ -1545,28 +1596,42 @@
 
                 showStatus("Schiffe werden verschoben...", "info", "fas fa-spinner fa-spin");
 
-                // Simuliere API-Call
-                setTimeout(() => {
-                    console.log("Schiff-Bewegungen:", state.shipMovements);
+                try {
+                    const response = await fetch("/booking/moveShips", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ movements: state.shipMovements })
+                    });
 
-                    // Hier würde der API-Call stattfinden
-                    // fetch("/api/moveShips", {
-                    //     method: "POST",
-                    //     headers: { "Content-Type": "application/json" },
-                    //     body: JSON.stringify({ movements: state.shipMovements })
-                    // })
+                    const data = await response.json();
 
-                    showStatus(`${state.shipMovements.length} Schiffe erfolgreich verschoben!`, "success", "fas fa-check-circle");
+                    if (data.success) {
+                        showStatus(`${state.shipMovements.length} Schiffe erfolgreich verschoben!`, "success", "fas fa-check-circle");
 
-                    // Bewegungen zurücksetzen
-                    state.shipMovements = [];
+                        // Aktualisiere die Original-Positionen nach erfolgreichem Speichern
+                        state.shipMovements.forEach(movement => {
+                            const shipIndex = state.occupiedShips.findIndex(s => s.id === movement.id);
+                            if (shipIndex >= 0) {
+                                state.occupiedShips[shipIndex].x = movement.x;
+                                state.occupiedShips[shipIndex].y = movement.y;
+                                state.occupiedShips[shipIndex].slot = movement.newSlot;
+                            }
+                        });
 
-                    // Erfolg für 3 Sekunden anzeigen
-                    setTimeout(() => {
-                        state.shipMoveStatus.message = "";
-                    }, 3000);
+                        // Bewegungen zurücksetzen
+                        state.shipMovements = [];
 
-                }, 1500);
+                        // Erfolg für 3 Sekunden anzeigen
+                        setTimeout(() => {
+                            state.shipMoveStatus.message = "";
+                        }, 3000);
+                    } else {
+                        showStatus("Fehler: " + (data.message || "Positionen konnten nicht gespeichert werden"), "error", "fas fa-exclamation-circle");
+                    }
+                } catch (error) {
+                    console.error("Fehler beim Speichern:", error);
+                    showStatus("Netzwerkfehler beim Speichern der Positionen", "error", "fas fa-exclamation-circle");
+                }
             }
 
             function resetShipMovements() {

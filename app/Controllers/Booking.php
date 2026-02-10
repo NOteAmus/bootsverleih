@@ -11,10 +11,28 @@ class Booking extends Controller
     public function index(): string
     {
         $itemModel = new ItemModel();
-        
+        $boatPositionModel = new \App\Models\BoatPositionModel();
+
         $data['slots'] = $itemModel->getBerths(); // Liegeplätze aus Datenbank laden
         $data['boats'] = $itemModel->getBoats(); // Boote aus Datenbank laden
         $data['marina_info'] = $this->getMarinaInfo();
+
+        // Lade Schiffspositionen aus der Datenbank
+        $boatPositions = $boatPositionModel->getMarinaBoatPositions();
+
+        // Wenn keine Positionen vorhanden sind, initialisiere Default-Positionen
+        if (empty($boatPositions)) {
+            $boatPositionModel->initializeDefaultPositions();
+            $boatPositions = $boatPositionModel->getMarinaBoatPositions();
+        }
+
+        $data['boat_positions'] = $boatPositions;
+
+        // User-Rolle für Admin-Check übergeben
+        $session = session();
+        $user = $session->get('user');
+        $data['user_role'] = $user['role'] ?? 'guest';
+        $data['is_admin'] = ($data['user_role'] === 'admin');
 
         return view('booking-view', $data);
     }
@@ -642,5 +660,62 @@ class Booking extends Controller
             'success' => true,
             'positions' => $positions
         ]);
+    }
+
+    /**
+     * Move ships - Update boat positions in grid
+     */
+    public function moveShips()
+    {
+        if (!$this->request->is('post')) {
+            return $this->response->setStatusCode(405)->setJSON([
+                'success' => false,
+                'message' => 'Method not allowed'
+            ]);
+        }
+
+        $data = $this->request->getJSON(true);
+
+        if (!isset($data['movements']) || !is_array($data['movements'])) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'success' => false,
+                'message' => 'Invalid data format. Expected movements array.'
+            ]);
+        }
+
+        $movements = $data['movements'];
+
+        if (empty($movements)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Keine Bewegungen zum Speichern'
+            ]);
+        }
+
+        $boatPositionModel = new \App\Models\BoatPositionModel();
+
+        try {
+            $success = $boatPositionModel->updateBoatPositions($movements);
+
+            if ($success) {
+                return $this->response->setJSON([
+                    'success' => true,
+                    'message' => count($movements) . ' Schiffe erfolgreich verschoben',
+                    'count' => count($movements)
+                ]);
+            } else {
+                return $this->response->setJSON([
+                    'success' => false,
+                    'message' => 'Fehler beim Speichern der Positionen'
+                ]);
+            }
+        } catch (\Exception $e) {
+            log_message('error', 'Move ships failed: ' . $e->getMessage());
+
+            return $this->response->setStatusCode(500)->setJSON([
+                'success' => false,
+                'message' => 'Serverfehler beim Speichern'
+            ]);
+        }
     }
 }
