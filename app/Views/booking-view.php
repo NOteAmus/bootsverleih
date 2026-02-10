@@ -3,684 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-    <!-- GridStack CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.3.0/dist/gridstack.min.css">
     <title>Yachthafen Plau am See - Liegeplätze & Bootsverleih</title>
 
+    <!-- External CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@8.3.0/dist/gridstack.min.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="<?= base_url('css/variables.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('css/base.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('css/header.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('css/booking.css') ?>" />
+    <link rel="stylesheet" href="<?= base_url('css/marina.css') ?>" />
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ==========================================
+           VIEW-SPECIFIC STYLES (Marina SVG, Slots)
+           Diese Styles sind spezifisch für die Buchungsansicht
+           und werden inline gelassen für einfachere Wartung
+           ========================================== */
 
-        :root {
-            --primary: #1a5276;
-            --primary-dark: #0d3c5a;
-            --primary-light: #2e86c1;
-            --secondary: #d4ac0d;
-            --secondary-light: #f4d03f;
-            --accent: #d4af37;
-            --white: #fff;
-            --light-bg: #f8f9fa;
-            --light-gray: #e9ecef;
-            --text-dark: #2c3e50;
-            --text-light: #6c757d;
-            --dark: #1e2a3a;
-            --gray: #6c757d;
-            --danger: #dc3545;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --border-radius: 12px;
-            --transition: all 0.3s ease;
-
-            /* Marina */
-            --main-dock-height: 25px;
-            --pier-width: 20px;
-            --pier-height: 260px;
-
-            --slot-gap: 10px;
-            --slot-width: 90px;
-            --slot-height: 34px;
-
-            --slot-top-start: 95px;
-            --slot-top-step: 40px;
-        }
-
+        /* Padding für fixierten Header */
         body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--light-bg);
-            color: var(--text-dark);
-            line-height: 1.6;
-            min-height: 100vh;
             padding-top: 80px;
         }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
 
-        /* Header Styles */
-        header {
-            background-color: rgba(10, 46, 92, 0.98);
-            color: white;
-            padding: 0.5rem 0;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 30px;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex: 0 1 auto;
-        }
-
-        .logo-icon {
-            font-size: 1.6rem;
-            color: var(--secondary);
-        }
-
-        .logo-text h1 {
-            font-size: 1.15rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            width: 220px;
-        }
-
-        .logo-text p {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-top: 2px;
-        }
-
-        /* Temperaturanzeige neben Logo */
-        .temp-display {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: 25px;
-            font-size: 1.1rem;
-            color: white;
-        }
-
-        .temp-display i {
-            display: none;
-        }
-
-        .temp-display span {
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        /* Hamburger Menu */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 10px;
-            z-index: 1002;
-        }
-
-        .hamburger span {
-            width: 25px;
-            height: 3px;
-            background-color: white;
-            margin: 3px 0;
-            transition: 0.3s;
-            border-radius: 3px;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: rotate(-45deg) translate(-5px, 6px);
-        }
-
-        .hamburger.active span:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.active span:nth-child(3) {
-            transform: rotate(45deg) translate(-5px, -6px);
-        }
-
-        .mobile-nav {
-            display: none;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 30px;
-            align-items: center;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 4px 0;
-            position: relative;
-            transition: color 0.3s;
-        }
-
-        nav a:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--secondary);
-            transition: width 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--secondary);
-        }
-
-        nav a:hover:after {
-            width: 100%;
-        }
-
-        .weather-header {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 30px;
-            margin-left: 0;
-            padding-left: 12px;
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
-            flex-wrap: nowrap;
-            font-size: 1rem;
-        }
-
-        .weather-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            white-space: nowrap;
-            padding: 0 6px;
-        }
-
-        /* Profil Icon & Dropdown */
-        .profile-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-left: 30px;
-        }
-
-        .profile-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), #e67e22);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.8rem;
-            color: var(--primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .profile-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-        }
-
-        .profile-dropdown {
-            position: relative;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 10px 0;
-            min-width: 200px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
-            z-index: 1001;
-            margin-top: 10px;
-        }
-
-        .profile-dropdown:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .dropdown-menu a {
-            display: block;
-            padding: 12px 20px;
-            color: var(--dark);
-            text-decoration: none;
-            transition: background-color 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .dropdown-menu a:hover {
-            background-color: #f8f9fa;
-            color: var(--primary);
-        }
-
-        .dropdown-menu a i {
-            width: 20px;
-            margin-right: 10px;
-            color: var(--gray);
-        }
-
-        .user-info {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 5px;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 5px;
-        }
-
-        .user-email {
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-
-        /* Login Button falls kein Benutzer */
-        .login-btn {
-            background: var(--accent);
-            color: var(--primary);
-            padding: 8px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .login-btn:hover {
-            background: #e6c260;
-            transform: translateY(-2px);
-        }
-
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .btn-primary { background: var(--secondary); color: var(--primary-dark); }
-        .btn-primary:hover {
-            background: var(--secondary-light);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(212, 172, 13, 0.2);
-        }
-
-        /* Tabs */
-        .nav-tabs {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 1rem;
-            margin: 2rem auto 4rem;
-            max-width: 900px;
-            box-shadow: 0 10px 30px var(--shadow);
-            display: flex;
-            gap: 1rem;
-            position: relative;
-            z-index: 10;
-        }
-        .nav-tab {
-            flex: 1;
-            padding: 1.5rem 2rem;
-            text-align: center;
-            background: var(--light-bg);
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-        .nav-tab.active {
-            background: var(--primary);
-            color: var(--white);
-            box-shadow: 0 5px 15px rgba(26, 82, 118, 0.2);
-        }
-        .nav-tab:hover:not(.active) { background: var(--primary-light); color: var(--white); }
-
-        .tab-content { display: none; animation: fadeIn 0.5s ease-out; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .marina-section {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 3rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 10px 30px var(--shadow);
-            border: 1px solid var(--light-gray);
-        }
-
-        .section-title {
-            font-size: 2.2rem;
-            color: var(--primary);
-            margin-bottom: 2rem;
-            text-align: center;
-            font-weight: 600;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-        .section-title::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: var(--secondary);
-            border-radius: 2px;
-        }
-
-        /* Marina Container */
-        .marina-map-container {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 10px 30px var(--shadow);
-            border: 1px solid var(--light-gray);
-            overflow: hidden;
-        }
-
-        /* Marina View */
-        .marina-view {
-            width: 100%;
-            height: 600px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            position: relative;
-            background: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
-            background-size: cover;
-            background-position: center;
-            border: 3px solid var(--primary);
-        }
-        .marina-view::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-            z-index: 1;
-        }
-
-        /* VERGRÖSSERTE Marina View für Schiffe verschieben */
-        .marina-view-large {
-            width: 100%;
-            height: 800px; /* Vergrößert auf 800px statt 600px */
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            position: relative;
-            background: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
-            background-size: cover;
-            background-position: center;
-            border: 3px solid var(--primary);
-        }
-        .marina-view-large::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-            z-index: 1;
-        }
-
-        .dock {
-            position: absolute;
-            background: linear-gradient(180deg, #8b4513 0%, #654321 100%);
-            border-radius: 4px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            z-index: 2;
-        }
-
-        .dock.pier {
-            width: var(--pier-width);
-            height: var(--pier-height);
-            top: calc(60px + var(--main-dock-height));
-        }
-
-        .slot {
-            position: absolute;
-            width: var(--slot-width);
-            height: var(--slot-height);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 0.9rem;
-            color: #fff;
-            z-index: 3;
-            user-select: none;
-            cursor: pointer;
-            transition: var(--transition);
-            background: linear-gradient(135deg, rgba(46, 134, 193, 0.92), rgba(52, 152, 219, 0.92));
-            border: 2px solid rgba(255, 255, 255, 0.65);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(2px);
-        }
-
-        .slot.side-right { transform: translateX(calc(var(--pier-width) + var(--slot-gap))); }
-        .slot.side-left { transform: translateX(calc(-1 * (var(--slot-width) + var(--slot-gap)))); }
-
-        .slot.side-right:hover:not(.occupied) {
-            transform: translateX(calc(var(--pier-width) + var(--slot-gap))) scale(1.05);
-            z-index: 10;
-        }
-        .slot.side-left:hover:not(.occupied) {
-            transform: translateX(calc(-1 * (var(--slot-width) + var(--slot-gap)))) scale(1.05);
-            z-index: 10;
-        }
-
-        .slot.selected {
-            border-color: var(--white);
-            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 5px 20px rgba(0, 0, 0, 0.5);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-
-        .slot.occupied {
-            background: linear-gradient(135deg, rgba(220, 53, 69, 0.92), rgba(192, 57, 43, 0.92));
-            cursor: not-allowed;
-            border-color: rgba(220, 53, 69, 1);
-        }
-
-        .slot.with-ship {
-            background: linear-gradient(135deg, rgba(106, 176, 76, 0.92), rgba(46, 204, 113, 0.92));
-            border-color: rgba(46, 204, 113, 0.9);
-            cursor: move;
-        }
-
-        .slot.with-ship:hover {
-            transform: scale(1.05);
-            z-index: 10;
-        }
-
-        .slot.pending {
-            background: linear-gradient(135deg, rgba(212, 172, 13, 0.95), rgba(244, 208, 63, 0.95));
-            border-color: rgba(255, 255, 255, 0.85);
-            color: #0d3c5a;
-        }
-
-        .slot.pending .boat-in-slot i { color: #0d3c5a; opacity: 0.95; }
-
-        .slot.drop-hover:not(.occupied) {
-            outline: 3px dashed rgba(255, 255, 255, 0.9);
-            outline-offset: 2px;
-            z-index: 20;
-        }
-
-        /* Boot-Palette */
-        .boat-palette {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin: 16px 0 0;
-        }
-        .boat-token {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(26, 82, 118, 0.92);
-            border: 2px solid rgba(212, 172, 13, 0.9);
-            color: #fff;
-            cursor: grab;
-            user-select: none;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-        .boat-token:active { cursor: grabbing; }
-        .boat-token i { font-size: 18px; color: #f4d03f; }
-        .boat-token .label { font-weight: 800; font-size: 0.95rem; }
-
-        .slot .boat-in-slot { display: flex; align-items: center; gap: 8px; }
-        .slot .boat-in-slot i { color: #fff; opacity: 0.95; }
-
-        /* GridStack Container */
-        .gridstack-container {
-            background: var(--white);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px var(--shadow);
-            border: 1px solid var(--light-gray);
-            min-height: 800px; /* Größere Höhe */
-        }
-
-        .gridstack-area {
-            width: 100%;
-            height: 700px; /* Vergrößertes Grid */
-            background: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
-            background-size: cover;
-            background-position: center;
-            border: 2px solid var(--primary);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .gridstack-area::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* GridStack Item Styles */
-        .grid-stack-item {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: var(--transition);
-        }
-
-        .grid-stack-item:hover {
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .grid-stack-item-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-            background: linear-gradient(135deg, rgba(46, 134, 193, 0.95), rgba(52, 152, 219, 0.95));
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            border-radius: 6px;
-            color: white;
-            text-align: center;
-            cursor: move;
-            user-select: none;
-        }
-
-        .grid-stack-item-content.with-ship {
-            background: linear-gradient(135deg, rgba(106, 176, 76, 0.95), rgba(46, 204, 113, 0.95));
-            border-color: rgba(255, 255, 255, 0.9);
-        }
-
-        .ship-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: var(--secondary-light);
-        }
-
-        .ship-name {
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-        }
-
-        .ship-slot {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 6px;
-            border-radius: 10px;
-            margin-top: 4px;
-        }
-
-        /* Controls */
-        .ships-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--light-gray);
-        }
 
         /* Forms */
         .booking-form {
@@ -984,7 +332,7 @@
 <div id="app" class="container">
     <!-- Liegeplätze -->
     <div class="tab-content" :class="{ active: activeTab === 'slots' }" id="slots-tab">
-        <div class="marina-map-container">
+        <div class="container-base marina-map-container">
             <h2 class="section-title">Marina Übersicht - Plauer See</h2>
 
             <div class="container">
@@ -1042,7 +390,7 @@
             $occupiedSlots = ['A2', 'B3', 'C4', 'D2', 'E1'];
             ?>
 
-            <div class="marina-view" id="marinaView">
+            <div class="water-container marina-view" id="marinaView">
                 <!-- Hauptsteg -->
                 <div class="dock" style="width:85%;height:25px;top:60px;left:7.5%;"></div>
 
@@ -1388,7 +736,7 @@
     <!-- Schiffe verschieben (nur für Admins) -->
     <?php if ($is_admin ?? false): ?>
     <div class="tab-content" :class="{ active: activeTab === 'ships' }" id="ships-tab">
-        <div class="marina-map-container">
+        <div class="container-base marina-map-container">
             <h2 class="section-title">Schiffe verschieben - Marina Plauer See</h2>
 
             <div class="container">
@@ -1412,8 +760,8 @@
             </p>
 
             <!-- GridStack Container -->
-            <div class="gridstack-container">
-                <div class="gridstack-area grid-stack" id="shipsGrid"></div>
+            <div class="container-base gridstack-container">
+                <div class="water-container gridstack-area grid-stack" id="shipsGrid"></div>
             </div>
 
             <!-- Controls für Schiffe verschieben -->
@@ -1479,8 +827,31 @@
 <!-- GridStack JS -->
 <script src="https://cdn.jsdelivr.net/npm/gridstack@8.3.0/dist/gridstack-all.js"></script>
 
+<!-- Booking App JavaScript -->
+<script src="<?= base_url('js/booking.js') ?>"></script>
 
 <script>
+    // Initialize the Booking App with server data
+    document.addEventListener('DOMContentLoaded', function() {
+        initBookingApp({
+            boatPositions: <?= json_encode(array_map(function($pos) {
+                return [
+                    'id' => (int)$pos['id'],
+                    'name' => $pos['ship_name'],
+                    'slot' => $pos['slot_number'],
+                    'x' => (int)$pos['grid_x'],
+                    'y' => (int)$pos['grid_y'],
+                    'w' => (int)$pos['grid_width'],
+                    'h' => (int)$pos['grid_height']
+                ];
+            }, $boat_positions ?? [])) ?>
+        });
+    });
+</script>
+
+<!-- OLD INLINE CODE - ENTFERNEN NACH TEST -->
+<script style="display: none;">
+    const OLD_CODE = function() {
     const { createApp, reactive, computed, watch } = Vue;
 
     createApp({
@@ -2176,6 +1547,7 @@
             }
         }
     }).mount("#app");
+    }; // END OLD_CODE
 </script>
 
 <style>

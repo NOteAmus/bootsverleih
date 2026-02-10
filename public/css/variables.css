@@ -1,0 +1,94 @@
+/**
+ * CSS Variables (Custom Properties)
+ * Globale Farbschema und Design-Tokens
+ *
+ * @package    Bootsverleih
+ * @subpackage CSS
+ * @author     Yachthafen Plau am See
+ * @version    1.0.0
+ */
+
+:root {
+    /* ==========================================
+       COLOR PALETTE
+       ========================================== */
+
+    /* Primary Colors - Hauptfarben */
+    --primary: #1a5276;           /* Dunkelblau */
+    --primary-dark: #0d3c5a;      /* Sehr dunkelblau */
+    --primary-light: #2e86c1;     /* Hellblau */
+
+    /* Secondary Colors - Sekundärfarben */
+    --secondary: #d4ac0d;         /* Gold */
+    --secondary-light: #f4d03f;   /* Hellgold */
+
+    /* Accent Color - Akzentfarbe */
+    --accent: #d4af37;            /* Goldener Akzent */
+
+    /* Neutral Colors - Neutrale Farben */
+    --white: #fff;                /* Weiß */
+    --light-bg: #f8f9fa;          /* Heller Hintergrund */
+    --light-gray: #e9ecef;        /* Hellgrau */
+    --dark: #1e2a3a;              /* Dunkelgrau */
+    --gray: #6c757d;              /* Mittelgrau */
+
+    /* Text Colors - Textfarben */
+    --text-dark: #2c3e50;         /* Dunkler Text */
+    --text-light: #6c757d;        /* Heller Text */
+
+    /* Status Colors - Statusfarben */
+    --success: #28a745;           /* Erfolg (Grün) */
+    --danger: #dc3545;            /* Fehler (Rot) */
+    --warning: #ffc107;           /* Warnung (Gelb) */
+    --info: #17a2b8;              /* Info (Cyan) */
+
+    /* ==========================================
+       EFFECTS & SHADOWS
+       ========================================== */
+
+    --shadow: rgba(0, 0, 0, 0.1);  /* Standardschatten */
+    --shadow-dark: rgba(0, 0, 0, 0.2); /* Dunkler Schatten */
+    --shadow-light: rgba(0, 0, 0, 0.05); /* Heller Schatten */
+
+    /* ==========================================
+       LAYOUT & SPACING
+       ========================================== */
+
+    --border-radius: 12px;         /* Abrundung */
+    --border-radius-sm: 8px;       /* Kleine Abrundung */
+    --border-radius-lg: 16px;      /* Große Abrundung */
+
+    --transition: all 0.3s ease;   /* Standard-Übergang */
+    --transition-fast: all 0.15s ease; /* Schneller Übergang */
+    --transition-slow: all 0.5s ease;  /* Langsamer Übergang */
+
+    /* ==========================================
+       MARINA SPECIFIC VARIABLES
+       ========================================== */
+
+    /* Marina Layout Dimensions */
+    --main-dock-height: 25px;      /* Höhe des Hauptstegs */
+    --pier-width: 20px;            /* Breite der Anlegestege */
+    --pier-height: 260px;          /* Höhe der Anlegestege */
+
+    /* Slot Dimensions */
+    --slot-gap: 10px;              /* Abstand zwischen Liegeplätzen */
+    --slot-width: 90px;            /* Breite eines Liegeplatzes */
+    --slot-height: 34px;           /* Höhe eines Liegeplatzes */
+
+    /* Slot Positioning */
+    --slot-top-start: 95px;        /* Start-Position oben */
+    --slot-top-step: 40px;         /* Schrittweite zwischen Liegeplätzen */
+
+    /* Water Background */
+    --water-bg-url: url("https://media.istockphoto.com/id/959508862/de/foto/blaues-meer-f%C3%BCr-hintergrund.jpg?s=612x612&w=0&k=20&c=2nDBrTHMDsfWpsb4x7zCUzOjiDrvPAhk8u-kENTclks=");
+
+    /* ==========================================
+       Z-INDEX HIERARCHY
+       ========================================== */
+
+    --z-dropdown: 1001;            /* Dropdown-Menüs */
+    --z-hamburger: 1002;           /* Hamburger-Menü */
+    --z-modal: 1100;               /* Modale Dialoge */
+    --z-toast: 1200;               /* Toast-Benachrichtigungen */
+}
