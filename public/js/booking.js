@@ -379,7 +379,6 @@ function initBookingApp(initialData = {}) {
                     removeSlotSelectionById(slotId);
                 } else {
                     addSlotSelectionById(slotId);
-                    document.getElementById("slotReservationForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }
             }
 
