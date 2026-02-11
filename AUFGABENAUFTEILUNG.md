@@ -77,12 +77,33 @@ Entwicklung des Liegeplatz-Buchungssystems, Boots-Buchungssystem, Inventarverwal
 - ✅ JavaScript für Boots-Buchungslogik
 - ✅ Fetch-Request zu `/booking/makeBoatReservation`
 
+#### 8. **Zahlungssystem**
+📁 `app/Controllers/Home.php`
+- ✅ `payment($reservationId)` - Zahlungsseite anzeigen
+- ✅ `processPayment()` - Zahlung verarbeiten
+- ✅ Status-Update von `pending` → `paid`
+- ✅ Unterstützung mehrerer Zahlungsmethoden (PayPal, Kreditkarte, Bar)
+
+📁 `app/Views/payment-view.php`
+- ✅ Zahlungsformular mit verschiedenen Zahlungsoptionen
+- ✅ Reservierungsübersicht
+- ✅ Preisaufschlüsselung
+
+📁 `app/Views/creditcard-view.php`
+- ✅ Kreditkarten-Eingabeformular
+- ✅ Kartenvalidierung
+
+#### 9. **Routing - Zahlungen**
+📁 `app/Config/Routes.php`
+- ✅ `GET /payment/(:num)` - Zahlungsseite
+- ✅ `POST /payment/process` - Zahlung verarbeiten
+
 ---
 
-## Person 2: Benutzer- & Buchungsverwaltung + Zahlungssystem + Homepage
+## Person 2: Benutzer- & Buchungsverwaltung + Homepage
 
 ### Verantwortungsbereich
-Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen und Homepage
+Entwicklung des Authentifizierungssystems, Admin-Funktionen und Homepage
 
 ### Implementierte Features
 
@@ -105,23 +126,7 @@ Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen 
 - ✅ Validierung von Email und Passwort
 - ✅ Rollen-System (user, worker, admin)
 
-#### 2. **Zahlungssystem**
-📁 `app/Controllers/Home.php`
-- ✅ `payment($reservationId)` - Zahlungsseite anzeigen
-- ✅ `processPayment()` - Zahlung verarbeiten
-- ✅ Status-Update von `pending` → `paid`
-- ✅ Unterstützung mehrerer Zahlungsmethoden (PayPal, Kreditkarte, Bar)
-
-📁 `app/Views/payment-view.php`
-- ✅ Zahlungsformular mit verschiedenen Zahlungsoptionen
-- ✅ Reservierungsübersicht
-- ✅ Preisaufschlüsselung
-
-📁 `app/Views/creditcard-view.php`
-- ✅ Kreditkarten-Eingabeformular
-- ✅ Kartenvalidierung
-
-#### 3. **Buchungsverwaltung**
+#### 2. **Buchungsverwaltung**
 📁 `app/Controllers/Home.php`
 - ✅ `myBookings()` - Eigene Buchungen anzeigen
 - ✅ `allBookings()` - Alle Buchungen für Admin/Worker
@@ -136,7 +141,7 @@ Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen 
 - ✅ Admin-Ansicht aller Buchungen
 - ✅ Stornierungsfunktion
 
-#### 4. **ReservationModel**
+#### 3. **ReservationModel**
 📁 `app/Models/ReservationModel.php`
 - ✅ Komplett entwickelt
 - ✅ `generateReservationNumber()` - Eindeutige Buchungsnummern
@@ -146,19 +151,19 @@ Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen 
 - ✅ `cancelReservation()` - Stornierung
 - ✅ Verwaltung von Zahlungsstatus
 
-#### 5. **Security Filter**
+#### 4. **Security Filter**
 📁 `app/Filters/`
 - ✅ `AuthFilter.php` - Authentifizierungsprüfung
 - ✅ `AdminFilter.php` - Admin-Berechtigungsprüfung
 - ✅ `WorkerFilter.php` - Worker/Admin-Berechtigungsprüfung
 
-#### 6. **Views - Authentifizierung**
+#### 5. **Views - Authentifizierung**
 📁 `app/Views/`
 - ✅ `login-view.php` - Login-Formular
 - ✅ `register-view.php` - Registrierungsformular
 - ✅ `register_success.php` - Erfolgreiche Registrierung
 
-#### 7. **Homepage & API**
+#### 6. **Homepage & API**
 📁 `app/Controllers/Home.php`
 - ✅ `index()` - Startseite mit Wetterinformationen
 
@@ -168,19 +173,16 @@ Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen 
 📁 `app/Views/welcome_message.php`
 - ✅ Startseite mit Marina-Informationen
 
-#### 8. **Routing - Benutzer & Verwaltung**
+#### 7. **Routing - Benutzer & Verwaltung**
 📁 `app/Config/Routes.php`
 - ✅ `GET/POST /login` - Login-Routen
 - ✅ `GET/POST /register` - Registrierungs-Routen
 - ✅ `GET /logout` - Logout
-- ✅ `POST /booking/makeBoatReservation` - Boots-Buchung
-- ✅ `GET /payment/(:num)` - Zahlungsseite
-- ✅ `POST /payment/process` - Zahlung verarbeiten
 - ✅ `GET /my-bookings` - Eigene Buchungen
 - ✅ `GET /admin/bookings` - Admin-Buchungsübersicht (mit Filter)
 - ✅ `POST /admin/bookings/cancel` - Stornierung (mit Filter)
 
-#### 9. **Datenbank**
+#### 8. **Datenbank**
 📁 `app/Database/Migrations/`
 - ✅ Tabelle: `benutzer` (id, vorname, nachname, email, passwort, role)
 - ✅ Tabelle: `reservations` (mit allen Buchungs- und Zahlungsfeldern)
@@ -219,13 +221,13 @@ Entwicklung des Authentifizierungssystems, Zahlungsabwicklung, Admin-Funktionen 
 
 | Aspekt | Person 1 | Person 2 |
 |--------|----------|----------|
-| **Hauptfokus** | Liegeplatzverwaltung & Inventar & Boots-Buchungssystem | Benutzer, Zahlungen & Homepage |
-| **Controllers** | Booking (Liegeplätze + Boote) | Login, Registration, Home |
+| **Hauptfokus** | Liegeplatzverwaltung & Inventar & Boots-Buchungssystem & Zahlungen | Benutzer & Homepage & Admin-Panel |
+| **Controllers** | Booking (Liegeplätze + Boote), Home (Zahlungen) | Login, Registration, Home (Buchungsverwaltung) |
 | **Models** | ItemModel | UserModel, ReservationModel |
-| **Views** | booking-view (Liegeplatz-Teil + Boot-Teil) | login, register, payment, my-bookings, all-bookings, welcome_message |
-| **Features** | Liegeplatz-Hafenplan, Boot-Katalog, Verfügbarkeit, Weather | Auth, Zahlung, Admin-Panel, Homepage |
+| **Views** | booking-view (komplett), payment-view, creditcard-view | login, register, my-bookings, all-bookings, welcome_message |
+| **Features** | Liegeplatz-Hafenplan, Boot-Katalog, Verfügbarkeit, Weather, Zahlungssystem | Auth, Admin-Panel, Homepage |
 | **Sicherheit** | - | Filter (Auth, Admin, Worker) |
-| **Zeilen Code (ca.)** | ~1200-1500 | ~1200-1500 |
+| **Zeilen Code (ca.)** | ~1500-1800 | ~1000-1200 |
 
 ---
 
