@@ -1,4 +1,43 @@
-# CodeIgniter 4 Application Starter
+# Bootsverleih - Yachthafen Management System
+
+Ein CodeIgniter 4-basiertes Verwaltungssystem für einen Bootsverleih/Yachthafen.
+
+## Projekt Setup & Ausführung
+
+### 1. Datenbank erstellen
+Erstelle die Datenbank `yachthafen` in phpMyAdmin oder über die MySQL-Konsole:
+```sql
+CREATE DATABASE yachthafen CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+```
+
+### 2. Migrationen ausführen
+Erstelle alle Tabellen in der Datenbank:
+```bash
+php spark migrate
+```
+
+### 3. Testdaten einfügen (optional)
+Füge Testdaten in die Datenbank ein:
+```bash
+php spark db:seed ItemsSeeder
+```
+
+### 4. Entwicklungsserver starten
+Starte die Anwendung:
+```bash
+php spark serve
+```
+
+Die Anwendung ist dann unter `http://localhost:8080` erreichbar.
+
+### Weitere nützliche Befehle
+- **Migration zurückrollen**: `php spark migrate:rollback`
+- **Migration-Status anzeigen**: `php spark migrate:status`
+- **Alle Seeds ausführen**: `php spark db:seed`
+
+---
+
+## CodeIgniter 4 Application Starter
 
 ## What is CodeIgniter?
 
