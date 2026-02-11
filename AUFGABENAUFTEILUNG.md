@@ -4,11 +4,13 @@
 **Projekt:** Yachthafen Plau am See - Liegeplatzverwaltung & Bootsverleih  
 **Framework:** CodeIgniter 4  
 **Datenbank:** MySQL  
-**Entwickler:** 2 Personen
+**Entwickler:**
+- Leon Teppler
+- Alexandr Korostin
 
 ---
 
-## Person 1: Liegeplatzverwaltung & Boots-Buchungssystem
+## Leon Teppler: Liegeplatzverwaltung & Boots-Buchungssystem
 
 ### Verantwortungsbereich
 Entwicklung des Liegeplatz-Buchungssystems, Boots-Buchungssystem, Inventarverwaltung und Produktverwaltung
@@ -100,7 +102,7 @@ Entwicklung des Liegeplatz-Buchungssystems, Boots-Buchungssystem, Inventarverwal
 
 ---
 
-## Person 2: Benutzer- & Buchungsverwaltung + Homepage
+## Alexandr Korostin: Benutzer- & Buchungsverwaltung + Homepage
 
 ### Verantwortungsbereich
 Entwicklung des Authentifizierungssystems, Admin-Funktionen und Homepage
@@ -187,24 +189,8 @@ Entwicklung des Authentifizierungssystems, Admin-Funktionen und Homepage
 - ✅ Tabelle: `benutzer` (id, vorname, nachname, email, passwort, role)
 - ✅ Tabelle: `reservations` (mit allen Buchungs- und Zahlungsfeldern)
 
----
 
-## Gemeinsame/Geteilte Komponenten
-
-### Beide Personen haben beigetragen zu:
-
-#### 1. **BookingController**
-- **Person 1:** Liegeplatz-spezifische Methoden + Boot-spezifische Methoden
-- **Person 2:** -
-
-#### 2. **booking-view.php**
-- **Person 1:** Rechte Seite (Liegeplatz-Auswahl) + Linke Seite (Boot-Auswahl)
-- **Person 2:** -
-
-#### 3. **ReservationModel & ItemModel Integration**
-- Beide Models arbeiten zusammen für Verfügbarkeitsabfragen
-
----
+  ---
 
 ## Technologie-Stack (von beiden verwendet)
 
@@ -217,29 +203,16 @@ Entwicklung des Authentifizierungssystems, Admin-Funktionen und Homepage
 - **Session-Management:** CodeIgniter Session Library
 
 ---
-## Zusammenfassung
-
-| Aspekt | Person 1 | Person 2 |
-|--------|----------|----------|
-| **Hauptfokus** | Liegeplatzverwaltung & Inventar & Boots-Buchungssystem & Zahlungen | Benutzer & Homepage & Admin-Panel |
-| **Controllers** | Booking (Liegeplätze + Boote), Home (Zahlungen) | Login, Registration, Home (Buchungsverwaltung) |
-| **Models** | ItemModel | UserModel, ReservationModel |
-| **Views** | booking-view (komplett), payment-view, creditcard-view | login, register, my-bookings, all-bookings, welcome_message |
-| **Features** | Liegeplatz-Hafenplan, Boot-Katalog, Verfügbarkeit, Weather, Zahlungssystem | Auth, Admin-Panel, Homepage |
-| **Sicherheit** | - | Filter (Auth, Admin, Worker) |
-| **Zeilen Code (ca.)** | ~1500-1800 | ~1000-1200 |
-
----
 
 ## Arbeitsweise
 
-### Person 1: Bottom-Up Ansatz
+### Leon Teppler
 1. Datenbank-Design (Items-Tabelle)
 2. Model-Entwicklung (ItemModel)
 3. Controller-Logik (Liegeplatz-Buchungen + Boots-Buchungen)
 4. Frontend-Integration (Hafenplan-Interface + Boot-Katalog)
 
-### Person 2: Top-Down Ansatz
+### Alexandr Korostin
 1. Benutzer-Story definiert (Login/Register)
 2. Authentifizierung implementiert
 3. Zahlungssystem entwickelt
